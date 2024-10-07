@@ -27,14 +27,13 @@ const Page = () => {
   const handleSubmit = async(slug,password) => {
       let result = false
       let user = {
-        slug: slug,
         password: password
       }
 
       axios.defaults.headers = {
         Authorization: auth.token
       }
-      await axios.post(host + "/admin/auth/password", user)
+      await axios.post(host + "/wholesale/auth/password", user)
         .then(res => {
           setMessage(res.data.message)
           setFlag("success")

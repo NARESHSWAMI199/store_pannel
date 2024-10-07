@@ -51,7 +51,7 @@ const createItem = () => {
             axios.defaults.headers = {
                 Authorization: auth.token
             }
-            await axios.get(host + "/admin/item/detail/"+slug,)
+            await axios.get(host + "/wholesale/item/detail/"+slug,)
                 .then(res => {
                     const data = res.data.res;
                     setValues(data)
@@ -98,7 +98,7 @@ const createItem = () => {
                 Authorization: auth.token,
                 "Content-Type" : "multipart/form-data"
             }
-            axios.post(host + "/admin/item/update", item)
+            axios.post(host + "/wholesale/item/update", item)
                 .then(res => {
                     setMessage(res.data.message)
                     setFlag("success")

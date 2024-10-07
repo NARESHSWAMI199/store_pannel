@@ -85,7 +85,8 @@ const Page = () => {
                     setItems(data);
                 })
                 .catch(err => {
-                    setMessage(err.message)
+                    setMessage(!!err.response ? err.response.data.message : err.message)
+                    setFlag("error")
                     setOpen(true)
                 })
         }
@@ -109,13 +110,14 @@ const Page = () => {
         }).then(res => {
             setMessage(res.data.message)
             setFlag("success")
+            setOpen(true)
         })
             .catch(err => {
+                setMessage(!!err.response ? err.response.data.message : err.message)
                 setFlag("error")
-                console.log(err)
-                setMessage(err.response.data.message)
+                setOpen(true)
             })
-        setOpen(true)
+
         return success;
     }
 
@@ -142,23 +144,6 @@ const Page = () => {
                 }
                 setOpen(true)
             }).catch(err => {
-                console.log(err)
-            })
-    }
-
-
-    const onDeleteStore = (slug) => {
-        axios.defaults.headers = {
-            Authorization: auth.token
-        }
-        axios.get(host + `/admin/store/delete/${slug}`)
-            .then(res => {
-                setFlag("success")
-                setMessage(res.data.message)
-                setOpen(true)
-                router.push('/wholesalers');
-            }).catch(err => {
-                console.log(err)
                 setMessage(!!err.response ? err.response.data.message : err.message)
                 setFlag("error")
                 setOpen(true)
@@ -177,7 +162,7 @@ const Page = () => {
                 setOpen(true)
             }).catch(err => {
                 console.log(err)
-                setMessage(err.message)
+                setMessage(!!err.respone ? err.response.data.message : err.message)
                 setFlag("error")
                 setOpen(true)
             })
