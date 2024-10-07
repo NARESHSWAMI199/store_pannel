@@ -84,10 +84,12 @@ const handlers = {
   },
   [HANDLERS.UPDATE_USER]: (state,action) => {
     const user = action.payload;
+    const store = action.store
     return {
       ...state,
       isAuthenticated: false,
-      user
+      user,
+      store
     };
   }
 
@@ -174,18 +176,21 @@ export const AuthProvider = (props) => {
       })
   };
 
-    const updateUserDetail = async (slug) => {
+    const updateUserDetail = async () => {
       axios.defaults.headers = {
         Authorization : initialState.token
       }
-      await axios.get(host+"/admin/auth/detail/"+slug)
+      await axios.get(host+"/wholesale/auth/detail/")
       .then (res => {
-        const user = res.data.res
+        const user = res.data.user
         window.sessionStorage.setItem("user",JSON.stringify(user))
+        const store = res.data.store
+        window.sessionStorage.setItem("store",JSON.stringify(store))
 
         dispatch({
           type: HANDLERS.UPDATE_USER,
-          payload : user
+          payload : user,
+          store :store
         });
       })
       .catch (err =>{ 
@@ -197,6 +202,7 @@ export const AuthProvider = (props) => {
 
 
 
+
   const signUp = async (email, name, password) => {
     throw new Error('Sign up is not implemented');
   };
@@ -204,6 +210,7 @@ export const AuthProvider = (props) => {
   const signOut = () => {
     window.sessionStorage.removeItem('authenticated');
     window.sessionStorage.removeItem('user');
+    window.sessionStorage.removeItem('store');
     dispatch({
       type: HANDLERS.SIGN_OUT
     });

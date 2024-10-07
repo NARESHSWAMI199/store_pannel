@@ -333,7 +333,7 @@ export const ItemsTable = (props) => {
 
                     <Link
                             href={{
-                              pathname: '/item/comments/[slug]',
+                              pathname: '/items/comments/[slug]',
                               query: { slug: item.slug },
                             }}
                           >
@@ -349,7 +349,7 @@ export const ItemsTable = (props) => {
 
                       <Link
                             href={{
-                              pathname: '/item/update/[slug]',
+                              pathname: '/items/update/[slug]',
                               query: { slug: item.slug },
                             }}
                           >

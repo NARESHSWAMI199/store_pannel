@@ -90,6 +90,40 @@ export const OverviewBox = (props) => {
 
 
 <Box style={{display : 'flex', flexWrap : 'wrap'}}>
+
+
+
+  
+<Stack
+            // alignItems="left"
+            direction="row"
+            spacing={1}
+            sx={{ flex : "1 1 50%" ,mt:2 }}
+          >
+                <SvgIcon
+                color='success'
+                fontSize="small"
+              >
+                <ShowChartIcon />
+              </SvgIcon>
+              <Typography
+                color='success.main'
+                variant="body2"
+                sx={{
+                  fontWeight:'bold'
+                }}
+              >
+                {value.inStock}
+              </Typography>
+              <Typography
+                color='text.secondary'
+                variant="caption"
+              >
+                IN STOCK
+              </Typography>
+          </Stack>
+
+
         <Stack
               // alignItems="RIGHT"
               direction="row"
@@ -119,18 +153,18 @@ export const OverviewBox = (props) => {
               </Typography>
             </Stack>
 
-  
-          <Stack
+
+         <Stack
             // alignItems="left"
             direction="row"
             spacing={1}
-            sx={{ flex : "1 1 50%" ,mt:2 }}
+            sx={{ flex :  "1 1 50%", mt:0.5  }}
           >
                 <SvgIcon
                 color='error'
                 fontSize="small"
               >
-                <ShowChartIcon />
+                <DevicesFoldIcon />
               </SvgIcon>
               <Typography
                 color='error.main'
@@ -139,13 +173,13 @@ export const OverviewBox = (props) => {
                   fontWeight:'bold'
                 }}
               >
-                {value.inStock}
+                {value.outStock}
               </Typography>
               <Typography
                 color='text.secondary'
                 variant="caption"
               >
-                IN STOCK
+                OUT OF STOCK
               </Typography>
           </Stack>
 
@@ -178,34 +212,7 @@ export const OverviewBox = (props) => {
               </Typography>
           </Stack>
    
-          <Stack
-            // alignItems="left"
-            direction="row"
-            spacing={1}
-            sx={{ flex :  "1 1 50%", mt:0.5  }}
-          >
-                <SvgIcon
-                color='error'
-                fontSize="small"
-              >
-                <DevicesFoldIcon />
-              </SvgIcon>
-              <Typography
-                color='error.main'
-                variant="body2"
-                sx={{
-                  fontWeight:'bold'
-                }}
-              >
-                {value.outStock}
-              </Typography>
-              <Typography
-                color='text.secondary'
-                variant="caption"
-              >
-                OUT OF STOCK
-              </Typography>
-          </Stack>
+
           </Box>
       </CardContent>
     </Card>
