@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { Avatar, Card, CardContent, Stack, SvgIcon, Typography } from '@mui/material';
+import { Avatar, Box, Card, CardContent, Grid, Stack, SvgIcon, Typography } from '@mui/material';
 import { PeopleOutline } from '@mui/icons-material';
 import LocalGroceryStoreIcon from '@mui/icons-material/LocalGroceryStore';
 import StoreIcon from '@mui/icons-material/Store';
@@ -12,7 +12,7 @@ import DevicesFoldIcon from '@mui/icons-material/DevicesFold';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 
-export const OverviewUsers = (props) => {
+export const OverviewBox = (props) => {
   const { sx, title } = props;
   const [value, setValue] = useState(props.value)
   const [tag,setTag] = useState('success.main')
@@ -88,11 +88,13 @@ export const OverviewUsers = (props) => {
         </Stack>
 
 
+
+<Box style={{display : 'flex', flexWrap : 'wrap'}}>
         <Stack
-              alignItems="RIGHT"
+              // alignItems="RIGHT"
               direction="row"
               spacing={1}
-              sx={{ mt: 2 }}
+              sx={{ flex :  "1 1 50%",mt:2 }}
             >
               <SvgIcon
                 color='success'
@@ -117,11 +119,41 @@ export const OverviewUsers = (props) => {
               </Typography>
             </Stack>
 
+  
           <Stack
-            alignItems="left"
+            // alignItems="left"
             direction="row"
             spacing={1}
-            sx={{ mt: 0.5}}
+            sx={{ flex : "1 1 50%" ,mt:2 }}
+          >
+                <SvgIcon
+                color='error'
+                fontSize="small"
+              >
+                <ShowChartIcon />
+              </SvgIcon>
+              <Typography
+                color='error.main'
+                variant="body2"
+                sx={{
+                  fontWeight:'bold'
+                }}
+              >
+                {value.inStock}
+              </Typography>
+              <Typography
+                color='text.secondary'
+                variant="caption"
+              >
+                IN STOCK
+              </Typography>
+          </Stack>
+
+          <Stack
+            // alignItems="left"
+            direction="row"
+            spacing={1}
+            sx={{ flex :  "1 1 50%" ,mt:0.5 }}
           >
                 <SvgIcon
                 color='error'
@@ -145,12 +177,42 @@ export const OverviewUsers = (props) => {
                 DEACTIVE
               </Typography>
           </Stack>
+   
+          <Stack
+            // alignItems="left"
+            direction="row"
+            spacing={1}
+            sx={{ flex :  "1 1 50%", mt:0.5  }}
+          >
+                <SvgIcon
+                color='error'
+                fontSize="small"
+              >
+                <DevicesFoldIcon />
+              </SvgIcon>
+              <Typography
+                color='error.main'
+                variant="body2"
+                sx={{
+                  fontWeight:'bold'
+                }}
+              >
+                {value.outStock}
+              </Typography>
+              <Typography
+                color='text.secondary'
+                variant="caption"
+              >
+                OUT OF STOCK
+              </Typography>
+          </Stack>
+          </Box>
       </CardContent>
     </Card>
   );
 };
 
-OverviewUsers.prototypes = {
+OverviewBox.prototypes = {
   sx: PropTypes.object,
   value: PropTypes.string.isRequired
 };

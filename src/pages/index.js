@@ -2,7 +2,7 @@ import Head from 'next/head';
 import { subDays, subHours } from 'date-fns';
 import { Box, Container, Unstable_Grid2 as Grid, Link } from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
-import {OverviewUsers } from 'src/sections/overview/overview-users';
+import {OverviewBox } from 'src/sections/overview/overview-users';
 import { OverviewLatestItems } from 'src/sections/overview/overview-latest-products';
 import { OverviewItems } from 'src/sections/overview/overview-sales';
 import { OverviewTraffic } from 'src/sections/overview/overview-traffic';
@@ -153,7 +153,7 @@ useEffect( ()=>{
             sm={6}
             lg={ 4}
           >
-           <Link href="/items" sx={{textDecoration:'none'}} > <OverviewUsers
+           <Link href="/items" sx={{textDecoration:'none'}} > <OverviewBox
               title="ITEMS"
               sx={{ height: '100%' }}
               value={dashboardData.items}
@@ -168,7 +168,7 @@ useEffect( ()=>{
           >
           <Link sx={{
             textDecoration:'none'
-           }}href="/items/label/N" > <OverviewUsers
+           }}href="/items/label/N" > <OverviewBox
                title="NEW ITEMS"
               sx={{ height: '100%' }}
               value={dashboardData.newItems}
@@ -176,54 +176,58 @@ useEffect( ()=>{
           </Grid>
 
 
-            <Grid
+          <Grid
               xs={12}
               sm={6}
-              lg={ 4}
+              lg={4}
             >
             <Link sx={{
               textDecoration:'none'
-            }} href="/items/label/O" >  <OverviewUsers
+            }} href="/items/label/O" >  <OverviewBox
                 title="OLD ITEMS"
                 sx={{ height: '100%' }}
                 value={dashboardData.oldItems}
               /> </Link>
             </Grid>
+
+          <Grid
+            xs={12}
+            md={6}
+            lg={4}
+          >
+            <OverviewTraffic
+              chartSeries={[
+                getPercentage(dashboardData.newItems.all, dashboardData.items.all), 
+                getPercentage(dashboardData.oldItems.all, dashboardData.items.all), 
+              ]}
+              title = "Items Labels Detail"
+              labels={['New Items', 'Old Items']}
+              sx={{ height: '100%' }}
+            />
+          </Grid>
+
+          <Grid
+            xs={12}
+            md={6}
+            lg={4}
+          >
+            <StockTraffic
+              chartSeries={[
+                getPercentage(dashboardData.inStock.all, dashboardData.items.all), 
+                getPercentage(dashboardData.outStock.all, dashboardData.items.all), 
+              ]}
+              title = "Items Stock Detail"
+              labels={['In stock', 'Out of stock']}
+              sx={{ height: '100%' }}
+            />
+          </Grid>
+
+
+
           
           <Grid
             xs={12}
-            sm={6}
-            lg={ 4}
-          >
-          <Link sx={{
-            textDecoration:'none'
-           }} href="/items/stock/Y"  >  <OverviewUsers
-              title='IN STOCK'
-              sx={{ height: '100%' }}
-              value={dashboardData.inStock}
-            /> </Link>
-          </Grid>
-
-
-          <Grid
-            xs={12}
-            sm={6}
-            lg={ 4}
-          >
-          <Link sx={{
-            textDecoration:'none'
-           }} href="/items/stock/N" >  <OverviewUsers
-              title='OUT OF STOCK'
-              sx={{ height: '100%' }}
-              value={dashboardData.outStock}
-            /> </Link>
-          </Grid>
-
-
-
-          <Grid
-            xs={12}
-            lg={12}
+            lg={8}
           >
             <OverviewItems
               chartSeries={[
@@ -240,6 +244,10 @@ useEffect( ()=>{
               sx={{ height: '100%' }}
             />
           </Grid>
+       
+
+
+      
 
 
 
@@ -278,35 +286,7 @@ useEffect( ()=>{
             />
           </Grid>*/}
 
-          <Grid
-            xs={12}
-            md={6}
-            lg={4}
-          >
-            <OverviewTraffic
-              chartSeries={[
-                getPercentage(dashboardData.newItems.all, dashboardData.items.all), 
-                getPercentage(dashboardData.oldItems.all, dashboardData.items.all), 
-              ]}
-              labels={['New Items', 'Old Items']}
-              sx={{ height: '100%' }}
-            />
-          </Grid>
 
-          <Grid
-            xs={12}
-            md={6}
-            lg={4}
-          >
-            <StockTraffic
-              chartSeries={[
-                getPercentage(dashboardData.inStock.all, dashboardData.items.all), 
-                getPercentage(dashboardData.outStock.all, dashboardData.items.all), 
-              ]}
-              labels={['In stock', 'Out of stock']}
-              sx={{ height: '100%' }}
-            />
-          </Grid>
 
 
 

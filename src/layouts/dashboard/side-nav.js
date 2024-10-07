@@ -22,6 +22,7 @@ import { useAuth } from 'src/hooks/use-auth';
 import { WorkspacePremium } from '@mui/icons-material';
 import { useEffect, useState } from 'react';
 import { ArrowButtons } from '../arrow-button';
+import { toTitleCase } from 'src/utils/util';
 
 export const SideNav = (props) => {
   const { open, onClose } = props;
@@ -96,13 +97,13 @@ export const SideNav = (props) => {
                 color="inherit"
                 variant="subtitle1"
               >
-                Swami Sales
+                {toTitleCase(auth.store.storeName)}
               </Typography>
               <Typography
                 color="neutral.400"
                 variant="body2"
               >
-                Admin pannel
+                Wholesale panel
               </Typography>
             </div>
             </Link>
