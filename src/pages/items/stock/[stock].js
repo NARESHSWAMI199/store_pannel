@@ -147,6 +147,7 @@ const Page = () => {
                     setMessage("Successfully removed from stock.")
                 }
                 setOpen(true)
+                setItems((items) => items.filter(item => item.slug != slug));
             }).catch(err => {
                 console.log(err)
             })
@@ -257,7 +258,7 @@ const Page = () => {
                             <div>
                                 <Link
                                     href={{
-                                        pathname: '/item/create',
+                                        pathname: '/items/create',
                                     }}>
                                     <Button
                                         startIcon={(

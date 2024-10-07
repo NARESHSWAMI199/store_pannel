@@ -91,7 +91,7 @@ const useChartOptions = (categories) => {
   };
 };
 
-export const OverviewStores = (props) => {
+export const OverviewItems = (props) => {
   const { chartSeries, sx , categories } = props;
   const chartOptions = useChartOptions(categories);
 
@@ -140,7 +140,7 @@ export const OverviewStores = (props) => {
   );
 };
 
-OverviewStores.protoTypes = {
+OverviewItems.protoTypes = {
   chartSeries: PropTypes.array.isRequired,
   sx: PropTypes.object
 };

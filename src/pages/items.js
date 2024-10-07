@@ -269,7 +269,7 @@ const Page = () => {
                             <div>
                                 <Link
                                     href={{
-                                        pathname: '/item/create/[slug]/[us]',
+                                        pathname: '/items/create/',
                                         query: {
                                             slug: wholesale.slug,
                                             us: userSlug

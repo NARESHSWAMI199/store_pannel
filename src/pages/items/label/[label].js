@@ -62,7 +62,7 @@ const Page = () => {
     const itemSlugs = useitemSlugs(items);
     const itemsSelection = useSelection(itemSlugs);
     const [totalElements, setTotalElements] = useState(0)
-    const [wholesale, setWholesale] = useState(auth.store)
+    const wholesale = auth.store
     
     
     const [data, setData] = useState({
@@ -215,7 +215,7 @@ const Page = () => {
             </Snackbar>
             <Head>
                 <title>
-                    {toTitleCase(wholesale.storeName)} | Swami Sales
+                    { toTitleCase(wholesale.storeName)} | Swami Sales
                 </title>
             </Head>
             <Box
@@ -257,7 +257,7 @@ const Page = () => {
                             <div>
                                 <Link
                                     href={{
-                                        pathname: '/item/create/[label]',
+                                        pathname: '/items/create/',
                                         query: {
                                             label : label
                                         },

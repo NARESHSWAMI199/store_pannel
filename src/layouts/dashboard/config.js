@@ -92,8 +92,8 @@ export const items = (user) =>{
     },
   
     {
-      title: 'Add User',
-      path: '/users/create/R',
+      title: 'Add Item',
+      path: '/items/create',
       show : true,
       icon: (
         <SvgIcon fontSize="small">
@@ -103,7 +103,7 @@ export const items = (user) =>{
     },
 
     {
-      title: 'Groups',
+      title: 'Permissions',
       path: '/groups',
       show : !!user ? user.userType == 'SA' : false,
       icon: (

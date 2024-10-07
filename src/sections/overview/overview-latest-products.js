@@ -17,14 +17,14 @@ import {
   ListItemText,
   SvgIcon
 } from '@mui/material';
-import { storeImage, toTitleCase } from 'src/utils/util';
+import { itemImage, storeImage, toTitleCase } from 'src/utils/util';
 
-export const OverviewLatestStores = (props) => {
+export const OverviewLatestItems = (props) => {
   const { products = [], sx } = props;
 
   return (
     <Card sx={sx}>
-      <CardHeader title="Latest Stores" />
+      <CardHeader title="Latest Items" />
       <List>
         {products.map((product, index) => {
           const hasDivider = index < products.length - 1;
@@ -41,7 +41,7 @@ export const OverviewLatestStores = (props) => {
                     ? (
                       <Box
                         component="img"
-                        src={storeImage+product.slug+"/"+product.avtar}
+                        src={itemImage+product.slug+"/"+product.avtar}
                         sx={{
                           borderRadius: 1,
                           height: 48,
@@ -62,7 +62,7 @@ export const OverviewLatestStores = (props) => {
                 }
               </ListItemAvatar>
               <ListItemText
-                primary={toTitleCase(product.storeName)}
+                primary={toTitleCase(product.name)}
                 primaryTypographyProps={{ variant: 'subtitle1' }}
                 secondary={`Updated ${ago} ago`}
                 secondaryTypographyProps={{ variant: 'body2' }}
@@ -79,7 +79,8 @@ export const OverviewLatestStores = (props) => {
       <Divider />
       <CardActions sx={{ justifyContent: 'flex-end' }}>
         <Link
-          href="/stores" >
+          href="/items" style={{textDecoration : 'none'}}>
+            
         <Button
           color="inherit"
           endIcon={(
@@ -98,7 +99,7 @@ export const OverviewLatestStores = (props) => {
   );
 };
 
-OverviewLatestStores.propTypes = {
+OverviewLatestItems.propTypes = {
   products: PropTypes.array,
   sx: PropTypes.object
 };

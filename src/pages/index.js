@@ -3,9 +3,8 @@ import { subDays, subHours } from 'date-fns';
 import { Box, Container, Unstable_Grid2 as Grid, Link } from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import {OverviewUsers } from 'src/sections/overview/overview-users';
-import { OverviewLatestUsers } from 'src/sections/overview/overview-latest-orders';
-import { OverviewLatestStores } from 'src/sections/overview/overview-latest-products';
-import { OverviewStores } from 'src/sections/overview/overview-sales';
+import { OverviewLatestItems } from 'src/sections/overview/overview-latest-products';
+import { OverviewItems } from 'src/sections/overview/overview-sales';
 import { OverviewTraffic } from 'src/sections/overview/overview-traffic';
 import { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
@@ -21,7 +20,7 @@ import { StockTraffic } from 'src/sections/overview/stock-traffic';
 const now = new Date();
 
 const Page = (props) =>  {
-const [wholesales,setWholesales] = useState([])
+
 const [users,setAllUsers] = useState([])
 const [currentYearDataMonths, setCurrentYearDataMonths] = useState([])
 const [lastYearDataMonths, setLastYearDataMonths] = useState([])
@@ -33,6 +32,7 @@ const [dashboardData,setDashboardData] = useState({
   inStock : {},
   outStock : {}
 })    
+const [items,setItems] = useState([])
 const currentYear = new Date().getFullYear();
 const auth = useAuth()
 const user = auth.user
@@ -45,10 +45,10 @@ useEffect( ()=>{
       axios.defaults.headers = {
         Authorization : auth.token
       }
-      await axios.post(host+"/admin/store/all",{})
+      await axios.post(host+"/wholesale/item/all",{storeId : auth.store.id})
       .then(res => {
           const data = res.data.content;
-          setWholesales(data);
+          setItems(data);
       })
       .catch(err => {
         console.log(err)
@@ -63,7 +63,7 @@ useEffect( ()=>{
       axios.defaults.headers = {
         Authorization: auth.token
       }
-        axios.post(host + "/admin/dashboard/graph/months/", {
+        axios.post(host + "/wholesale/dashboard/graph/months/", {
           "year": currentYear
         })
         .then(res => {
@@ -90,7 +90,7 @@ useEffect( ()=>{
     axios.defaults.headers = {
       Authorization: auth.token
     }
-    axios.post(host + "/admin/dashboard/graph/months/", {
+    axios.post(host + "/wholesale/dashboard/graph/months/", {
       "year": currentYear-1
     })
       .then(res => {
@@ -113,7 +113,7 @@ useEffect( ()=>{
       axios.defaults.headers = {
         Authorization : auth.token
       }
-      await axios.get(host +"/wholesaler/dashboard/counts")
+      await axios.get(host +"/wholesale/dashboard/counts")
       .then(res => {
           const data = res.data;
           setDashboardData(data)
@@ -125,31 +125,6 @@ useEffect( ()=>{
     getData();
 
   },[])
-
-
-
-// All users 
-
-
-// Getting All Stores 
-useEffect( ()=>{
-  const getData = async () => {
-    axios.defaults.headers = {
-      Authorization : auth.token
-    }
-    await axios.post(host+"/admin/auth/A/all",{})
-    .then(res => {
-        const data = res.data.content;
-        setAllUsers(data);
-    })
-    .catch(err => {
-      console.log(err)
-    } )
-  }
-  getData();
-
-},[])
-
 
 
   const getPercentage = useCallback((currentCount,totalCount) =>{
@@ -193,7 +168,7 @@ useEffect( ()=>{
           >
           <Link sx={{
             textDecoration:'none'
-           }} href="/customers" > <OverviewUsers
+           }}href="/items/label/N" > <OverviewUsers
                title="NEW ITEMS"
               sx={{ height: '100%' }}
               value={dashboardData.newItems}
@@ -208,16 +183,13 @@ useEffect( ()=>{
             >
             <Link sx={{
               textDecoration:'none'
-            }} href="/wholesalers" >  <OverviewUsers
+            }} href="/items/label/O" >  <OverviewUsers
                 title="OLD ITEMS"
                 sx={{ height: '100%' }}
                 value={dashboardData.oldItems}
               /> </Link>
             </Grid>
           
-
-
-
           <Grid
             xs={12}
             sm={6}
@@ -225,32 +197,35 @@ useEffect( ()=>{
           >
           <Link sx={{
             textDecoration:'none'
-           }} href="/users/SA" >  <OverviewUsers
-              title='OUT OF STOCK'
-              sx={{ height: '100%' }}
-              value={dashboardData.outStock}
-            /> </Link>
-          </Grid>
-
-          <Grid
-            xs={12}
-            sm={6}
-            lg={ 4}
-          >
-          <Link sx={{
-            textDecoration:'none'
-           }} href="/staffs" >  <OverviewUsers
+           }} href="/items/stock/Y"  >  <OverviewUsers
               title='IN STOCK'
               sx={{ height: '100%' }}
               value={dashboardData.inStock}
             /> </Link>
           </Grid>
 
+
+          <Grid
+            xs={12}
+            sm={6}
+            lg={ 4}
+          >
+          <Link sx={{
+            textDecoration:'none'
+           }} href="/items/stock/N" >  <OverviewUsers
+              title='OUT OF STOCK'
+              sx={{ height: '100%' }}
+              value={dashboardData.outStock}
+            /> </Link>
+          </Grid>
+
+
+
           <Grid
             xs={12}
             lg={12}
           >
-            <OverviewStores
+            <OverviewItems
               chartSeries={[
                 {
                   name: 'This year',
@@ -312,8 +287,6 @@ useEffect( ()=>{
               chartSeries={[
                 getPercentage(dashboardData.newItems.all, dashboardData.items.all), 
                 getPercentage(dashboardData.oldItems.all, dashboardData.items.all), 
-                //getPercentage(dashboardData.inStock.all, dashboardData.items.all), 
-                //getPercentage(dashboardData.outStock.all, dashboardData.items.all), 
               ]}
               labels={['New Items', 'Old Items']}
               sx={{ height: '100%' }}
@@ -342,12 +315,12 @@ useEffect( ()=>{
             md={6}
             lg={4}
           >
-         <OverviewLatestStores
-              products = {wholesales }
+         <OverviewLatestItems
+              products = {items }
               sx={{ height: '100%' }}
             />
           </Grid>
-          <Grid
+          {/* <Grid
             xs={12}
             md={12}
             lg={8}
@@ -356,7 +329,7 @@ useEffect( ()=>{
               users={users}
               sx={{ height: '100%' }}
             />
-          </Grid>
+          </Grid> */}
         </Grid>
       </Container>
     </Box>
