@@ -1,14 +1,14 @@
 {
-  "name": "material-kit-react",
+  "name": "wholesale-panel",
   "version": "3.0.0",
-  "author": "Devias",
+  "author": "Naresh",
   "licence": "MIT",
-  "homepage": "https://devias.io",
+  "homepage": "",
   "private": false,
   "scripts": {
-    "dev": "next",
+    "dev": "next -p 3001",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 3001",
     "export": "next export",
     "lint": "next lint",
     "lint-fix": "next lint --fix"
