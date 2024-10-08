@@ -44,7 +44,14 @@ import ImageInput from "src/sections/image-input";
     const router = useRouter()
     const { createUserType } = router.query
     const [userType,setUserType] = useState(createUserType)
-    const [values,setValues] = useState({...store, ...user,city : store.address.city, state : store.address.state,storeEmail : store.email ,storePhone : store.phone})
+    const [values,setValues] = useState({...store, ...user,
+      city : store.address.city, 
+      state : store.address.state,
+      street : store.address.street,
+      zipCode : store.address.zipCode,
+      storeEmail : store.email,
+      storePhone : store.phone
+    })
     const [groups,setGroups] = useState([])
     const [assignGroup , setAssignGroup] = useState([])
     const [data,setData] = useState({
@@ -56,9 +63,14 @@ import ImageInput from "src/sections/image-input";
         axios.defaults.headers={
             Authorization : auth.token
         }
-        axios.get(host+"/admin/address/state")
+        axios.get(host+"/wholesale/address/state")
         .then(res=>setStateList(res.data))
-        .catch(err=>console.log(err))
+        .catch(err=>{
+          console.log(err)
+          setMessage(!!err.response ? err.response.data.message : err.message)
+          setFlag("error")
+          setOpen(true)
+        })
     },[])
 
 
@@ -67,11 +79,16 @@ import ImageInput from "src/sections/image-input";
       axios.defaults.headers={
         Authorization : auth.token
       }
-      axios.get(host+`/admin/address/city/${selectedState}`)
+      axios.get(host+`/wholesale/address/city/${selectedState}`)
       .then(res=>{
           setCityList(res.data)}
           )
-      .catch(err=>console.log(err))
+      .catch(err=>{
+        console.log(err)
+        setMessage(!!err.response ? err.response.data.message : err.message)
+        setFlag("error")
+        setOpen(true)
+      })
     },[selectedState])
 
 
@@ -110,6 +127,8 @@ import ImageInput from "src/sections/image-input";
             storePhone : formData.get("storePhone"),
             state:  formData.get("state"),
             city :  formData.get("city"),
+            street:  formData.get("street"),
+            zipCode :  formData.get("zipCode"),
             storeName :  formData.get("storeName")
           }
 
@@ -195,11 +214,51 @@ import ImageInput from "src/sections/image-input";
                             name="storeName"
                             onChange={handleChange}
                             required
+                            minRows={4}
                             value={values.storeName}
                             InputLabelProps={{shrink : true}}
                           />
           
                         </Grid>
+
+
+
+                        <Grid
+                          xs={12}
+                          md={6}
+                        >
+                          <TextField
+                            fullWidth
+                            label="Street Address"
+                            name="street"
+                            onChange={handleChange}
+                            required
+                            value={values.street}
+                            InputLabelProps={{shrink : true}}
+                          />
+          
+                        </Grid>
+
+
+                        <Grid
+                          xs={12}
+                          md={6}
+                        >
+                          <TextField
+                            fullWidth
+                            label="Zip Code"
+                            name="zipCode"
+                            type="number"
+                            onChange={handleChange}
+                            required
+                            InputProps={{ maxLength: 6 }}
+                            value={values.zipCode}
+                            InputLabelProps={{shrink : true}}
+                          />
+          
+                        </Grid>
+
+
 
                         {/* address */}
 

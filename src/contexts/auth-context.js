@@ -180,7 +180,7 @@ export const AuthProvider = (props) => {
       axios.defaults.headers = {
         Authorization : initialState.token
       }
-      await axios.get(host+"/wholesale/auth/detail/")
+      await axios.get(host+"/wholesale/auth/detail")
       .then (res => {
         const user = res.data.user
         window.sessionStorage.setItem("user",JSON.stringify(user))
