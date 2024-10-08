@@ -97,7 +97,7 @@ export const SideNav = (props) => {
                 color="inherit"
                 variant="subtitle1"
               >
-                {toTitleCase(auth.store.storeName)}
+                {toTitleCase(!!auth.store && auth.store.storeName)}
               </Typography>
               <Typography
                 color="neutral.400"
