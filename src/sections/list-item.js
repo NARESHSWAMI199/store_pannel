@@ -43,7 +43,7 @@ export default function AlignItemsList(props) {
               {" ~ " +item.messageBody.substring(0,60)+".."} 
               <Link href="/" > Read more..</Link>
               </>
-              : item.messageBody}
+              : " ~ " +item.messageBody}
             </Fragment>
           }
         />
