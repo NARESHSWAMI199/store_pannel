@@ -1,32 +1,18 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Head from 'next/head';
-import ArrowDownOnSquareIcon from '@heroicons/react/24/solid/ArrowDownOnSquareIcon';
-import ArrowUpOnSquareIcon from '@heroicons/react/24/solid/ArrowUpOnSquareIcon';
-import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
 import {  Alert, Box, Button, Card, CardActions, CardContent, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, Link, MenuItem, Rating, Snackbar, Stack, SvgIcon, Typography, useMediaQuery } from '@mui/material';
-import { useSelection } from 'src/hooks/use-selection';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
-import { CustomersTable } from 'src/sections/customer/customers-table';
-import { BasicSearch, CustomersSearch } from 'src/sections/basic-search';
-import { applyPagination } from 'src/utils/apply-pagination';
 import axios from 'axios';
 import { host, itemImage, toTitleCase } from 'src/utils/util';
 import { useAuth } from 'src/hooks/use-auth';
-import { CustomerHeaders } from 'src/sections/customer/customers-header';
-import { StoresCard } from 'src/sections/wholesale/stores-table';
 import { Divider, Image } from 'antd';
-import { ArrowLeftIcon, ArrowRightIcon } from '@mui/x-date-pickers';
 import { useRouter } from 'next/router';
 import { CurrencyRupee, Discount, DiscountOutlined, EditOutlined, KeyOutlined } from '@mui/icons-material';
-import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import KeyIcon from '@mui/icons-material/Key';
-import PersonIcon from '@mui/icons-material/Person';
 import { format } from 'date-fns';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { OptionMenu } from 'src/layouts/option-menu';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { ArrowButtons } from 'src/layouts/arrow-button';
+
 
 
 const now = new Date();
@@ -69,7 +55,7 @@ const Page = () => {
         axios.defaults.headers = {
             Authorization: auth.token
         }
-        await axios.get(host + "/admin/item/detail/"+slug,)
+        await axios.get(host + "/wholesale/item/detail/"+slug,)
             .then(res => {
                 const result = res.data.res;
                 setItem(result)
@@ -91,7 +77,7 @@ useEffect( ()=>{
        axios.defaults.headers = {
          Authorization : auth.token
        }
-       await axios.post(host+"/admin/item/comments/all",data)
+       await axios.post(host+"/wholesale/item/comments/all",data)
        .then(res => {
           const data = res.data;
            setComments(data);
@@ -257,7 +243,7 @@ useEffect( ()=>{
                   </Grid>
               <Grid xs={2} md={2}>
                   <Typography style={{float:'right'}}>
-                    <Link href={"/item/update/"+slug}
+                    <Link href={"/items/update/"+slug}
                       style={{ textDecoration : 'none', color:'#6C737F'}}
                     >
                       <EditOutlined />

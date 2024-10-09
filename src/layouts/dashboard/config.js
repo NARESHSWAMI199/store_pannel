@@ -13,6 +13,7 @@ import SecurityIcon from '@mui/icons-material/Security';
 import BadgeIcon from '@mui/icons-material/Badge';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import { suId } from 'src/utils/util';
+import BlockIcon from '@mui/icons-material/Block';
 export const items = (user) =>{
 
   return [
@@ -101,14 +102,16 @@ export const items = (user) =>{
         </SvgIcon>
       )
     },
+    
 
+      
     {
-      title: 'Permissions',
-      path: '/groups',
-      show : !!user ? user.userType == 'SA' : false,
+      title: 'Blocked Items',
+      path: '/blocked',
+      show : true,
       icon: (
         <SvgIcon fontSize="small">
-          <SecurityIcon />
+          <BlockIcon />
         </SvgIcon>
       )
     },

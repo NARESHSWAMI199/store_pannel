@@ -24,13 +24,9 @@ import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "src/hooks/use-auth";
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { host, itemImage } from "src/utils/util";
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormGroup from '@mui/material/FormGroup';
 import { useRouter } from "next/router";
-import { redirect } from "next/navigation";
 import ImageInput from "src/sections/image-input";
 import RefreshIcon from '@mui/icons-material/Refresh';
-import { ArrowButtons } from "src/layouts/arrow-button";
 
 
 const createItem = () => {
@@ -41,6 +37,7 @@ const createItem = () => {
     const [open, setOpen] = useState(false)
     const [message, setMessage] = useState("")
     const [flag, setFlag] = useState("success")
+    const [categories,setItemCategories] = useState([])
 
     const auth = useAuth()
     const [values, setValues] = useState({})
@@ -54,7 +51,28 @@ const createItem = () => {
             await axios.get(host + "/wholesale/item/detail/"+slug,)
                 .then(res => {
                     const data = res.data.res;
-                    setValues(data)
+                    setValues({...data,category : data.itemCategory.id})
+                })
+                .catch(err => {
+                    setMessage(!!err.response ? err.response.data.message : err.message)
+                    setFlag('error')
+                    setOpen(true)
+                })
+        }
+        getData();
+
+    }, [])
+
+
+    useEffect(() => {
+        const getData = async () => {
+            axios.defaults.headers = {
+                Authorization: auth.token
+            }
+            await axios.get(host + "/wholesale/item/category")
+                .then(res => {
+                    const data = res.data;
+                    setItemCategories(data)
                 })
                 .catch(err => {
                     setMessage(!!err.response ? err.response.data.message : err.message)
@@ -91,6 +109,7 @@ const createItem = () => {
                 inStock: formData.get("inStock") ? 'Y' : 'N',
                 label: formData.get("itemLabel"),
                 description: formData.get("description"),
+                categoryId: formData.get("category"),
                 itemImage : values.itemImage
             }
 
@@ -245,6 +264,29 @@ const createItem = () => {
                                         </FormControl>
                                     </Grid>
 
+
+                                    {/* Category */}
+                                    <Grid
+                                        xs={12}
+                                        md={6}
+                                    >
+                                        <FormControl fullWidth>
+                                            <InputLabel id="itemLabel">Category</InputLabel>
+                                            <Select
+                                                labelId="itemLabel"
+                                                id="category"
+                                                name='category'
+                                                value={""+values.category}
+                                                label="Category"
+                                                onChange={handleChange}
+                                            >
+                                            {categories.map((categroyObj , i) => {
+                                                return ( <MenuItem key={i} value={categroyObj.id}>{categroyObj.category}</MenuItem>
+                                                )})
+                                            }
+                                            </Select>
+                                        </FormControl>
+                                    </Grid>
 
                                     <Grid
                                         xs={12}

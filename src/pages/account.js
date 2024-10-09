@@ -19,63 +19,10 @@ const Page = () => {
     const auth = useAuth()
     const [content, setContent] = useState(auth.user)
     const user = auth.user
-    const [groups,setGroups] = useState([])
-    const [assignGroup , setAssignGroup] = useState([])
     const [data,setData] = useState({
       pageNumber : 0,
       size : 1000000
     })
-
-
-
-
-    useEffect( ()=>{
-      const getData = async () => {
-         axios.defaults.headers = {
-           Authorization : auth.token
-         }
-         await axios.get(host+"/admin/auth/groups/"+user.slug)
-         .then(res => {
-            const data = res.data.content
-            setAssignGroup(data);
-         })
-         .catch(err => {
-           setFlag("error")
-           setMessage(!!err.response ? err.response.data.message : err.message)
-           setOpen(true)
-         } )
-       }
-      getData();
-  
-     },[])
-
-
-
-    useEffect( ()=>{
-      const getData = async () => {
-         axios.defaults.headers = {
-           Authorization : auth.token
-         }
-         await axios.post(host+"/group/all",data)
-         .then(res => {
-            const data = res.data.content;
-             setGroups(data);
-         })
-         .catch(err => {
-           //setErrors(err.message)
-           setFlag("error")
-           setMessage(!!err.response ? err.response.data.message : err.message)
-           setOpen(true)
-         } )
-       }
-      getData();
-  
-     },[data])
-
-
-
-
-
 
     const updateProfile = async (updatedUser) =>{
         axios.defaults.headers = {
@@ -85,7 +32,7 @@ const Page = () => {
           ...user,
           ...updatedUser
         }
-        await axios.post(host+"/admin/auth/update",data)
+        await axios.post(host+"/wholesale/auth/update",data)
         .then(res => {
           setMessage(res.data.message)
           setFlag("success")
@@ -158,7 +105,7 @@ const Page = () => {
                   md={6}
                   lg={8}
                 >
-                  <AccountProfileDetails user={content} updateProfile={updateProfile} assignGroup={assignGroup} groups={groups} userType ="Owner"/>
+                  <AccountProfileDetails user={content} updateProfile={updateProfile} userType ="W"/>
                 </Grid>
               </Grid>
             </div>

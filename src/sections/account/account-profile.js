@@ -37,7 +37,7 @@ export const AccountProfile = (props) => {
     let data = new FormData();
     if (!!image) data.append("profileImage", image);
     else return false
-    await axios.post(host+`/admin/auth/update_profile/${user.slug}` , data)
+    await axios.post(host+`/wholesale/auth/update_profile/${user.slug}` , data)
     .then(res =>{
       flagStatus = "success"
       setMessage(res.data.message)
