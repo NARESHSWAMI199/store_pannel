@@ -19,6 +19,9 @@ import { AccountPopover } from './account-popover';
 import { useAuth } from 'src/hooks/use-auth';
 import { host, userImage } from 'src/utils/util';
 import { ArrowButtons } from '../arrow-button';
+import { notification } from 'antd';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 
 const SIDE_NAV_WIDTH = 280;
 const TOP_NAV_HEIGHT = 64;
@@ -29,6 +32,43 @@ export const TopNav = (props) => {
   const accountPopover = usePopover();
   const auth = useAuth()
   const user = auth.user!=null ? auth.user : {};
+  const [api, contextHolder] = notification.useNotification();
+  const [notifications,setNotifications] = useState([])
+  const [totalElements,setTotalElements] = useState()
+
+
+
+  useEffect(() => {
+    const getData = async () => {
+        axios.defaults.headers = {
+            Authorization: auth.token
+        }
+        await axios.post(host + "/wholesale/store/notifications", {})
+            .then(res => {
+                const data = res.data.content;
+                setTotalElements(res.data.totalElements)
+                setNotifications(data);
+            })
+            .catch(err => {
+              console.log(err)
+            })
+    }
+    getData();
+
+}, [])
+
+
+  const openNotification = () => {
+
+    for(let notificationItem of notifications){
+      api.open({
+        message: notificationItem.title,
+        description: notificationItem.messageBody,
+        duration: 0
+      })}
+  };
+
+
   return (
     <>
       <Box
@@ -94,14 +134,15 @@ export const TopNav = (props) => {
               </IconButton>
             </Tooltip>
             <Tooltip title="Notifications">
-              <IconButton>
+              <IconButton onClick={openNotification}>
+              {contextHolder}
                 <Badge
-                  badgeContent={4}
+                  badgeContent={totalElements}
                   color="success"
-                  variant="dot"
+                  //variant="dot"
                 >
                   <SvgIcon fontSize="small">
-                    <BellIcon />
+                    <BellIcon/>
                   </SvgIcon>
                 </Badge>
               </IconButton>
