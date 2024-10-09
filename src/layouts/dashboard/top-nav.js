@@ -2,7 +2,6 @@ import PropTypes from 'prop-types';
 import BellIcon from '@heroicons/react/24/solid/BellIcon';
 import UsersIcon from '@heroicons/react/24/solid/UsersIcon';
 import Bars3Icon from '@heroicons/react/24/solid/Bars3Icon';
-import MagnifyingGlassIcon from '@heroicons/react/24/solid/MagnifyingGlassIcon';
 import {
   Avatar,
   Badge,
@@ -19,9 +18,11 @@ import { AccountPopover } from './account-popover';
 import { useAuth } from 'src/hooks/use-auth';
 import { host, userImage } from 'src/utils/util';
 import { ArrowButtons } from '../arrow-button';
-import { notification } from 'antd';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import CustomModal from 'src/sections/modal';
+import AlignItemsList from 'src/sections/list-item';
+import DrawerRight from 'src/sections/drawer';
 
 const SIDE_NAV_WIDTH = 280;
 const TOP_NAV_HEIGHT = 64;
@@ -32,10 +33,10 @@ export const TopNav = (props) => {
   const accountPopover = usePopover();
   const auth = useAuth()
   const user = auth.user!=null ? auth.user : {};
-  const [api, contextHolder] = notification.useNotification();
   const [notifications,setNotifications] = useState([])
   const [totalElements,setTotalElements] = useState()
-
+  const [open, setOpen] = useState(false);
+  const [seenIds,setSeenIds]= useState([])
 
 
   useEffect(() => {
@@ -46,8 +47,18 @@ export const TopNav = (props) => {
         await axios.post(host + "/wholesale/store/notifications", {})
             .then(res => {
                 const data = res.data.content;
-                setTotalElements(res.data.totalElements)
+
                 setNotifications(data);
+                let newNotifications= 0
+                let seenNotifications = []
+                for(let item of data){
+                  if (item.seen == "N"){
+                    seenNotifications.push(item.id)
+                    newNotifications +=1;
+                  }
+                }
+                setSeenIds(seenNotifications)
+                setTotalElements(newNotifications)
             })
             .catch(err => {
               console.log(err)
@@ -55,19 +66,27 @@ export const TopNav = (props) => {
     }
     getData();
 
+ 
+
 }, [])
 
 
-  const openNotification = () => {
 
-    for(let notificationItem of notifications){
-      api.open({
-        message: notificationItem.title,
-        description: notificationItem.messageBody,
-        duration: 0
-      })}
-  };
-
+const showLoading = () => {
+    setOpen(open ? false : true)
+      let data = {seenIds : seenIds }
+      axios.defaults.headers = {
+          Authorization: auth.token
+      }
+       axios.post(host + "/wholesale/store/update/notifications", data)
+          .then(res => {
+              const data = res.data;
+              setTotalElements((0))
+          })
+          .catch(err => {
+            console.log(err)
+          })
+}
 
   return (
     <>
@@ -130,12 +149,15 @@ export const TopNav = (props) => {
               <IconButton>
                 <SvgIcon fontSize="small">
                   <UsersIcon />
-                </SvgIcon>
+                </SvgIcon>z
               </IconButton>
             </Tooltip>
             <Tooltip title="Notifications">
-              <IconButton onClick={openNotification}>
-              {contextHolder}
+              <IconButton onClick={showLoading}>
+              {/* {contextHolder} */}
+              <DrawerRight open={open}  >
+                <AlignItemsList  itemList={notifications} />
+                </DrawerRight>
                 <Badge
                   badgeContent={totalElements}
                   color="success"
