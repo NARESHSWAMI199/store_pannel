@@ -37,14 +37,17 @@ export const TopNav = (props) => {
   const [totalElements,setTotalElements] = useState()
   const [open, setOpen] = useState(false);
   const [seenIds,setSeenIds]= useState([])
-
+  const [data,setData] = useState({
+    pageNumber : 0,
+    size : 50
+  })
 
   useEffect(() => {
     const getData = async () => {
         axios.defaults.headers = {
             Authorization: auth.token
         }
-        await axios.post(host + "/wholesale/store/notifications", {})
+        await axios.post(host + "/wholesale/store/notifications", data)
             .then(res => {
                 const data = res.data.content;
 
@@ -68,7 +71,7 @@ export const TopNav = (props) => {
 
  
 
-}, [])
+}, [data])
 
 
 const onClose = ()=>{
@@ -90,6 +93,14 @@ const showLoading = () => {
             console.log(err)
           })
 }
+
+
+const viewMore = () =>{
+  setData({
+    size : data.size + 50
+  })
+}
+
 
   return (
     <>
@@ -157,7 +168,7 @@ const showLoading = () => {
             </Tooltip>
             <Tooltip title="Notifications">
             <DrawerRight onClose={onClose} open={open}  >
-                <AlignItemsList itemList={notifications} />
+                <AlignItemsList viewMore={viewMore} itemList={notifications} />
                 </DrawerRight>
               <IconButton onClick={showLoading}>
               {/* {contextHolder} */}

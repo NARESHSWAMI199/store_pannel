@@ -16,9 +16,15 @@ export default function AlignItemsList(props) {
   
     useEffect(()=>{
         setItemsList(props.itemList)
-    },[])
+    },[props.itemList])
 
-  return (
+
+    const viewMore = () =>{
+      props.viewMore();
+    }
+
+
+  return (<>
     <List sx={{ width: '100%', maxWidth: "100%", bgcolor: 'background.paper',p:0,m:0, boxShadow : 1}}>
 
 
@@ -43,7 +49,7 @@ export default function AlignItemsList(props) {
                 {item.title}
               </Typography>
               
-              {item.messageBody.length > 100 ? 
+              {item.messageBody.length > 40 ? 
               <>
               <span id={"messageBody"+i}>{" ~ " + item.messageBody.substring(0,40)+".." }</span> <br/>
               
@@ -81,5 +87,7 @@ export default function AlignItemsList(props) {
       </>)
     })}
     </List>
+      <Button onClick={e=>viewMore()} color='primary' sx={{float:'right'}} variant='outline'>View More</Button>
+    </>
   );
 }
