@@ -24,7 +24,7 @@ export const toTitleCase = (str) => {
 
   export  const itemImage = host+"/admin/item/image/";
   export const storeImage = host+"/admin/store/image/"
-  export const userImage = host+"/admin/auth/profile/"
+  export const userImage = host+"/wholesale/auth/profile/"
 
 
   export const suId = 0;
