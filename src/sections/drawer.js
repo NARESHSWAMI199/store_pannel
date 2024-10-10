@@ -12,17 +12,18 @@ const DrawerRight = (props) => {
 
   const onClose = () => {
     setOpen(false);
+    props.onClose()
   };
  
   return (
     <>
       <Drawer
+        bodyStyle={{ padding:'0px' }}
         title="Basic Drawer"
         placement={placement}
-        closable={false}
-        onClose={onClose}
         open={open}
         key={placement}
+        onClose={onClose}
       >
       {props.children}
       </Drawer>

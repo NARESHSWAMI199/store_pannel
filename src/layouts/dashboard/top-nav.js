@@ -71,6 +71,9 @@ export const TopNav = (props) => {
 }, [])
 
 
+const onClose = ()=>{
+  setOpen(false)
+}
 
 const showLoading = () => {
     setOpen(open ? false : true)
@@ -153,11 +156,11 @@ const showLoading = () => {
               </IconButton>
             </Tooltip>
             <Tooltip title="Notifications">
+            <DrawerRight onClose={onClose} open={open}  >
+                <AlignItemsList itemList={notifications} />
+                </DrawerRight>
               <IconButton onClick={showLoading}>
               {/* {contextHolder} */}
-              <DrawerRight open={open}  >
-                <AlignItemsList  itemList={notifications} />
-                </DrawerRight>
                 <Badge
                   badgeContent={totalElements}
                   color="success"
