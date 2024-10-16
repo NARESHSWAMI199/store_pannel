@@ -257,8 +257,8 @@ useEffect( ()=>{
               <Typography variant='h6' sx={{color : 'text.primary'}}>
                   Customer Reviews :
               </Typography>
-              {comments.map(comment => {
-                  return (<Box style={{width : '100%' , padding : 20}} sx={{boxShadow : 1}}>
+              {comments.map((comment,i) => {
+                  return (<Box key={i} style={{width : '100%' , padding : 20}} sx={{boxShadow : 1}}>
                     <Grid container spacing={3}>
                       <Grid item xs={11} md={11} >
                         <Typography variant='subtitle' sx={{color : "text.primary", fontSize : 15}}>

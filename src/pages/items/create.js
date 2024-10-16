@@ -24,14 +24,11 @@ import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { host } from "src/utils/util";
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
-import { useRouter } from "next/router";
 import ImageInput from "src/sections/image-input";
 
 
 
-const createItem = () =>{    
-
-const router = useRouter()
+const CreateItem = () =>{    
 const [open,setOpen] = useState(false)
 const [message,setMessage] = useState("")
 const [flag,setFlag] = useState("success")
@@ -333,10 +330,10 @@ return ( <>
 }
 
 
-createItem.getLayout = (page) => (
+CreateItem.getLayout = (page) => (
 <DashboardLayout>
   {page}
 </DashboardLayout>
 );
 
-export default createItem;
+export default CreateItem;

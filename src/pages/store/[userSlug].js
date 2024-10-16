@@ -19,19 +19,7 @@ import { BasicSearch } from 'src/sections/basic-search';
 import { ReloadOutlined } from '@ant-design/icons';
 import { ArrowButtons } from 'src/layouts/arrow-button';
 
-const now = new Date();
-
-
-const useitems = (content, page, rowsPerPage) => {
-    return useMemo(
-        () => {
-            return applyPagination(content, page, rowsPerPage);
-        },
-        [page, rowsPerPage]
-    )
-};
-
-const useitemSlugs = (items) => {
+const UseitemSlugs = (items) => {
     return useMemo(
         () => {
             return items.map((item) => item.slug);
@@ -57,7 +45,7 @@ const Page = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [items, setItems] = useState([])
-    const itemSlugs = useitemSlugs(items);
+    const itemSlugs = UseitemSlugs(items);
     const itemsSelection = useSelection(itemSlugs);
     const [totalElements, setTotalElements] = useState(0)
     const [wholesale, setWholesale] = useState({})
