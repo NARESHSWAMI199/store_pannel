@@ -13,7 +13,7 @@
     "lint": "next lint",
     "lint-fix": "next lint --fix",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build" 
+    "deploy": "gh-pages -d build"
   },
   "dependencies": {
     "@ant-design/icons": "^5.4.0",
@@ -36,7 +36,7 @@
     "dayjs": "^1.11.10",
     "formik": "2.2.9",
     "moment": "^2.30.1",
-    "next": "^13.1.6",
+    "next": "^12.0.9",
     "nprogress": "0.2.0",
     "prop-types": "15.8.1",
     "react": "18.2.0",
@@ -58,7 +58,8 @@
     "eslint": "8.34.0",
     "eslint-config-next": "13.1.6"
   },
-  "eslint": {
-    "ignoreDuringBuilds": true
-  }
+  "description": "![license](https://img.shields.io/badge/license-MIT-blue.svg)",
+  "main": "next.config.js",
+  "keywords": [],
+  "license": "ISC"
 }
