@@ -3,7 +3,7 @@
   "version": "3.0.0",
   "author": "Naresh",
   "licence": "MIT",
-  "homepage": "",
+  "homepage": "https://nareshswami199.github.io/store_pannel",
   "private": false,
   "scripts": {
     "dev": "next -p 3001",
@@ -11,7 +11,9 @@
     "start": "next start -p 3001",
     "export": "next export",
     "lint": "next lint",
-    "lint-fix": "next lint --fix"
+    "lint-fix": "next lint --fix",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build" 
   },
   "dependencies": {
     "@ant-design/icons": "^5.4.0",
