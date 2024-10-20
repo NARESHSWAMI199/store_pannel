@@ -38,7 +38,7 @@ const CreateItem = () => {
     const [message, setMessage] = useState("")
     const [flag, setFlag] = useState("success")
     const [categories,setItemCategories] = useState([])
-
+    const [subcategories,setItemSubCategories] = useState([])
     const auth = useAuth()
     const [values, setValues] = useState({})
 
@@ -51,7 +51,7 @@ const CreateItem = () => {
             await axios.get(host + "/wholesale/item/detail/"+slug,)
                 .then(res => {
                     const data = res.data.res;
-                    setValues({...data,category : data.itemCategory.id})
+                    setValues({...data,category : data.itemCategory.id,subcategory : data.itemSubCategory.id})
                 })
                 .catch(err => {
                     setMessage(!!err.response ? err.response.data.message : err.message)
@@ -85,6 +85,29 @@ const CreateItem = () => {
     }, [])
 
 
+    useEffect(() => {
+        const getSubcategory = async () => {
+            axios.defaults.headers = {
+                Authorization: auth.token
+            }
+            await axios.get(host + "/admin/item/subcategory/"+values.category)
+                .then(res => {
+                    const data = res.data;
+                    setItemSubCategories(data)
+                })
+                .catch(err => {
+                    setMessage(!!err.response ? err.response.data.message : err.message)
+                    setFlag('error')
+                    setOpen(true)
+                })
+        }
+        if(values.category !=undefined){
+            getSubcategory();
+        }
+    }, [values.category])
+
+
+
     const handleChange = useCallback(
         (event) => {
             setValues((prevState) => ({
@@ -110,6 +133,7 @@ const CreateItem = () => {
                 label: formData.get("itemLabel"),
                 description: formData.get("description"),
                 categoryId: formData.get("category"),
+                subCategoryId: formData.get("subcategory"),
                 itemImage : values.itemImage
             }
 
@@ -167,7 +191,6 @@ const CreateItem = () => {
                 autoComplete="off"
                 onSubmit={handleSubmit}
             >
-                <Card >
                     <Card>
                         <CardHeader
                             //subheader="From here you can add a new item."
@@ -177,7 +200,7 @@ const CreateItem = () => {
                             <Box sx={{ m: -1.5 }}>
         
                             <div style={{marginLeft : '10px',marginTop: '10px'}}>
-                                <ImageInput onChange={onSubmit} avtar={itemImage+values.slug+"/"+values.avtar}/>
+                                <ImageInput onChange={onSubmit} avtar={values.slug !=undefined ?itemImage+values.slug+"/"+values.avtar : ''}/>
                             </div>
 
                                 <Grid
@@ -244,26 +267,7 @@ const CreateItem = () => {
 
 
 
-                                    <Grid
-                                        xs={12}
-                                        md={6}
-                                    >
-                                        <FormControl fullWidth>
-                                            <InputLabel id="itemLabel">Label</InputLabel>
-                                            <Select
-                                                labelId="itemLabel"
-                                                id="demo-simple-select"
-                                                name='itemLabel'
-                                                value={""+values.label}
-                                                label="Label"
-                                                onChange={handleChange}
-                                            >
-                                                <MenuItem value={"O"}>Old</MenuItem>
-                                                <MenuItem value={"N"}>New</MenuItem>
-                                            </Select>
-                                        </FormControl>
-                                    </Grid>
-
+                               
 
                                     {/* Category */}
                                     <Grid
@@ -288,6 +292,51 @@ const CreateItem = () => {
                                         </FormControl>
                                     </Grid>
 
+                                         {/* Subcategory */}
+                                         <Grid
+                                        xs={12}
+                                        md={6}
+                                    >
+                                        <FormControl fullWidth>
+                                            <InputLabel id="itemLabel">Subcategory</InputLabel>
+                                            <Select
+                                                labelId="itemLabel"
+                                                id="subcategory"
+                                                name='subcategory'
+                                                value={""+values.subcategory}
+                                                label="Subcategory"
+                                                onChange={handleChange}
+                                            >
+                                            {subcategories.map((subcategroyObj , i) => {
+                                                return ( <MenuItem key={i} value={subcategroyObj.id}>{subcategroyObj.subcategory}</MenuItem>
+                                                )})
+                                            }
+                                            </Select>
+                                        </FormControl>
+                                    </Grid>
+
+
+                                    <Grid
+                                        xs={12}
+                                        md={6}
+                                    >
+                                        <FormControl fullWidth>
+                                            <InputLabel id="itemLabel">Label</InputLabel>
+                                            <Select
+                                                labelId="itemLabel"
+                                                id="demo-simple-select"
+                                                name='itemLabel'
+                                                value={""+values.label}
+                                                label="Label"
+                                                onChange={handleChange}
+                                            >
+                                                <MenuItem value={"O"}>Old</MenuItem>
+                                                <MenuItem value={"N"}>New</MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                    </Grid>
+
+
                                     <Grid
                                         xs={12}
                                         md={6}
@@ -308,7 +357,7 @@ const CreateItem = () => {
                             </Box>
                         </CardContent>
                         <Divider />
-                    </Card>
+         
 
                     <CardActions sx={{ justifyContent: 'flex-end' }}>
                         <Button type="submit" variant="contained">

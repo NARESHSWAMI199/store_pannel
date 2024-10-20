@@ -36,7 +36,7 @@ const [flag,setFlag] = useState("success")
 const auth = useAuth()
 const [values,setValues] = useState({})
 const [categories,setItemCategories] = useState([])
-
+const [subcategories,setItemSubCategories] = useState([])
 
   const handleChange = useCallback(
     (event) => {
@@ -71,6 +71,29 @@ const [categories,setItemCategories] = useState([])
 
 }, [])
 
+
+useEffect(() => {
+  const getSubcategory = async () => {
+      axios.defaults.headers = {
+          Authorization: auth.token
+      }
+      await axios.get(host + "/admin/item/subcategory/"+values.category)
+          .then(res => {
+              const data = res.data;
+              setItemSubCategories(data)
+          })
+          .catch(err => {
+              setMessage(!!err.response ? err.response.data.message : err.message)
+              setFlag('error')
+              setOpen(true)
+          })
+  }
+  if(values.category !=undefined){
+      getSubcategory();
+  }
+}, [values.category]) 
+
+
   const handleSubmit = useCallback(
     (e) =>{
     e.preventDefault()
@@ -85,6 +108,7 @@ const [categories,setItemCategories] = useState([])
         description: formData.get("description"),
         wholesaleSlug : auth.store.slug,
         categoryId: formData.get("category"),
+        subCategoryId: formData.get("subcategory"),
         itemImage : values.itemImage
       }
 
@@ -148,7 +172,7 @@ return ( <>
     autoComplete="off"
     onSubmit={handleSubmit}
   >
-<Card >
+
 <Card>
       <CardHeader
         subheader="From here you can add a new item."
@@ -223,25 +247,6 @@ return ( <>
 
 
 
-          <Grid
-            xs={12}
-            md={6}
-          >
-            <FormControl fullWidth>
-          <InputLabel id="itemLabel">Label</InputLabel>
-          <Select
-            labelId="itemLabel"
-            id="demo-simple-select"
-            name='itemLabel'
-            value={values.itemLabel}
-            onChange={handleChange}
-          >
-            <MenuItem value={"O"}>Old</MenuItem>
-            <MenuItem value={"N"}>New</MenuItem>
-        
-          </Select>
-          </FormControl>
-          </Grid>
 
 
               {/* Category */}
@@ -267,6 +272,49 @@ return ( <>
                 </FormControl>
             </Grid>
 
+               {/* Subcategory */}
+              <Grid
+                xs={12}
+                md={6}
+            >
+                <FormControl fullWidth>
+                    <InputLabel id="itemLabel">Subcategory</InputLabel>
+                    <Select
+                        labelId="itemLabel"
+                        id="subcategory"
+                        name='subcategory'
+                        value={""+values.subcategory}
+                        label="Subcategory"
+                        onChange={handleChange}
+                    >
+                    {subcategories.map((subcategroyObj , i) => {
+                        return ( <MenuItem key={i} value={subcategroyObj.id}>{subcategroyObj.subcategory}</MenuItem>
+                        )})
+                    }
+                    </Select>
+                </FormControl>
+            </Grid>
+
+
+          <Grid
+            xs={12}
+            md={6}
+          >
+            <FormControl fullWidth>
+          <InputLabel id="itemLabel">Label</InputLabel>
+          <Select
+            labelId="itemLabel"
+            id="demo-simple-select"
+            name='itemLabel'
+            value={values.itemLabel}
+            onChange={handleChange}
+          >
+            <MenuItem value={"O"}>Old</MenuItem>
+            <MenuItem value={"N"}>New</MenuItem>
+        
+          </Select>
+          </FormControl>
+          </Grid>
           
           <Grid
               xs={12}
@@ -300,7 +348,6 @@ return ( <>
         </Box>
       </CardContent>
       <Divider />
-    </Card>
 
     <CardActions sx={{ justifyContent: 'flex-end' }}>
         <Button type="submit" variant="contained">
