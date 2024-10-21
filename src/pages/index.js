@@ -54,7 +54,10 @@ useEffect( ()=>{
         console.log(err)
       } )
     }
-    getData();
+    if(!!auth.store){
+      getData();
+    }
+
 
   },[])
 
