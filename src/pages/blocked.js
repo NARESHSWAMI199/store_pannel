@@ -48,7 +48,7 @@ const Page = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [items, setItems] = useState([])
-    const itemSlugs = UseitemSlugsseitemSlugs(items);
+    const itemSlugs = UseitemSlugs(items);
     const itemsSelection = useSelection(itemSlugs);
     const [totalElements, setTotalElements] = useState(0)
     const [wholesale, setWholesale] = useState(auth.store)
