@@ -42,22 +42,19 @@ import ImageInput from "src/sections/image-input";
     const[stateList,setStateList] = useState([])
     const [selectedState , setSelectedState] = useState(1)
     const router = useRouter()
-    const { createUserType } = router.query
-    const [userType,setUserType] = useState(createUserType)
+    const [categories,setItemCategories] = useState([])
+    const [subcategories,setItemSubCategories] = useState([])
     const [values,setValues] = useState({...store, ...user,
       city : store.address.city, 
       state : store.address.state,
       street : store.address.street,
       zipCode : store.address.zipCode,
       storeEmail : store.email,
-      storePhone : store.phone
+      storePhone : store.phone,
+      category : store.storeCategory.id,
+      subcategory : store.storeSubCategory.id,
     })
-    const [groups,setGroups] = useState([])
-    const [assignGroup , setAssignGroup] = useState([])
-    const [data,setData] = useState({
-      pageNumber : 0,
-      size : 1000000
-    })
+
 
     useEffect(()=>{
         axios.defaults.headers={
@@ -108,6 +105,53 @@ import ImageInput from "src/sections/image-input";
       );
 
 
+
+
+      useEffect(() => {
+        const getData = async () => {
+            axios.defaults.headers = {
+                Authorization: auth.token
+            }
+            await axios.get(host + "/wholesale/store/category")
+                .then(res => {
+                    const data = res.data;
+                    setItemCategories(data)
+                })
+                .catch(err => {
+                    setMessage(!!err.response ? err.response.data.message : err.message)
+                    setFlag('error')
+                    setOpen(true)
+                })
+        }
+        getData();
+    
+    }, [])
+    
+    
+    useEffect(() => {
+      const getSubcategory = async () => {
+          axios.defaults.headers = {
+              Authorization: auth.token
+          }
+          await axios.get(host + "/wholesale/store/subcategory/"+values.category)
+              .then(res => {
+                  const data = res.data;
+                  setItemSubCategories(data)
+              })
+              .catch(err => {
+                  setMessage(!!err.response ? err.response.data.message : err.message)
+                  setFlag('error')
+                  setOpen(true)
+              })
+      }
+      if(values.category !=undefined){
+          getSubcategory();
+      }
+    }, [values.category]) 
+    
+
+
+
       const handleChange = useCallback(
         (event) => {
           setValues((prevState) => ({
@@ -125,7 +169,7 @@ import ImageInput from "src/sections/image-input";
         const form = e.target;
         const formData = new FormData(form)
         let data = {
-            ...store,
+            // ...store,
             addressSlug : store.address.slug,
             description : formData.get("description"),
             storeEmail : formData.get("storeEmail"),
@@ -134,6 +178,8 @@ import ImageInput from "src/sections/image-input";
             city :  formData.get("city"),
             street:  formData.get("street"),
             zipCode :  formData.get("zipCode"),
+            categoryId: formData.get("category"),
+            subCategoryId: formData.get("subcategory"),
             storeName :  formData.get("storeName")
           }
 
@@ -314,6 +360,54 @@ import ImageInput from "src/sections/image-input";
                           </Select> 
                           </FormControl>
                         </Grid>
+
+                      {/* Category */}
+                      <Grid
+                        xs={12}
+                        md={6}
+                    >
+                        <FormControl fullWidth>
+                            <InputLabel id="itemLabel">Category</InputLabel>
+                            <Select
+                                labelId="itemLabel"
+                                id="category"
+                                name='category'
+                                value={values.category !=undefined ? ""+values.category : ""}
+                                label="Category"
+                                onChange={handleChange}
+                                required
+                            >
+                            {categories.map((categroyObj , i) => {
+                                return ( <MenuItem key={i} value={categroyObj.id}>{categroyObj.category}</MenuItem>
+                                )})
+                            }
+                            </Select>
+                        </FormControl>
+                    </Grid>
+
+                      {/* Subcategory */}
+                      <Grid
+                        xs={12}
+                        md={6}
+                    >
+                        <FormControl fullWidth>
+                            <InputLabel id="itemLabel">Subcategory</InputLabel>
+                            <Select
+                                labelId="itemLabel"
+                                id="subcategory"
+                                name='subcategory'
+                                value={values.subcategory !=undefined ? ""+values.subcategory : ""}
+                                label="Subcategory"
+                                onChange={handleChange}
+                                required
+                            >
+                            {subcategories.map((subcategroyObj , i) => {
+                                return ( <MenuItem key={i} value={subcategroyObj.id}>{subcategroyObj.subcategory}</MenuItem>
+                                )})
+                            }
+                            </Select>
+                        </FormControl>
+                    </Grid>
 
 
                         <Grid
