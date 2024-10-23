@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import { subDays, subHours } from 'date-fns';
-import { Box, Container, Unstable_Grid2 as Grid, Link } from '@mui/material';
+import { Box, Container, Unstable_Grid2 as Grid } from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import {OverviewBox } from 'src/sections/overview/overview-users';
 import { OverviewLatestItems } from 'src/sections/overview/overview-latest-products';
@@ -12,6 +12,7 @@ import { useAuth } from 'src/hooks/use-auth';
 import { host, suId } from 'src/utils/util';
 import { useRouter } from 'next/router';
 import { StockTraffic } from 'src/sections/overview/stock-traffic';
+import Link from 'next/link';
 
 
 
@@ -21,7 +22,6 @@ const now = new Date();
 
 const Page = (props) =>  {
 
-const [users,setAllUsers] = useState([])
 const [currentYearDataMonths, setCurrentYearDataMonths] = useState([])
 const [lastYearDataMonths, setLastYearDataMonths] = useState([])
   const [years,setYears] = useState([])
@@ -156,7 +156,12 @@ useEffect( ()=>{
             sm={6}
             lg={ 4}
           >
-           <Link href="/items" sx={{textDecoration:'none'}} > <OverviewBox
+           <Link 
+            href={{
+                pathname : "/items"
+              }} 
+              style={{textDecoration:'none'}} >
+            <OverviewBox
               title="ITEMS"
               sx={{ height: '100%' }}
               value={dashboardData.items}
@@ -169,9 +174,13 @@ useEffect( ()=>{
             sm={6}
             lg={ 4}
           >
-          <Link sx={{
+          <Link style={{
             textDecoration:'none'
-           }}href="/items/label/N" > <OverviewBox
+           }}
+            href={{
+              pathname : "/items/label/N"
+            }} > 
+          <OverviewBox
                title="NEW ITEMS"
               sx={{ height: '100%' }}
               value={dashboardData.newItems}
@@ -184,9 +193,13 @@ useEffect( ()=>{
               sm={6}
               lg={4}
             >
-            <Link sx={{
+            <Link style={{
               textDecoration:'none'
-            }} href="/items/label/O" >  <OverviewBox
+            }}
+            href={{
+              pathname : "/items/label/O"
+            }}>  
+            <OverviewBox
                 title="OLD ITEMS"
                 sx={{ height: '100%' }}
                 value={dashboardData.oldItems}
