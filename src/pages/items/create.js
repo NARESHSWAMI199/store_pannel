@@ -261,7 +261,7 @@ return ( <>
                         labelId="itemLabel"
                         id="category"
                         name='category'
-                        value={""+values.category}
+                        value={!!values.category ? ""+values.category : ""}
                         label="Category"
                         onChange={handleChange}
                         required
@@ -285,7 +285,7 @@ return ( <>
                         labelId="itemLabel"
                         id="subcategory"
                         name='subcategory'
-                        value={""+values.subcategory}
+                        value={!!values.subcategory ? ""+values.subcategory : ""}
                         label="Subcategory"
                         onChange={handleChange}
                         required
