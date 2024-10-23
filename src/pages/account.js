@@ -47,6 +47,11 @@ const Page = () => {
           setFlag('error')
           setMessage(!!err.response ? err.response.data.message : err.message)
           console.log(err.message)
+          let status = (!!err.response ? err.response.status : 0);
+          if (status == 401) {
+            auth.signOut();
+            router.push("/auth/login")
+          }
         })
         setOpen(true)
     }

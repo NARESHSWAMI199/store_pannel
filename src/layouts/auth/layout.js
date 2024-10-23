@@ -91,9 +91,9 @@ export const Layout = (props) => {
             <Typography
               align="center"
               sx={{ mb: 3 }}
-              variant="subtitle1"
+              variant="h1"
             >
-              Opportunity come with a time period.
+             WHOLESALE PANEL
             </Typography>
             <img
               alt=""

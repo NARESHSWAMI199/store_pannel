@@ -1,23 +1,18 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import Head from 'next/head';
 import ArrowDownOnSquareIcon from '@heroicons/react/24/solid/ArrowDownOnSquareIcon';
-import ArrowUpOnSquareIcon from '@heroicons/react/24/solid/ArrowUpOnSquareIcon';
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
-import { Alert, Avatar, Box, Button, Container, Snackbar, Stack, SvgIcon, Typography } from '@mui/material';
+import { Alert, Box, Button, Container, Snackbar, Stack, SvgIcon } from '@mui/material';
+import axios from 'axios';
+import Head from 'next/head';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useAuth } from 'src/hooks/use-auth';
 import { useSelection } from 'src/hooks/use-selection';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
-import { applyPagination } from 'src/utils/apply-pagination';
-import axios from 'axios';
-import { host, toTitleCase } from 'src/utils/util';
-import { useAuth } from 'src/hooks/use-auth';
-import { ItemsTable } from 'src/sections/wholesale/wholesale-table';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
 import DialogFormForExcelImport from 'src/layouts/excel/import-excel';
-import { StoresCard } from 'src/sections/wholesale/stores-table';
 import { BasicSearch } from 'src/sections/basic-search';
-import { ReloadOutlined } from '@ant-design/icons';
-import { ArrowButtons } from 'src/layouts/arrow-button';
+import { ItemsTable } from 'src/sections/wholesale/wholesale-table';
+import { host, toTitleCase } from 'src/utils/util';
 
 const UseitemSlugs = (items) => {
     return useMemo(
@@ -82,6 +77,11 @@ const Page = () => {
                     setMessage(!!err.response ? err.response.data.message : err.message)
                     setFlag("error")
                     setOpen(true)
+                    let status = (!!err.response ? err.response.status : 0);
+                    if (status == 401) {
+                      auth.signOut();
+                      router.push("/auth/login")
+                    }
                 })
         }
         getData();
@@ -97,7 +97,7 @@ const Page = () => {
         axios.defaults.headers = {
             Authorization: auth.token
         }
-        await axios.post(host + '/admin/item/importExcel/' + wholesale.slug, formData, {
+        await axios.post(host + '/wholesale/item/importExcel/' + wholesale.slug, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
@@ -120,6 +120,8 @@ const Page = () => {
 
 
 
+
+
     const onChangeInStock = (slug, inStock) => {
         axios.defaults.headers = {
             Authorization: auth.token
@@ -136,6 +138,13 @@ const Page = () => {
                     setFlag("warning")
                     setMessage("Successfully removed from stock.")
                 }
+                setItems((items) => {
+                    items.filter((_) => {
+                      if(_.slug === slug) return _.inStock = inStock
+                      return _;
+                    })
+                    return items
+                });
                 setOpen(true)
             }).catch(err => {
                 setMessage(!!err.response ? err.response.data.message : err.message)
@@ -143,7 +152,6 @@ const Page = () => {
                 setOpen(true)
             })
     }
-
 
 
     const onDelete = (slug) => {
@@ -155,8 +163,10 @@ const Page = () => {
                 setFlag("success")
                 setMessage(res.data.message)
                 setOpen(true)
+                setItems((items) =>items.filter((_) => _.slug !== slug));
             }).catch(err => {
-                setMessage(!!err.response ? err.response.data.message : err.message)
+                console.log(err)
+                setMessage(!!err.respone ? err.response.data.message : err.message)
                 setFlag("error")
                 setOpen(true)
             })

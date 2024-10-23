@@ -1,9 +1,7 @@
-import PropTypes from 'prop-types';
-import { format } from 'date-fns';
-import DeleteIcon from '@mui/icons-material/Delete';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
+import DeleteIcon from '@mui/icons-material/Delete';
 import DiscountIcon from '@mui/icons-material/Discount';
 import {
   Avatar,
@@ -21,24 +19,26 @@ import {
   TableRow,
   Typography
 } from '@mui/material';
+import { format } from 'date-fns';
+import PropTypes from 'prop-types';
 
+import { CopyOutlined } from '@ant-design/icons';
+import EditIcon from '@mui/icons-material/Edit';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { Image } from 'antd';
+import Link from 'next/link';
+import React, { useEffect, useState } from 'react';
 import { Scrollbar } from 'src/components/scrollbar';
 import { getInitials } from 'src/utils/get-initials';
-import React, {useEffect, useState } from 'react';
-import Link from 'next/link';
-import EditIcon from '@mui/icons-material/Edit';
 import { itemImage, toTitleCase } from 'src/utils/util';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import { CopyOutlined } from '@ant-design/icons';
 
 export const BlockedItems = (props) => {
   const {

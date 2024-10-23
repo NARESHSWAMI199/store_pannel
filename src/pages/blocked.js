@@ -1,24 +1,18 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import Head from 'next/head';
 import ArrowDownOnSquareIcon from '@heroicons/react/24/solid/ArrowDownOnSquareIcon';
-import ArrowUpOnSquareIcon from '@heroicons/react/24/solid/ArrowUpOnSquareIcon';
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
-import { Alert, Avatar, Box, Button, Container, Snackbar, Stack, SvgIcon, Typography } from '@mui/material';
+import { Alert, Box, Button, Container, Snackbar, Stack, SvgIcon } from '@mui/material';
+import axios from 'axios';
+import Head from 'next/head';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useAuth } from 'src/hooks/use-auth';
 import { useSelection } from 'src/hooks/use-selection';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
-import { applyPagination } from 'src/utils/apply-pagination';
-import axios from 'axios';
-import { host, toTitleCase } from 'src/utils/util';
-import { useAuth } from 'src/hooks/use-auth';
-import { ItemsTable } from 'src/sections/wholesale/wholesale-table';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
 import DialogFormForExcelImport from 'src/layouts/excel/import-excel';
-import { StoresCard } from 'src/sections/wholesale/stores-table';
 import { BasicSearch } from 'src/sections/basic-search';
-import { ReloadOutlined } from '@ant-design/icons';
-import { ArrowButtons } from 'src/layouts/arrow-button';
 import { BlockedItems } from 'src/sections/wholesale/block-items';
+import { host, toTitleCase } from 'src/utils/util';
 
 const now = new Date();
 
@@ -80,6 +74,11 @@ const Page = () => {
                     setMessage(!!err.response ? err.response.data.message : err.message)
                     setFlag("error")
                     setOpen(true)
+                    let status = (!!err.response ? err.response.status : 0);
+                    if (status == 401) {
+                      auth.signOut();
+                      router.push("/auth/login")
+                    }
                 })
         }
         getData();

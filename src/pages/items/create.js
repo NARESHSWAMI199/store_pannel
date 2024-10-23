@@ -25,6 +25,7 @@ import { host } from "src/utils/util";
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import ImageInput from "src/sections/image-input";
+import { margin } from "@mui/system";
 
 
 
@@ -77,7 +78,7 @@ useEffect(() => {
       axios.defaults.headers = {
           Authorization: auth.token
       }
-      await axios.get(host + "/admin/item/subcategory/"+values.category)
+      await axios.get(host + "/wholesale/item/subcategory/"+values.category)
           .then(res => {
               const data = res.data;
               setItemSubCategories(data)
@@ -181,9 +182,9 @@ return ( <>
       <CardContent sx={{ pt: 0 }}>
         <Box sx={{ m: -1.5 }}>
 
-        <div style={{marginLeft : '10px',marginTop: '10px'}}>
-          <ImageInput onChange={onSubmit} avtar={host+'/admin/store/image/'+values.avtar}/>
-        </div>
+        <Box style={{marginLeft : '10px',marginTop: '20px',marginBottom : '20px'}}>
+          <ImageInput onChange={onSubmit} totalImage={1}/>
+        </Box>
 
           <Grid
             container
@@ -309,8 +310,9 @@ return ( <>
             value={values.itemLabel}
             onChange={handleChange}
           >
-            <MenuItem value={"O"}>Old</MenuItem>
             <MenuItem value={"N"}>New</MenuItem>
+            <MenuItem value={"O"}>Old</MenuItem>
+      
         
           </Select>
           </FormControl>
@@ -328,7 +330,7 @@ return ( <>
             required={true}
             multiline
             value={values.itemDiscription}
-            rows={2}
+            rows={4}
           />
         </Grid>
 

@@ -41,6 +41,11 @@ const Page = () => {
         }).catch(err => {
           setMessage(!!err.response ? err.response.data.message : err.message)
           setFlag("error")
+          let status = (!!err.response ? err.response.status : 0);
+          if (status == 401) {
+            auth.signOut();
+            router.push("/auth/login")
+          }
         })
       setOpen(true)
       return result

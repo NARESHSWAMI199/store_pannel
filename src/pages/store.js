@@ -70,6 +70,11 @@ import ImageInput from "src/sections/image-input";
           setMessage(!!err.response ? err.response.data.message : err.message)
           setFlag("error")
           setOpen(true)
+          let status = (!!err.response ? err.response.status : 0);
+          if (status == 401) {
+            auth.signOut();
+            router.push("/auth/login")
+          }
         })
     },[])
 
@@ -352,6 +357,8 @@ import ImageInput from "src/sections/image-input";
                             required
                             value={values.description}
                             InputLabelProps={{shrink : true}}
+                            multiline
+                            rows={4}
                           />
                         </Grid>
                       </Grid>

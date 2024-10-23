@@ -106,13 +106,6 @@ export const ItemsTable = (props) => {
 
 
   const changeInStock = (slug,inStock) => {
-    setItems((items) => {
-        items.filter((_, index) => {
-          if(_.slug === slug) return _.inStock = inStock
-          return _;
-        })
-        return items
-    });
       props.onChangeInStock(slug,inStock)
   }
 
@@ -132,7 +125,6 @@ export const ItemsTable = (props) => {
 
   const takeAction = (action) =>{
     if (action === 'delete'){
-      setItems((items) =>items.filter((_, index) => index !== rowIndex));
       props.onDelete(slug)
     }else if (action == 'status'){
       changeStatus(slug,status)
@@ -193,7 +185,7 @@ export const ItemsTable = (props) => {
                   Stock
                 </TableCell>
 
-                <TableCell>
+                <TableCell sx={{width: '10%'}}>
                   Created at
                 </TableCell>
 

@@ -76,6 +76,11 @@ const Page = () => {
                     setMessage(!!err.response ? err.response.data.message : err.message)
                     setFlag("error")
                     setOpen(true)
+                    let status = (!!err.response ? err.response.status : 0);
+                    if (status == 401) {
+                      auth.signOut();
+                      router.push("/auth/login")
+                    }
                 })
         }
         getData();
@@ -91,7 +96,7 @@ const Page = () => {
         axios.defaults.headers = {
             Authorization: auth.token
         }
-        await axios.post(host + '/admin/item/importExcel/' + wholesale.slug, formData, {
+        await axios.post(host + '/wholesale/item/importExcel/' + wholesale.slug, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
@@ -118,7 +123,7 @@ const Page = () => {
         axios.defaults.headers = {
             Authorization: auth.token
         }
-        axios.post(host + `/admin/item/stock`, {
+        axios.post(host + `/wholesale/item/stock`, {
             slug: slug,
             stock: inStock
         })
@@ -130,6 +135,13 @@ const Page = () => {
                     setFlag("warning")
                     setMessage("Successfully removed from stock.")
                 }
+                setItems((items) => {
+                    items.filter((_) => {
+                      if(_.slug === slug) return _.inStock = inStock
+                      return _;
+                    })
+                    return items
+                });
                 setOpen(true)
             }).catch(err => {
                 setMessage(!!err.response ? err.response.data.message : err.message)
@@ -143,11 +155,12 @@ const Page = () => {
         axios.defaults.headers = {
             Authorization: auth.token
         }
-        axios.get(host + `/admin/item/delete/${slug}`)
+        axios.get(host + `/wholesale/item/delete/${slug}`)
             .then(res => {
                 setFlag("success")
                 setMessage(res.data.message)
                 setOpen(true)
+                setItems((items) =>items.filter((_) => _.slug !== slug));
             }).catch(err => {
                 console.log(err)
                 setMessage(!!err.respone ? err.response.data.message : err.message)

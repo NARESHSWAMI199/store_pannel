@@ -13,16 +13,21 @@ const ImageInput = (props) => {
   const [previewImage, setPreviewImage] = useState('');
   const [avtar, setAvtar] = useState(props.avtar)
   const [fileList, setFileList] = useState([]);
-
+  const [totalImage,setTotalImage] = useState(2)
   const accept = {
     accept: '.png,.jpg',
  };
   useEffect(()=>{
-    setAvtar(props.avtar)
-    setFileList([{
-      url: props.avtar
-    }])
-  },[props.avtar])
+    if(!!props.totalImage || props.totalImage == 0){
+      setTotalImage(props.totalImage)
+    }
+    if(!!props.avtar){
+      setAvtar(props.avtar)
+      setFileList([{
+        url: props.avtar
+      }])
+    }
+  },[props.avtar,props.totalImage])
 
   const handlePreview = async (file) => {
     if (!file.url && !file.preview) {
@@ -65,7 +70,7 @@ const ImageInput = (props) => {
         onChange={handleChange}
         {...accept}
       >
-        {fileList.length >= 8 ? null : uploadButton}
+        {fileList.length >= totalImage ? null : uploadButton}
       </Upload>
       {previewImage && (
         <Image

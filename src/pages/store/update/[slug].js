@@ -312,6 +312,7 @@ return ( <>
                 required
                 value={store.description}
                 InputLabelProps={{ shrink: true }}
+                rows={4}
               />
             </Grid>
           </Grid>

@@ -90,7 +90,7 @@ const CreateItem = () => {
             axios.defaults.headers = {
                 Authorization: auth.token
             }
-            await axios.get(host + "/admin/item/subcategory/"+values.category)
+            await axios.get(host + "/wholesale/item/subcategory/"+values.category)
                 .then(res => {
                     const data = res.data;
                     setItemSubCategories(data)
@@ -330,8 +330,9 @@ const CreateItem = () => {
                                                 label="Label"
                                                 onChange={handleChange}
                                             >
-                                                <MenuItem value={"O"}>Old</MenuItem>
                                                 <MenuItem value={"N"}>New</MenuItem>
+                                                <MenuItem value={"O"}>Old</MenuItem>
+                                        
                                             </Select>
                                         </FormControl>
                                     </Grid>
@@ -349,7 +350,7 @@ const CreateItem = () => {
                                             required={true}
                                             multiline
                                             value={values.description}
-                                            rows={2}
+                                            rows={4}
                                             InputLabelProps={{ shrink: true }}
                                         />
                                     </Grid>
