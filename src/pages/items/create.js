@@ -264,6 +264,7 @@ return ( <>
                         value={""+values.category}
                         label="Category"
                         onChange={handleChange}
+                        required
                     >
                     {categories.map((categroyObj , i) => {
                         return ( <MenuItem key={i} value={categroyObj.id}>{categroyObj.category}</MenuItem>
@@ -287,6 +288,7 @@ return ( <>
                         value={""+values.subcategory}
                         label="Subcategory"
                         onChange={handleChange}
+                        required
                     >
                     {subcategories.map((subcategroyObj , i) => {
                         return ( <MenuItem key={i} value={subcategroyObj.id}>{subcategroyObj.subcategory}</MenuItem>
@@ -309,6 +311,7 @@ return ( <>
             name='itemLabel'
             value={values.itemLabel}
             onChange={handleChange}
+            required
           >
             <MenuItem value={"N"}>New</MenuItem>
             <MenuItem value={"O"}>Old</MenuItem>
