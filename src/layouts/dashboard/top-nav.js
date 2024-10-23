@@ -149,7 +149,7 @@ const viewMore = () =>{
                 </SvgIcon>
               </IconButton>
             </Tooltip> */}
-            ADMIN PANNEL
+            WHOLESALE PANEL
           </Stack>
           <Box>
             <ArrowButtons/>
