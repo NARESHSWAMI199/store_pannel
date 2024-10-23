@@ -123,11 +123,13 @@ useEffect(() => {
       setFlag("success")
       form.reset();
       reset()
+      setOpen(true)
     }).catch(err=>{
         setMessage(!!err.response  ? err.response.data.message : err.message)
         setFlag("error")
+        setOpen(true)
     })
-    setOpen(true)
+
   })
 
   const handleClose = useCallback(()=>{
