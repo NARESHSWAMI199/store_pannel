@@ -95,10 +95,10 @@ export const Layout = (props) => {
             >
              WHOLESALE PANEL
             </Typography>
-            <img
+            {/* <img
               alt=""
               src="/assets/auth-illustration.svg"
-            />
+            /> */}
           </Box>
         </Grid>
       </Grid>
