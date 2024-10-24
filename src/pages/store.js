@@ -180,7 +180,8 @@ import ImageInput from "src/sections/image-input";
             zipCode :  formData.get("zipCode"),
             categoryId: formData.get("category"),
             subCategoryId: formData.get("subcategory"),
-            storeName :  formData.get("storeName")
+            storeName :  formData.get("storeName"),
+            storePic : values.storePic,
           }
 
         axios.defaults.headers = {
