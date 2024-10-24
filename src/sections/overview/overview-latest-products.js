@@ -10,13 +10,13 @@ import {
   CardHeader,
   Divider,
   IconButton,
-  Link,
   List,
   ListItem,
   ListItemAvatar,
   ListItemText,
   SvgIcon
 } from '@mui/material';
+import Link from 'next/link';
 import { itemImage, storeImage, toTitleCase } from 'src/utils/util';
 
 export const OverviewLatestItems = (props) => {
