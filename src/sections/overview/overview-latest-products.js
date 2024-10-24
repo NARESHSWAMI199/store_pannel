@@ -79,7 +79,8 @@ export const OverviewLatestItems = (props) => {
       <Divider />
       <CardActions sx={{ justifyContent: 'flex-end' }}>
         <Link
-          href="/items" style={{textDecoration : 'none'}}>
+          href={{pathname : "/items" }} 
+          style={{textDecoration : 'none'}}>
             
         <Button
           color="inherit"
