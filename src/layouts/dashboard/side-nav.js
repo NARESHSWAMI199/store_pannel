@@ -64,7 +64,7 @@ export const SideNav = (props) => {
         sx={{
           display: 'flex',
           flexDirection: 'column',
-          height: '100%'
+          height: '100vh'
         }}
       >
         <Box sx={{ p: 3 }}>
