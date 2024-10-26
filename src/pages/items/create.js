@@ -26,6 +26,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import ImageInput from "src/sections/image-input";
 import { margin } from "@mui/system";
+import { useRouter } from "next/router";
 
 
 
@@ -34,10 +35,13 @@ const [open,setOpen] = useState(false)
 const [message,setMessage] = useState("")
 const [flag,setFlag] = useState("success")
 
+const router = useRouter();
+const {label,stock} = router.query
 const auth = useAuth()
-const [values,setValues] = useState({})
+const [values,setValues] = useState({itemLabel:label})
 const [categories,setItemCategories] = useState([])
 const [subcategories,setItemSubCategories] = useState([])
+
 
   const handleChange = useCallback(
     (event) => {
