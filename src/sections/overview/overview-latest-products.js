@@ -67,11 +67,6 @@ export const OverviewLatestItems = (props) => {
                 secondary={`Updated ${ago} ago`}
                 secondaryTypographyProps={{ variant: 'body2' }}
               />
-              {/* <IconButton edge="end">
-                <SvgIcon>
-                  <EllipsisVerticalIcon />
-                </SvgIcon>
-              </IconButton> */}
             </ListItem>
           );
         })}

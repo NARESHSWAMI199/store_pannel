@@ -136,7 +136,6 @@ export const ItemsTable = (props) => {
 
   return ( <>
     <Card>
-      <Scrollbar>
         <Box sx={{ minWidth: 800 }}>
           <Table>
             <TableHead>
@@ -371,7 +370,6 @@ export const ItemsTable = (props) => {
             </TableBody>
           </Table>
         </Box>
-      </Scrollbar>
       <TablePagination
         component="div"
         count={count}
