@@ -151,11 +151,9 @@ const viewMore = () =>{
             </Tooltip> */}
             WHOLESALE PANEL
           </Stack>
-          { window.screen.width > 600  ?
           <Box>
             <ArrowButtons/>
           </Box>
-            :""}
           <Stack
             alignItems="center"
             direction="row"

@@ -155,7 +155,7 @@ const viewMore = () =>{
           <Box>
             <ArrowButtons/>
           </Box>
-            :""}
+            : window.screen.size}
           <Stack
             alignItems="center"
             direction="row"
