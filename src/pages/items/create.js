@@ -262,13 +262,12 @@ return ( <>
                 md={6}
             >
                 <FormControl fullWidth>
-                    <InputLabel id="itemLabel">Category</InputLabel>
+                    <InputLabel  style={{background : 'white'}} id="itemLabel">Category</InputLabel>
                     <Select
                         labelId="itemLabel"
                         id="category"
                         name='category'
                         value={values.category !=undefined ? ""+values.category : ""}
-                        label="Category"
                         onChange={handleChange}
                         required
                     >
@@ -286,13 +285,12 @@ return ( <>
                 md={6}
             >
                 <FormControl fullWidth>
-                    <InputLabel id="itemLabel">Subcategory</InputLabel>
+                    <InputLabel  style={{background : 'white'}} id="itemLabel">Subcategory</InputLabel>
                     <Select
                         labelId="itemLabel"
                         id="subcategory"
                         name='subcategory'
                         value={values.subcategory !=undefined ? ""+values.subcategory : ""}
-                        label="Subcategory"
                         onChange={handleChange}
                         required
                     >
@@ -310,7 +308,7 @@ return ( <>
             md={6}
           >
             <FormControl fullWidth>
-          <InputLabel id="itemLabel">Label</InputLabel>
+          <InputLabel  style={{background : 'white'}} id="itemLabel">Label</InputLabel>
           <Select
             labelId="itemLabel"
             id="demo-simple-select"

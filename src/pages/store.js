@@ -319,13 +319,12 @@ import ImageInput from "src/sections/image-input";
                           md={6}
                         >      
                         <FormControl fullWidth>
-                        <InputLabel id="stateLabel">State</InputLabel>
+                        <InputLabel  style={{background : 'white'}}  id="stateLabel">State</InputLabel>
                           <Select
                             labelId="stateLable"
                             id="demo-simple-select"
                             name='state'
                             value={values.state}
-                            label="State"
                             onChange={changeState}
                             required
                             InputLabelProps={{shrink : true}}
@@ -344,16 +343,15 @@ import ImageInput from "src/sections/image-input";
                           md={6}
                         >
                         <FormControl fullWidth>
-                          <InputLabel id="cityLabel">City</InputLabel>
+                          <InputLabel style={{background : 'white'}} id="cityLabel">City</InputLabel>
                           <Select
                             fullWidth
                             labelId="cityLabel"
                             name='city'
-                            label="City"
                             value={values.city}
                             onChange={handleChange}
                             required
-                            InputLabelProps={{shrink : true}}
+                            InputLabelProps={{shrink : true,values:'filled'}}
                           >
                           {cityList.map((city,i) => {
                               return (<MenuItem key={i} value={city.id}>{city.cityName}</MenuItem>)
@@ -368,13 +366,12 @@ import ImageInput from "src/sections/image-input";
                         md={6}
                     >
                         <FormControl fullWidth>
-                            <InputLabel id="itemLabel">Category</InputLabel>
+                            <InputLabel  style={{background : 'white'}}  id="itemLabel">Category</InputLabel>
                             <Select
                                 labelId="itemLabel"
                                 id="category"
                                 name='category'
                                 value={values.category !=undefined ? ""+values.category : ""}
-                                label="Category"
                                 onChange={handleChange}
                                 required
                             >
@@ -392,13 +389,12 @@ import ImageInput from "src/sections/image-input";
                         md={6}
                     >
                         <FormControl fullWidth>
-                            <InputLabel id="itemLabel">Subcategory</InputLabel>
+                            <InputLabel  style={{background : 'white'}}  id="itemLabel">Subcategory</InputLabel>
                             <Select
                                 labelId="itemLabel"
                                 id="subcategory"
                                 name='subcategory'
                                 value={values.subcategory !=undefined ? ""+values.subcategory : ""}
-                                label="Subcategory"
                                 onChange={handleChange}
                                 required
                             >
