@@ -3,7 +3,7 @@ import { subDays, subHours } from 'date-fns';
 import { Box, Container, Unstable_Grid2 as Grid } from '@mui/material';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import {OverviewBox } from 'src/sections/overview/overview-users';
-import { OverviewLatestItems } from 'src/sections/overview/overview-latest-products';
+import { OverviewLatestItems } from 'src/sections/overview/overview-latest-items';
 import { OverviewItems } from 'src/sections/overview/overview-sales';
 import { OverviewTraffic } from 'src/sections/overview/overview-traffic';
 import { useCallback, useEffect, useState } from 'react';

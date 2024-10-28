@@ -193,10 +193,17 @@ const Page = () => {
 
 
     const onSearch = (searchData) => {
-        setData({
-            ...data,
-            ...searchData,
-        })
+        if(!!searchData){
+            setData({
+                ...data,
+                ...searchData,
+            })
+        }else{
+            setData({
+                pageNumber: page,
+                size: rowsPerPage
+            })
+        }
     }
 
     return (

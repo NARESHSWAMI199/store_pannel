@@ -125,8 +125,7 @@ export const BlockedItems = (props) => {
 
   return ( <>
     <Card>
-      <Scrollbar>
-        <Box sx={{ minWidth: 800 }}>
+        <Box sx={{overflow : 'auto'}}>
           <Table>
             <TableHead>
               <TableRow>
@@ -334,7 +333,6 @@ export const BlockedItems = (props) => {
             </TableBody>
           </Table>
         </Box>
-      </Scrollbar>
       <TablePagination
         component="div"
         count={count}

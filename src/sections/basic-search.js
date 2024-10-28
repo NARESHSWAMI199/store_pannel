@@ -1,15 +1,32 @@
 import MagnifyingGlassIcon from '@heroicons/react/24/solid/MagnifyingGlassIcon';
-import { SearchOutlined } from '@mui/icons-material';
-import { Button, Card, InputAdornment, MenuItem, OutlinedInput, Select, SvgIcon, TextField } from '@mui/material';
-import { format } from 'date-fns';
-import { useCallback } from 'react';
+import { Refresh, RefreshOutlined, SearchOutlined } from '@mui/icons-material';
+import { Button, Card, Grid, InputAdornment, MenuItem, OutlinedInput, Select, SvgIcon, TextField } from '@mui/material';
+import { format, toDate } from 'date-fns';
+import { useCallback, useState } from 'react';
 import KeyIcon from '@mui/icons-material/Key';
+import { status } from 'nprogress';
 export const BasicSearch = (props) => {
+
+
 
   const previousDate = format(new Date().getTime()-(10 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd')
   const currentDate = format(new Date().getTime()+(24 * 60 * 60 * 1000), 'yyyy-MM-dd')
 
 
+  const [values,setValues] = useState({
+    inStock : 'Y',
+    status : 'A',
+    type : 'A',
+    fromDate : previousDate,
+    toDate : currentDate
+  })
+
+  const handleChange = (e) =>{
+    setValues({
+      ...values,
+      [e.target.name] : [e.target.value]
+    })
+  }
 
   const handleSubmit = (e)=>{
     e.preventDefault();
@@ -26,121 +43,178 @@ export const BasicSearch = (props) => {
     }
     props.onSearch(data);
   }
+
+
+
+  const resetFilters = (e) => {
+    /** reset default filters  */
+    setValues({  inStock : 'Y',
+      status : 'A',
+      type : 'A',
+      fromDate : previousDate,
+      toDate : toDate
+    })
+    props.onSearch();
+  }
   
 
  return (<Card sx={{ p: 2 }}>
-    <form onSubmit={(e)=>{handleSubmit(e)}}>
-    <OutlinedInput
-      defaultValue=""
-      fullWidth
-      placeholder="Search"
-      name='searchKey'
-      startAdornment={(
-        <InputAdornment position="start" >
-          
-          <SvgIcon
-            color="action"
-            fontSize="small"
-          >
-            <MagnifyingGlassIcon />
-          </SvgIcon>
-        </InputAdornment>
-      )}
-      sx={{ maxWidth: 240 }}
-    />
+    <form id={"search"} onSubmit={(e)=>{handleSubmit(e)}}>
+      <Grid spacing={1} container>
+
+      <Grid xs={12} md={2}>
+          <OutlinedInput
+          value={values.searchKey}
+          onChange={handleChange}
+          fullWidth
+          placeholder="Search"
+          name='searchKey'
+          startAdornment={(
+            <InputAdornment position="start" >
+              
+              <SvgIcon
+                color="action"
+                fontSize="small"
+              >
+                <MagnifyingGlassIcon />
+              </SvgIcon>
+            </InputAdornment>
+          )}
+          sx={{ maxWidth: 240 }}
+        />
+      </Grid>
+
+
+
+
 
   { props.type !== "A" &&  props.type !== "item" &&
-   <OutlinedInput
-        defaultValue=""
-        fullWidth
-        placeholder="Token Id"
-        name='slug'
-        startAdornment={(
-          <InputAdornment position="start" >
-            
-            <KeyIcon
-              color="action"
-              fontSize="small"
-            >
-              <MagnifyingGlassIcon />
-            </KeyIcon>
-          </InputAdornment>
-        )}
-        sx={{ maxWidth: 240 }}
-      />
- }
+  <Grid xs={12} md={2}>
+    <OutlinedInput
+          sx={{height : 54}}
+          value={values.slug}
+          fullWidth
+          onChange={handleChange}
+          placeholder="Token Id"
+          name='slug'
+          startAdornment={(
+            <InputAdornment position="start" >
+              
+              <KeyIcon
+                color="action"
+                fontSize="small"
+              >
+                <MagnifyingGlassIcon />
+              </KeyIcon>
+            </InputAdornment>
+          )}
+        />
+ </Grid>}
 
 
 
-          { props.type === "A" && <Select
-                sx={{minWidth:200}}
+          { props.type === "A" &&  <Grid xs={12} md={2}><Select
+                fullWidth
+                sx={{height : 54}}
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
                 name='type'
-                defaultValue="A"
+                onChange={handleChange}
+                value={values.type}
                 label="User type"
               >
                 <MenuItem value={"A"}>All</MenuItem>
                 <MenuItem value={"S"}>Staff</MenuItem>
                 <MenuItem value={"W"}>Wholesaler</MenuItem>
                 <MenuItem value={'R'}>Retailer</MenuItem>
-              </Select>}
+              </Select></Grid>}
 
-             {props.type !== "G" && <Select
-                sx={{minWidth:200}}
+             {props.type !== "G" && <Grid xs={12} md={2}><Select
+                fullWidth
+                sx={{height : 54}}
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
                 name='status'
-                defaultValue="A"
+                onChange={handleChange}
+                value={values.status}
                 label="Status"
               >
                 <MenuItem value={"A"}>Active</MenuItem>
                 <MenuItem value={"D"}>Deactive</MenuItem>
-              </Select>}
+              </Select></Grid>}
 
 
-              {props.type == "item" && <Select
-                sx={{minWidth:200}}
+              {props.type == "item" && <Grid xs={12} md={2}><Select
+                fullWidth
+                sx={{height : 54}}
                 labelId="demo-simple-select-label"
                 id="demo-simple-select"
                 name='inStock'
-                defaultValue="Y"
+                onChange={handleChange}
+                value={values.inStock}
                 label="Status"
               >
                 <MenuItem value={"Y"}>In stock</MenuItem>
                 <MenuItem value={"N"}>Out of stock</MenuItem>
-              </Select>}
+              </Select></Grid>}
+     
+        <Grid xs={12} md={2}>
+          <TextField
+            fullWidth
+            sx={{height : 54}}
+            id="datetime-local"
+            label="From Date"
+            type="date"
+            name='fromDate'
+            onChange={handleChange}
+            value={values.fromDate}
+            // defaultValue={previousDate}
+            InputLabelProps={{
+              shrink: true,
+            }}
+          />
+      </Grid>
+
+      <Grid xs={12} md={2}>
       <TextField
-        sx={{minWidth:200}}
-        id="datetime-local"
-        label="From Date"
-        type="date"
-        name='fromDate'
-        defaultValue={previousDate}
-        InputLabelProps={{
-          shrink: true,
-        }}
-      />
+          fullWidth
+          sx={{height : 54}}
+          id="datetime-local"
+          label="To Date"
+          type="date"
+          onChange={handleChange}
+          value={values.toDate}
+          // defaultValue={currentDate}
+          name='toDate'
+          InputLabelProps={{
+            shrink: true,
+          }}
+        />
+      </Grid>
+      <Grid xs={6} md={1}>
+      <Button type='submit' sx={{height : 54,width: '100%'}} 
+        startIcon={(
+            <SvgIcon fontSize="small">
+              <SearchOutlined />
+            </SvgIcon>
+          )}
+          variant="contained"> Search 
+        </Button>
+        </Grid>
 
-      
-    <TextField
-        sx={{minWidth:200}}
-        id="datetime-local"
-        label="To Date"
-        type="date"
-        defaultValue={currentDate}
-        name='toDate'
-        InputLabelProps={{
-          shrink: true,
-        }}
-      />
 
-      <Button type='submit' sx={{mx:2}} startIcon={(
-                    <SvgIcon fontSize="small">
-                      <SearchOutlined />
-                    </SvgIcon>
-                  )}
-                  variant="contained"> Search </Button>
+        <Grid xs={6} md={1}>
+        <Button type='reset' onClick={resetFilters} sx={{height : 54,width: '100%',background:'red',mx:1}} 
+          startIcon={(
+              <SvgIcon fontSize="small">
+                <RefreshOutlined />
+              </SvgIcon>
+            )}
+            variant="contained"> Reset 
+          </Button>
+        </Grid>
+
+</Grid>
     </form>
   </Card>
 )};
