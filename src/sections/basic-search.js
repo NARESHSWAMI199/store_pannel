@@ -80,7 +80,6 @@ export const BasicSearch = (props) => {
               </SvgIcon>
             </InputAdornment>
           )}
-          sx={{ maxWidth: 240 }}
         />
       </Grid>
 
