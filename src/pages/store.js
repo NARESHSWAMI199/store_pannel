@@ -379,6 +379,7 @@ import ImageInput from "src/sections/image-input";
                                 return ( <MenuItem key={i} value={categroyObj.id}>{categroyObj.category}</MenuItem>
                                 )})
                             }
+                             <MenuItem value={0}>{"Other"}</MenuItem>
                             </Select>
                         </FormControl>
                     </Grid>
@@ -402,6 +403,7 @@ import ImageInput from "src/sections/image-input";
                                 return ( <MenuItem key={i} value={subcategroyObj.id}>{subcategroyObj.subcategory}</MenuItem>
                                 )})
                             }
+                             <MenuItem value={0}>{"Other"}</MenuItem>
                             </Select>
                         </FormControl>
                     </Grid>

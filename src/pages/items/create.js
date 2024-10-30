@@ -275,6 +275,7 @@ return ( <>
                         return ( <MenuItem key={i} value={categroyObj.id}>{categroyObj.category}</MenuItem>
                         )})
                     }
+                     <MenuItem value={0}>{"Other"}</MenuItem>
                     </Select>
                 </FormControl>
             </Grid>
@@ -298,6 +299,7 @@ return ( <>
                         return ( <MenuItem key={i} value={subcategroyObj.id}>{subcategroyObj.subcategory}</MenuItem>
                         )})
                     }
+                     <MenuItem value={0}>{"Other"}</MenuItem>
                     </Select>
                 </FormControl>
             </Grid>
