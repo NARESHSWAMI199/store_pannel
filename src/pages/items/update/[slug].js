@@ -51,7 +51,12 @@ const CreateItem = () => {
             await axios.get(host + "/wholesale/item/detail/"+slug,)
                 .then(res => {
                     const data = res.data.res;
-                    setValues({...data,category : data.itemCategory.id,subcategory : data.itemSubCategory.id})
+                    setValues({
+                        ...data,
+                        category : data.itemCategory.id,
+                        subcategory : data.itemSubCategory.id,
+                        unit :  data.itemSubCategory.unit
+                    })
                 })
                 .catch(err => {
                     setMessage(!!err.response ? err.response.data.message : err.message)
@@ -110,12 +115,26 @@ const CreateItem = () => {
 
     const handleChange = useCallback(
         (event) => {
-            setValues((prevState) => ({
-                ...prevState,
-                [event.target.name]: event.target.value
-            }));
+            if ([event.target.name] == 'subcategory'){
+                for(let subcategory of subcategories){
+                    console.log(subcategory.id + " "+event.target.value )
+                    if(subcategory.id ==  event.target.value){
+                        setValues((prevState) => ({
+                            ...prevState,
+                            unit : subcategory.unit,
+                            [event.target.name]: event.target.value
+                        }));
+                        break
+                    }
+                }
+            }else{
+                setValues((prevState) => ({
+                    ...prevState,
+                    [event.target.name]: event.target.value
+                }));
+            }
         },
-        []
+        [subcategories]
     );
 
 
@@ -134,6 +153,7 @@ const CreateItem = () => {
                 description: formData.get("description"),
                 categoryId: formData.get("category"),
                 subCategoryId: formData.get("subcategory"),
+                capacity : !!values.unit && values.unit != 'null' ? formData.get('capacity') : 0 ,
                 itemImage : values.itemImage
             }
 
@@ -321,6 +341,25 @@ const CreateItem = () => {
                                         </FormControl>
                                     </Grid>
 
+                            {/* capacity */}
+                            {!!values.unit && values.unit != 'null' ? 
+                                    <Grid
+                                        xs={12}
+                                        md={6}
+                                    >
+                                        <TextField
+                                            fullWidth
+                                            label={"Capacity/Weight in "+values.unit}
+                                            name="capacity"
+                                            onChange={handleChange}
+                                            required={true}
+                                            type="number"
+                                            value={values.capacity}
+                                            InputLabelProps={{ shrink: true }}
+                                        />
+
+                                    </Grid> : ''
+                            }
 
                                     <Grid
                                         xs={12}
