@@ -103,7 +103,16 @@ export const items = (user) =>{
       )
     },
     
-
+    {
+      title: 'Remove Background',
+      path: 'removebg',
+      show : true,
+      icon: (
+        <SvgIcon fontSize="small">
+          <PersonAddAltIcon />
+        </SvgIcon>
+      )
+    },
       
     {
       title: 'Blocked Items',

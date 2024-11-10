@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
 import { Image, Upload } from 'antd';
+import ImgCrop from "antd-img-crop";
 const getBase64 = (file) =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -15,7 +16,7 @@ const ImageInput = (props) => {
   const [fileList, setFileList] = useState([]);
   const [totalImage,setTotalImage] = useState(2)
   const accept = {
-    accept: '.png,.jpg',
+    accept: '.png,.jpg,.jpeg',
  };
   useEffect(()=>{
     if(!!props.totalImage || props.totalImage == 0){
@@ -30,6 +31,7 @@ const ImageInput = (props) => {
   },[props.avtar,props.totalImage])
 
   const handlePreview = async (file) => {
+    debugger
     if (!file.url && !file.preview) {
       file.preview = await getBase64(file.originFileObj);
     }
@@ -62,6 +64,7 @@ const ImageInput = (props) => {
   );
   return (
     <>
+       <ImgCrop showGrid rotationSlider aspectSlider showReset>
       <Upload
         //action={props.action}
         listType="picture-circle"
@@ -72,6 +75,7 @@ const ImageInput = (props) => {
       >
         {fileList.length >= totalImage ? null : uploadButton}
       </Upload>
+      </ImgCrop>
       {previewImage && (
         <Image
           wrapperStyle={{
@@ -85,6 +89,7 @@ const ImageInput = (props) => {
           src={previewImage}
         />
       )}
+
     </>
   );
 };
