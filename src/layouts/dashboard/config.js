@@ -105,7 +105,7 @@ export const items = (user) =>{
     
     {
       title: 'Remove Background',
-      path: 'removebg',
+      path: '/removebg',
       show : true,
       icon: (
         <SvgIcon fontSize="small">
