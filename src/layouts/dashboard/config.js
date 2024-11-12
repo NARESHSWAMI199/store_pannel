@@ -3,17 +3,13 @@ import CogIcon from '@heroicons/react/24/solid/CogIcon';
 import ShoppingBagIcon from '@heroicons/react/24/solid/ShoppingBagIcon';
 import UserIcon from '@heroicons/react/24/solid/UserIcon';
 import UsersIcon from '@heroicons/react/24/solid/UsersIcon';
-import { StoreOutlined } from '@mui/icons-material';
-import { SvgIcon } from '@mui/material';
-import StoreIcon from '@mui/icons-material/Store';
-import WorkspacePremium from '@mui/icons-material/WorkspacePremium';
-import { useAuth } from 'src/hooks/use-auth';
-import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
-import SecurityIcon from '@mui/icons-material/Security';
-import BadgeIcon from '@mui/icons-material/Badge';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
-import { suId } from 'src/utils/util';
+import BadgeIcon from '@mui/icons-material/Badge';
 import BlockIcon from '@mui/icons-material/Block';
+import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
+import StoreIcon from '@mui/icons-material/Store';
+import { SvgIcon } from '@mui/material';
+import WallpaperIcon from '@mui/icons-material/Wallpaper';
 export const items = (user) =>{
 
   return [
@@ -109,7 +105,7 @@ export const items = (user) =>{
       show : true,
       icon: (
         <SvgIcon fontSize="small">
-          <PersonAddAltIcon />
+          <WallpaperIcon />
         </SvgIcon>
       )
     },
