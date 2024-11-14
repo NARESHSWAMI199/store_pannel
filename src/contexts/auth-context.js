@@ -149,8 +149,15 @@ export const AuthProvider = (props) => {
 
 
 
-  const signIn = async (email, password) => {
-      await axios.post(host+"/wholesale/auth/login" , {
+  const signIn = async (email, password,method) => {
+
+    let baseUrl = host+"/wholesale/auth/login" 
+    if(method == 'OTP'){
+      baseUrl =  host+"/wholesale/auth/login/otp"
+    }
+    
+
+      await axios.post(baseUrl , {
           email : email,
           password : password
       })
