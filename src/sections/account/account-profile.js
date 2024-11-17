@@ -41,7 +41,7 @@ export const AccountProfile = (props) => {
     .then(res =>{
       flagStatus = "success"
       setMessage(res.data.message)
-      user.avatar = image.name
+      user.avatar = res.data.imageName
       handleUpdateLoggedUser()
     }).catch(err=>{
         flagStatus = "error"
