@@ -27,6 +27,7 @@ import FormGroup from '@mui/material/FormGroup';
 import ImageInput from "src/sections/image-input";
 import { margin } from "@mui/system";
 import { useRouter } from "next/router";
+import MultipleImageInput from "src/sections/multipleImage-input";
 
 
 
@@ -41,6 +42,10 @@ const auth = useAuth()
 const [values,setValues] = useState({itemLabel:label})
 const [categories,setItemCategories] = useState([])
 const [subcategories,setItemSubCategories] = useState([])
+const [newImages,setNewImages] = useState([])
+/** This is a string becaouse don't get actual files again */
+const [previousImages,setPreviousImages] = useState('')
+
 
 const handleChange = useCallback(
   (event) => {
@@ -127,7 +132,9 @@ useEffect(() => {
         categoryId: formData.get("category"),
         subCategoryId: formData.get("subcategory"),
         capacity : !!values.unit && values.unit != 'null' ? formData.get('capacity') : 0 ,
-        itemImage : values.itemImage
+        // itemImage : values.itemImage
+        previousItemImages : previousImages,
+        newItemImages : newImages
       }
 
     axios.defaults.headers = {
@@ -159,14 +166,21 @@ const reset = () =>{
 }
 
 
-const onSubmit = (image) =>{
-  console.log(image)
-  setValues((pervious)=>({
-    ...pervious,
-    itemImage : image.originFileObj
-  }))
-}
+const onSubmit = (images) =>{
+  console.log(images)
 
+  let previousImages = ''
+  let newImages = []
+  for(let image of images){
+      if(image.hasOwnProperty("oldImage")){
+          previousImages +=image.name + ","
+      }else{
+          newImages.push(image.originFileObj)
+      }
+  }
+  setPreviousImages(previousImages)
+  setNewImages(newImages)
+}
 
 return ( <>
 
@@ -201,9 +215,12 @@ return ( <>
       <CardContent sx={{ pt: 0 }}>
         <Box sx={{ m: -1.5 }}>
 
-        <Box style={{marginLeft : '10px',marginTop: '20px',marginBottom : '20px'}}>
-          <ImageInput onChange={onSubmit} totalImage={1}/>
+        <Box sx={{
+            my: 2
+        }}>
+             <MultipleImageInput totalImage={5} onChange={onSubmit} />
         </Box>
+
 
           <Grid
             container

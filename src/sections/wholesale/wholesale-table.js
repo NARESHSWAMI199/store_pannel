@@ -223,8 +223,8 @@ export const ItemsTable = (props) => {
                         spacing={2}
                       >      
                  
-                    {!!item.avtar ? <Image src={itemImage+item.slug+"/"+item.avtar} style={{borderRadius : "50%" , width:"50px", height : "50px" }}/>  : 
-                        <Avatar src={itemImage+item.slug+"/"+item.avtar} >
+                    {!!item.avtar ? <Image src={itemImage+item.slug+"/"+item.avtars?.split(',')[0]} style={{borderRadius : "50%" , width:"50px", height : "50px" }}/>  : 
+                        <Avatar src={itemImage+item.slug+"/"+item.avtars?.split(',')[0]} >
                           {getInitials(item.name)}
                         </Avatar>
                         }

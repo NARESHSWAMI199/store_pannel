@@ -1,32 +1,31 @@
+import RefreshIcon from '@mui/icons-material/Refresh';
 import {
+    Alert,
     Box,
     Button,
     Card,
     CardActions,
     CardContent,
     CardHeader,
+    Container,
     Divider,
-    MenuItem,
-    Select,
-    TextField,
+    FormControl,
     Unstable_Grid2 as Grid,
     InputLabel,
-    FormControl,
+    MenuItem,
+    Select,
     Snackbar,
-    Checkbox,
-    Alert,
-    Container,
     Stack,
-    SvgIcon
+    SvgIcon,
+    TextField
 } from "@mui/material";
 import axios from "axios";
+import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "src/hooks/use-auth";
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
+import MultipleImageInput from "src/sections/multipleImage-input";
 import { host, itemImage } from "src/utils/util";
-import { useRouter } from "next/router";
-import ImageInput from "src/sections/image-input";
-import RefreshIcon from '@mui/icons-material/Refresh';
 
 
 const CreateItem = () => {
@@ -41,7 +40,10 @@ const CreateItem = () => {
     const [subcategories,setItemSubCategories] = useState([])
     const auth = useAuth()
     const [values, setValues] = useState({})
-
+    const [avtars,setAvtars] = useState([])
+    const [newImages,setNewImages] = useState([])
+    /** This is a string becaouse don't get actual files again */
+    const [previousImages,setPreviousImages] = useState('')
 
     useEffect(() => {
         const getData = async () => {
@@ -113,6 +115,19 @@ const CreateItem = () => {
 
 
 
+    useEffect(()=>{
+        if(!!values.avtars){
+            console.log(values.avtars)
+            let avatarImages = values.avtars.split(',')
+            let avatarImagesUrls = []
+            for(let avtarImage of avatarImages){
+                avatarImagesUrls.push(values.slug !=undefined ? itemImage+values.slug+"/"+avtarImage : '')
+            }
+            setAvtars(avatarImagesUrls)
+        }   
+    },[values])
+
+
     const handleChange = useCallback(
         (event) => {
             if ([event.target.name] == 'subcategory'){
@@ -154,7 +169,8 @@ const CreateItem = () => {
                 categoryId: formData.get("category"),
                 subCategoryId: formData.get("subcategory"),
                 capacity : !!values.unit && values.unit != 'null' ? formData.get('capacity') : 0 ,
-                itemImage : values.itemImage
+                previousItemImages : previousImages,
+                newItemImages : newImages
             }
 
             axios.defaults.headers = {
@@ -181,12 +197,21 @@ const CreateItem = () => {
     })
 
 
-    const onSubmit = (image) =>{
-        console.log(image)
-        setValues((pervious)=>({
-          ...pervious,
-          itemImage : image.originFileObj
-        }))
+
+    const onSubmit = (images) =>{
+        console.log(images)
+
+        let previousImages = ''
+        let newImages = []
+        for(let image of images){
+            if(image.hasOwnProperty("oldImage")){
+                previousImages +=image.name + ","
+            }else{
+                newImages.push(image.originFileObj)
+            }
+        }
+        setPreviousImages(previousImages)
+        setNewImages(newImages)
       }
 
     return (<>
@@ -221,9 +246,17 @@ const CreateItem = () => {
                         <CardContent sx={{ pt: 0 }}>
                             <Box sx={{ m: -1.5 }}>
         
-                            <div style={{marginLeft : '10px',marginTop: '10px'}}>
+                            {/* <div style={{marginLeft : '10px',marginTop: '10px'}}>
                                 <ImageInput onChange={onSubmit} avtar={values.slug !=undefined ?itemImage+values.slug+"/"+values.avtar : ''}/>
-                            </div>
+                            </div> */}
+
+
+                            <Box sx={{
+                                my: 2
+                            }}>
+                                <MultipleImageInput totalImage={5} onChange={onSubmit} avtars={avtars.length > 0 && avtars}/>
+                            </Box>
+
 
                                 <Grid
                                     container

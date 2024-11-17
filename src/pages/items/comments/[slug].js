@@ -1,18 +1,18 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import Head from 'next/head';
-import {  Alert, Box, Button, Card, CardActions, CardContent, Container, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, Link, MenuItem, Rating, Snackbar, Stack, SvgIcon, Typography, useMediaQuery } from '@mui/material';
-import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
-import axios from 'axios';
-import { host, itemImage, toTitleCase } from 'src/utils/util';
-import { useAuth } from 'src/hooks/use-auth';
-import { Divider, Image } from 'antd';
-import { useRouter } from 'next/router';
-import { CurrencyRupee, Discount, DiscountOutlined, EditOutlined, KeyOutlined } from '@mui/icons-material';
+import { CurrencyRupee, Discount, EditOutlined } from '@mui/icons-material';
 import KeyIcon from '@mui/icons-material/Key';
-import { format } from 'date-fns';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { Alert, Box, Button, Card, CardContent, Container, Grid, Rating, Snackbar, Typography } from '@mui/material';
+import { Carousel, Image } from 'antd';
+import axios from 'axios';
+import { format } from 'date-fns';
+import Head from 'next/head';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import { useAuth } from 'src/hooks/use-auth';
+import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { OptionMenu } from 'src/layouts/option-menu';
-
+import { host, itemImage, toTitleCase } from 'src/utils/util';
 
 
 const now = new Date();
@@ -65,11 +65,6 @@ const Page = () => {
                 setMessage(!!err.response ? err.response.data.message : err.message)
                 setFlag('error')
                 setOpen(true)
-                let status = (!!err.response ? err.response.status : 0);
-                if (status == 401) {
-                  auth.signOut();
-                  router.push("/auth/login")
-                }
             })
     }
     getData();
@@ -135,20 +130,35 @@ useEffect( ()=>{
       >
         <Container maxWidth="xl">
           <Card>
-            <CardContent sx={{mt:3}}>
+            <CardContent>
               {/* <BasicSearch onSearch={onSearch} /> */}
               <Grid container spacing={3}>
                   <Grid xs={12} md={3}> 
-                      <Image
-                          height="100%"
-                          width ='100%'
-                          max-width='300px'
-                          max-height='300px'
-                          src={itemImage+item.slug+"/"+item.avtar}
-                      />
+                    <Carousel style={{
+                      height : 400,
+                      background : '#303030'
+                    }}>
+                      {!!item.avtars && item.avtars.split(',').map(avtar =>{
+                       return (<Image
+                            width ={376}
+                            height={'auto'}
+                            max-width='300px'
+                            max-height='300px'
+                            src={itemImage+item.slug+"/"+avtar}
+                        />)
+                      })}
+                      </Carousel>
                   </Grid>
                   {/* item Detail */}
-                  <Grid item xs={12} md={7}>
+                    <Grid item xs={12} md={7} 
+                          style={{
+                            display : 'flex',
+                            flexDirection : 'column',
+                            justifyContent : 'center',
+                            // alignItems : 'center',
+                            textAlign : 'left'
+                          }}
+                      >
                           <Typography component="div" variant="h5">
                               {toTitleCase(item.name)}
                           </Typography>
@@ -246,15 +256,29 @@ useEffect( ()=>{
                                   </div>  
                           </Typography>
                   </Grid>
-              <Grid xs={2} md={2}>
-                  <Typography style={{float:'right'}}>
-                    <Link href={"/items/update/"+slug}
-                      style={{ textDecoration : 'none', color:'#6C737F'}}
-                    >
-                      <EditOutlined />
-                    </Link>         
-                  </Typography>
-              </Grid>
+
+                 <Grid xs={2} md={2} 
+                  style={{
+                    display : "flex",
+                    justifyContent : 'flex-end',
+                    alignItems :'center'
+                  }}
+                 >
+                        <Link href = {{
+                            pathname : "/item/update/[slug]",
+                            query : {slug : slug}
+                        }}
+                          style={{ 
+                            textDecoration : 'none', 
+                            color:'#6C737F',
+                          }}
+                        >
+                          <Button variant='outlined' icon> <Typography>
+                            Edit
+                          </Typography> </Button>
+                      </Link>         
+                  </Grid>`
+
               </Grid>
             </CardContent>
           </Card>
@@ -263,7 +287,9 @@ useEffect( ()=>{
                   Customer Reviews :
               </Typography>
               {comments.map((comment,i) => {
-                  return (<Box key={i} style={{width : '100%' , padding : 20}} sx={{boxShadow : 1}}>
+                  return (<Box 
+                  key ={i}
+                  style={{width : '100%' , padding : 20}} sx={{boxShadow : 1}}>
                     <Grid container spacing={3}>
                       <Grid item xs={11} md={11} >
                         <Typography variant='subtitle' sx={{color : "text.primary", fontSize : 15}}>
