@@ -1,7 +1,7 @@
 import { ArrowRightAltOutlined } from '@mui/icons-material'
 import { Avatar, Box, Button, SvgIcon, Typography } from '@mui/material'
 import Link from 'next/link'
-import bg from 'public/assets/bg.png'
+import bg from 'public/assets/bg2.png'
 import logo from 'public/assets/logos/logo.png'
 import HomeNavbar from 'src/sections/top-nav'
 function Page() {
@@ -21,7 +21,7 @@ function Page() {
             display : 'flex',
             justifyContent : 'center',
             alignItems : 'center',
-            height : '100%',
+            height : '95%',
             width : '90%',
             m : '0 auto',
             flexDirection : 'column'
@@ -51,13 +51,14 @@ function Page() {
             variant='h1'
             sx={{
                 fontFamily : 'Georgia, serif',
-                fontSize : '6vw',
+                fontSize : '4vw',
                 textAlign : 'center',
-                fontWeight : 'light'
+                fontWeight : 'light',
+                color : '#ffffff'
             }}
-        >WELCOME 
-        <br/> TO <br/>
-         <span style={{color : '#6366f1'}}>S</span>WAMI <span style={{color : '#6366f1'}}>S</span>ALES
+        >
+            WELCOME TO <br/>
+            <span style={{  fontSize : '6vw',}}> SWAMI SALES </span>
         </Typography>
 
         <Typography 
@@ -96,7 +97,7 @@ function Page() {
                 justifyContent : 'center',
                 alignItems : 'center',
                 boxShadow: '0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)',
-                alignSelf : 'flex-end'
+                // alignSelf : 'flex-end'
                 // top : '25%',
                 // left : '35%'
             }} > 

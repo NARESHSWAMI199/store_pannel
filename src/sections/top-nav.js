@@ -53,7 +53,7 @@ function HomeNavbar() {
   }
 
   return (
-    <AppBar position="fixed">
+    <AppBar position="fixed"  sx={{boxShadow : 0}}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Avatar src={logo.src} sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
