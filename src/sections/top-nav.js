@@ -17,7 +17,7 @@ import * as React from 'react';
 import { projectName } from 'src/utils/util';
 
 
-const pages = ['Products','Pricing','Blog','Login'];
+const pages = ['Products','Pricing','Blog','Sign-In', "Sign-Up"];
 const settings = ['Profile', 'Account', 'Dashboard', 'Login'];
 
 function HomeNavbar() {
@@ -43,8 +43,11 @@ function HomeNavbar() {
 
 
   const handleRedirect = (pageName) => {
-    if(pageName == "Login") {
+    if(pageName == "Login" || pageName == "Sign-In") {
       router.push("/auth/login")
+    }
+    else if(pageName == "Register" || pageName == "Sign-Up") {
+      router.push("/auth/register")
     }else if(pageName == "Pricing"){
       router.push("/pricing")
     }else {
