@@ -155,8 +155,6 @@ export const AuthProvider = (props) => {
     if(method == 'OTP'){
       baseUrl =  host+"/wholesale/auth/login/otp"
     }
-    
-
       await axios.post(baseUrl , {
           email : email,
           password : password
@@ -210,8 +208,21 @@ export const AuthProvider = (props) => {
 
 
 
-  const signUp = async (email, name, password) => {
-    throw new Error('Sign up is not implemented');
+  const signUp = async (name,email,contact,password) => {
+    let baseUrl = host+"/wholesale/auth/register" 
+    await axios.post(baseUrl , {
+        email : email,
+        password : password,
+        username : name,
+        contact : contact
+    })
+    .then (res => {
+      signIn(email,password)
+    })
+    .catch (err =>{ 
+        const errorMessage = (!!err.response) ? err.response.data.message : err.message;
+        console.log(errorMessage)
+    })
   };
 
   const signOut = () => {

@@ -2,6 +2,7 @@ import {
   Alert,
   Box,
   Button,
+  Link,
   Snackbar,
   Stack,
   Tab,
@@ -19,6 +20,20 @@ import { useAuth } from 'src/hooks/use-auth';
 import { Layout as AuthLayout } from 'src/layouts/auth/layout';
 import { host } from 'src/utils/util';
 import * as Yup from 'yup';
+import bg from 'public/assets/bg2.png'
+import styled from '@emotion/styled';
+import HomeNavbar from 'src/sections/top-nav';
+import NextLink from 'next/link';
+
+const Container = styled.div`
+  width : 35%;
+  background : white;
+  border-radius : 20px;
+  @media (max-width: 768px) {
+    width : 98%;
+  }
+`;
+
 
 const Page = (props) => {
 
@@ -133,6 +148,20 @@ const Page = (props) => {
 
   return (
     <>
+        <Box
+        sx={{
+            backgroundImage:`url(${bg.src})`,
+            backgroundRepeat: "no-repeat",
+            backgroundSize: "cover",
+            height : '100vh',
+            display : 'flex',
+            flexDirection : 'row',
+            justifyContent : 'center',
+            alignItems : 'center'
+        }}
+     >
+    <HomeNavbar />
+    <Container>
       <Head>
         <title>
           Login | Swami Sales
@@ -140,11 +169,10 @@ const Page = (props) => {
       </Head>
       <Box
         sx={{
-          backgroundColor: 'background.paper',
-          flex: '1 1 auto',
           alignItems: 'center',
           display: 'flex',
-          justifyContent: 'center'
+          justifyContent: 'center',
+          borderRadius : 2
         }}
       >
         <Box
@@ -161,7 +189,22 @@ const Page = (props) => {
               sx={{ mb: 3 }}
             >
               <Typography variant="h4">
-                Login
+                Already have an account ?
+              </Typography>
+              <Typography
+                color="text.secondary"
+                variant="body2"
+              >
+                Don't have any account?
+                &nbsp;
+                <Link
+                  component={NextLink}
+                  href="/auth/register"
+                  underline="hover"
+                  variant="subtitle2"
+                >
+                  Register
+                </Link>
               </Typography>
             </Stack>
             <Tabs
@@ -223,7 +266,7 @@ const Page = (props) => {
                   type="submit"
                   variant="contained"
                 >
-                  Continue
+                  Login
                 </Button>
          
             
@@ -301,15 +344,17 @@ const Page = (props) => {
     </Snackbar>
 
       </Box>
+      </Container>
+      </Box>
     </>
   );
 };
 
-Page.getLayout = (page) => (
-    <AuthLayout>
-      {page}
-    </AuthLayout>
-);
+// Page.getLayout = (page) => (
+//     <AuthLayout>
+//       {page}
+//     </AuthLayout>
+// );
 
 
 export default Page;

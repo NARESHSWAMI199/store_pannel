@@ -6,6 +6,19 @@ import * as Yup from 'yup';
 import { Box, Button, Link, Stack, TextField, Typography } from '@mui/material';
 import { useAuth } from 'src/hooks/use-auth';
 import { Layout as AuthLayout } from 'src/layouts/auth/layout';
+import HomeNavbar from 'src/sections/top-nav';
+import bg from 'public/assets/bg2.png'
+import styled from '@emotion/styled';
+
+
+const Container = styled.div`
+  width : 40%;
+  background : white;
+  border-radius : 20px;
+  @media (max-width: 768px) {
+    width : 98%;
+  }
+`;
 
 const Page = () => {
   const router = useRouter();
@@ -15,6 +28,8 @@ const Page = () => {
       email: '',
       name: '',
       password: '',
+      password2: '',
+      contact : '',
       submit: null
     },
     validationSchema: Yup.object({
@@ -30,11 +45,23 @@ const Page = () => {
       password: Yup
         .string()
         .max(255)
-        .required('Password is required')
+        .required('Password is required'),
+      password2: Yup
+        .string()
+        .max(255)
+        .required('Password is required'),
+      contact : Yup
+        .string()
+        .max(10)
+        .required('Contact is required')
     }),
     onSubmit: async (values, helpers) => {
       try {
-        await auth.signUp(values.email, values.name, values.password);
+        if(values.password == values.password2){
+          await auth.signUp(values.name, values.email, values.contact,values.password);
+        }else{
+          throw new Error("Password and confrim password doesn't match");
+        }
         router.push('/');
       } catch (err) {
         helpers.setStatus({ success: false });
@@ -46,9 +73,23 @@ const Page = () => {
 
   return (
     <>
+    <Box
+        sx={{
+            backgroundImage:`url(${bg.src})`,
+            backgroundRepeat: "no-repeat",
+            backgroundSize: "cover",
+            height : '100vh',
+            display : 'flex',
+            flexDirection : 'row',
+            justifyContent : 'center',
+            alignItems : 'center'
+        }}
+     >
+    <HomeNavbar />
+    <Container>
       <Head>
         <title>
-          Register | Devias Kit
+          Register | Swami Sales
         </title>
       </Head>
       <Box
@@ -61,7 +102,7 @@ const Page = () => {
       >
         <Box
           sx={{
-            maxWidth: 550,
+            maxWidth: 650,
             px: 3,
             py: '100px',
             width: '100%'
@@ -73,7 +114,7 @@ const Page = () => {
               sx={{ mb: 3 }}
             >
               <Typography variant="h4">
-                Register
+                Don't have any account ?
               </Typography>
               <Typography
                 color="text.secondary"
@@ -105,6 +146,7 @@ const Page = () => {
                   onBlur={formik.handleBlur}
                   onChange={formik.handleChange}
                   value={formik.values.name}
+                  InputLabelProps={{shrink: true}}
                 />
                 <TextField
                   error={!!(formik.touched.email && formik.errors.email)}
@@ -116,7 +158,22 @@ const Page = () => {
                   onChange={formik.handleChange}
                   type="email"
                   value={formik.values.email}
+                  InputLabelProps={{shrink: true}}
                 />
+
+                <TextField
+                  error={!!(formik.touched.contact && formik.errors.contact)}
+                  fullWidth
+                  helperText={formik.touched.contact && formik.errors.contact}
+                  label="Phone Number"
+                  name="contact"
+                  onChange={formik.handleChange}
+                  type="number"
+                  value={formik.values.contact}
+                  max={10}
+                  InputLabelProps={{shrink: true}}
+                />
+                
                 <TextField
                   error={!!(formik.touched.password && formik.errors.password)}
                   fullWidth
@@ -127,6 +184,20 @@ const Page = () => {
                   onChange={formik.handleChange}
                   type="password"
                   value={formik.values.password}
+                  InputLabelProps={{shrink: true}}
+                />
+
+                <TextField
+                  error={!!(formik.touched.password2 && formik.errors.password2)}
+                  fullWidth
+                  helperText={formik.touched.password2 && formik.errors.password2}
+                  label="Confirm Password"
+                  name="password2"
+                  onBlur={formik.handleBlur}
+                  onChange={formik.handleChange}
+                  type="password"
+                  value={formik.values.password2}
+                  InputLabelProps={{shrink: true}}
                 />
               </Stack>
               {formik.errors.submit && (
@@ -145,20 +216,16 @@ const Page = () => {
                 type="submit"
                 variant="contained"
               >
-                Continue
+                Register
               </Button>
             </form>
           </div>
         </Box>
       </Box>
+      </Container>
+      </Box>
     </>
   );
 };
-
-Page.getLayout = (page) => (
-  <AuthLayout>
-    {page}
-  </AuthLayout>
-);
 
 export default Page;

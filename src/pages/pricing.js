@@ -1,5 +1,5 @@
 
-import { Avatar, Box, Button, Grid, Link, Typography } from '@mui/material'
+import { Alert, Avatar, Box, Button, Grid, Link, Snackbar, Typography } from '@mui/material'
 import bg from 'public/assets/bg.png'
 import HomeNavbar from 'src/sections/top-nav'
 import { host, projectName } from 'src/utils/util'
@@ -8,26 +8,68 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import {useRouter } from 'next/router'
 import { redirect } from 'next/dist/server/api-utils'
+import { useAuth } from 'src/hooks/use-auth'
 
 
 function Pricing() {
-    const [plans,setPlans] = useState([])
+    const [plans,setPlans] = useState([])    
+    const auth = useAuth()
+
+    const [open, setOpen] = useState()
+    const [message, setMessage] = useState("")
+    const [flag, setFlag] = useState("warning")
+
 
     useEffect(()=>{
         axios(host+"/plans/all")
         .then(res => {
             setPlans(res.data)
         })
-        .catch(err=>console.log(err))
+        .catch(err=>{
+            console.log(err)
+            setMessage(!!err.respone ? err.response.data.message : err.message)
+            setFlag("error")
+            setOpen(true)
+        })
     },[])
 
 
     const redirectForPayment = (slug) =>{
-        window.open(host+"/pg/phonepe/"+slug)
+        axios.defaults.headers = {
+            Authorization: auth.token
+        }
+        
+        axios.get(host+"/pg/pay/"+slug)
+        .then(res => {
+            window.open(res.data.url);
+        })
+        .catch(err => {
+            console.log(err)
+            setMessage(!!err.respone ? err.response.data.message : err.message)
+            setFlag("error")
+            setOpen(true)
+        });
     }
 
 
-  return (<Box
+    /** for snackbar close */
+    const handleClose = () => {
+        setOpen(false)
+    };
+    
+
+  return (<>
+  
+<Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+    open={open}
+    onClose={handleClose}
+    key={'top' + 'right'}
+>
+    <Alert onClose={handleClose} severity={flag} sx={{ width: '100%' }}>
+        {message}
+    </Alert>
+</Snackbar>
+<Box
         sx={{
             backgroundImage:`url(${bg.src})`,
             backgroundRepeat: "no-repeat",
@@ -138,6 +180,7 @@ function Pricing() {
        
         </Grid>
      </Box>
+     </>
   )
 }
 
