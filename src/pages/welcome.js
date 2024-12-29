@@ -3,9 +3,11 @@ import { Avatar, Box, Button, SvgIcon, Typography } from '@mui/material'
 import Link from 'next/link'
 import bg from 'public/assets/bg2.png'
 import logo from 'public/assets/logos/logo.png'
+import { useAuth } from 'src/hooks/use-auth'
 import HomeNavbar from 'src/sections/top-nav'
 function Page() {
 
+const auth = useAuth()
   return (
     <Box
         sx={{
@@ -81,7 +83,7 @@ function Page() {
 
             
         <Link href={{
-            pathname : "/pricing"
+            pathname :  !!auth.token ? "/pricing" : "/auth/register"
         }} style={{
                 height : 60,
                 width: 300,

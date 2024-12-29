@@ -68,18 +68,22 @@ const handlers = {
   [HANDLERS.SIGN_IN]: (state, action) => {
     const user = action.payload;
     const store = action.store;
+    const planIsActive = action.planIsActive;
     return {
       ...state,
       token : action.token,
       isAuthenticated: true,
-      user,store
+      user,store,
+      planIsActive
     };
   },
   [HANDLERS.SIGN_OUT]: (state) => {
     return {
       ...state,
       isAuthenticated: false,
-      user: null
+      user: null,
+      token : null,
+      store : null
     };
   },
   [HANDLERS.UPDATE_USER]: (state,action) => {
@@ -165,13 +169,16 @@ export const AuthProvider = (props) => {
         window.sessionStorage.setItem('token', token);
         const user = res.data.user
         const store = res.data.store
+        const planIsActive = res.data.planIsActive;
         window.sessionStorage.setItem("user",JSON.stringify(user))
         window.sessionStorage.setItem("store",JSON.stringify(store))
+        window.sessionStorage.setItem("planIsActive",JSON.stringify(planIsActive))
         dispatch({
           type: HANDLERS.SIGN_IN,
           token: token,
           payload : user,
-          store : store
+          store : store,
+          planIsActive : planIsActive
         });
       })
       .catch (err =>{ 
@@ -229,8 +236,12 @@ export const AuthProvider = (props) => {
     window.sessionStorage.removeItem('authenticated');
     window.sessionStorage.removeItem('user');
     window.sessionStorage.removeItem('store');
+    window.sessionStorage.removeItem('token');
     dispatch({
-      type: HANDLERS.SIGN_OUT
+      type: HANDLERS.SIGN_OUT,
+      token : null,
+      payload  : null,
+      store : null
     });
   };
 

@@ -15,7 +15,7 @@ import axios from 'axios';
 import { useFormik } from 'formik';
 import Head from 'next/head';
 import { useRouter } from 'next/navigation';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from 'src/hooks/use-auth';
 import { Layout as AuthLayout } from 'src/layouts/auth/layout';
 import { host } from 'src/utils/util';
@@ -51,6 +51,15 @@ const Page = (props) => {
   const [values,setValues] = useState({})
   const [showSpinner,setShowSpinner] = useState(false)
   const [showOtpInput,setShowOtpInput] = useState(false)
+
+
+
+  useEffect(()=>{
+    if(!!auth.token){
+      router.push("/")
+    }
+  },[auth.token])
+
 
   const handleChange = (event) => {
     if ([event.target.name] == 'email') setShowOtpInput(false)
@@ -130,6 +139,7 @@ const Page = (props) => {
     onSubmit: async (values, helpers) => {
       try {
         await auth.signIn(values.email, values.password);
+        alert(auth.planIsActive)
         router.push('/');
       } catch (err) {
         helpers.setStatus({ success: false });

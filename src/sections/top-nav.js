@@ -14,17 +14,31 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import logo from 'public/assets/logos/logow.png';
 import * as React from 'react';
+import { useAuth } from 'src/hooks/use-auth';
 import { projectName } from 'src/utils/util';
 
 
-const pages = ['Products','Pricing','Blog','Sign-In', "Sign-Up"];
-const settings = ['Profile', 'Account', 'Dashboard', 'Login'];
+
 
 function HomeNavbar() {
 
+  const auth = useAuth();
   const router = useRouter()
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const [pages,setPages] = React.useState(['Products','Pricing','Blog'])
+// const settings = ['Profile', 'Account', 'Dashboard',"Register", 'Login'];
+
+
+React.useEffect(()=>{
+  console.log(auth.token)
+  if(!!auth.token){
+    setPages([...pages.filter(p => (((p != "Login") || (p !="Register")))) ,"Logout"])
+  }else{
+    setPages([...pages.filter(p => p != "Logout") ,"Login","Register"])
+  }
+},[auth.token])
+
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -42,18 +56,22 @@ function HomeNavbar() {
   };
 
 
-  const handleRedirect = (pageName) => {
-    if(pageName == "Login" || pageName == "Sign-In") {
+  const handleRedirect = async(pageName) => {
+    if(pageName == "Login") {
       router.push("/auth/login")
+    } else if(pageName == "Logout") {
+      await auth.signOut();
+      router.push('/auth/login');
     }
-    else if(pageName == "Register" || pageName == "Sign-Up") {
+    else if(pageName == "Register") {
       router.push("/auth/register")
     }else if(pageName == "Pricing"){
-      router.push("/pricing")
+      router.push(!!auth.token ? "/pricing" : "/auth/register")
     }else {
       router.push("/welcome")
     }
   }
+
 
   return (
     <AppBar position="fixed"  sx={{boxShadow : 0}}>

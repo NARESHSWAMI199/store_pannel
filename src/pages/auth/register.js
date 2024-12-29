@@ -9,6 +9,7 @@ import { Layout as AuthLayout } from 'src/layouts/auth/layout';
 import HomeNavbar from 'src/sections/top-nav';
 import bg from 'public/assets/bg2.png'
 import styled from '@emotion/styled';
+import { useEffect } from 'react';
 
 
 const Container = styled.div`
@@ -70,6 +71,15 @@ const Page = () => {
       }
     }
   });
+
+
+
+    useEffect(()=>{
+      if(!!auth.token){
+        router.push("/")
+      }
+    },[auth.token])
+  
 
   return (
     <>
