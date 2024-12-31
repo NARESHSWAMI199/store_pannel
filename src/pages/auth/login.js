@@ -15,7 +15,7 @@ import axios from 'axios';
 import { useFormik } from 'formik';
 import Head from 'next/head';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth } from 'src/hooks/use-auth';
 import { Layout as AuthLayout } from 'src/layouts/auth/layout';
 import { host } from 'src/utils/util';
@@ -25,15 +25,30 @@ import styled from '@emotion/styled';
 import HomeNavbar from 'src/sections/top-nav';
 import NextLink from 'next/link';
 
+
 const Container = styled.div`
-  width : 35%;
+  width : 30%;
   background : white;
   border-radius : 20px;
+  padding : 60px;
   @media (max-width: 768px) {
     width : 98%;
+    padding : 30px;
   }
-`;
+  @media (min-width: 768px) and (max-width: 992px) {
+    width : 50%;
+    padding : 50px;
+  }
+  @media (min-width: 992px) and (max-width: 1200px) {
+    width : 50%;
+    padding : 80px;
+  }
+  @media (min-width: 1200px){
+    width : 30%;
+    padding : 80px;
+  }
 
+`;
 
 const Page = (props) => {
 
@@ -139,7 +154,6 @@ const Page = (props) => {
     onSubmit: async (values, helpers) => {
       try {
         await auth.signIn(values.email, values.password);
-        alert(auth.planIsActive)
         router.push('/');
       } catch (err) {
         helpers.setStatus({ success: false });
@@ -156,43 +170,67 @@ const Page = (props) => {
     []
   );
 
+
+
+  
+    const appBarRef = useRef(null);
+    const [appBarHeight, setAppBarHeight] = useState(0);
+  
+    useEffect(() => {
+      const getAppBarHeight = () => {
+        if (appBarRef.current) {
+          setAppBarHeight(appBarRef.current.clientHeight);
+        }
+      };
+  
+      getAppBarHeight(); 
+  
+      const resizeObserver = new ResizeObserver(getAppBarHeight);
+      if (appBarRef.current) {
+        resizeObserver.observe(appBarRef.current);
+      }
+  
+      return () => {
+        if (appBarRef.current) {
+          resizeObserver.unobserve(appBarRef.current);
+        }
+      };
+    }, []);
+  
+
   return (
     <>
-        <Box
+       <Box
         sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw', 
+            height: '100vh',
             backgroundImage:`url(${bg.src})`,
             backgroundRepeat: "no-repeat",
             backgroundSize: "cover",
-            height : '100vh',
+            overflowX: 'hidden', /* Hide horizontal scrollbar */
+            scrollbarWidth: 'none' 
+        }}
+     >
+    <HomeNavbar navRef = {appBarRef} />
+    <Box sx={{
+            mt : (appBarHeight+10)+'px',
             display : 'flex',
             flexDirection : 'row',
             justifyContent : 'center',
-            alignItems : 'center'
-        }}
-     >
-    <HomeNavbar />
-    <Container>
+            alignItems : 'center',
+            minHeight : 'calc(100% - '+(appBarHeight+10)+'px)'
+          }}
+          >
       <Head>
         <title>
           Login | Swami Sales
         </title>
       </Head>
-      <Box
-        sx={{
-          alignItems: 'center',
-          display: 'flex',
-          justifyContent: 'center',
-          borderRadius : 2
-        }}
-      >
-        <Box
-          sx={{
-            maxWidth: 550,
-            px: 3,
-            py: '100px',
-            width: '100%'
-          }}
-        >
+      <Container>
+        <Box >
           <div>
             <Stack
               spacing={1}
@@ -352,9 +390,8 @@ const Page = (props) => {
           {message}
       </Alert>
     </Snackbar>
-
-      </Box>
       </Container>
+      </Box>
       </Box>
     </>
   );

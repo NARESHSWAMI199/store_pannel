@@ -3,29 +3,63 @@ import { Avatar, Box, Button, SvgIcon, Typography } from '@mui/material'
 import Link from 'next/link'
 import bg from 'public/assets/bg2.png'
 import logo from 'public/assets/logos/logo.png'
+import { useEffect, useRef, useState } from 'react'
 import { useAuth } from 'src/hooks/use-auth'
 import HomeNavbar from 'src/sections/top-nav'
 function Page() {
+
+
+    
+    const appBarRef = useRef(null);
+    const [appBarHeight, setAppBarHeight] = useState(0);
+    
+    useEffect(() => {
+        const getAppBarHeight = () => {
+        if (appBarRef.current) {
+            setAppBarHeight(appBarRef.current.clientHeight);
+        }
+        };
+    
+        getAppBarHeight(); 
+    
+        const resizeObserver = new ResizeObserver(getAppBarHeight);
+        if (appBarRef.current) {
+        resizeObserver.observe(appBarRef.current);
+        }
+    
+        return () => {
+        if (appBarRef.current) {
+            resizeObserver.unobserve(appBarRef.current);
+        }
+        };
+    }, []);
+      
 
 const auth = useAuth()
   return (
     <Box
         sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw', 
+            height: '100vh',
             backgroundImage:`url(${bg.src})`,
             backgroundRepeat: "no-repeat",
             backgroundSize: "cover",
-            height : '100vh'
+            overflowX: 'hidden', /* Hide horizontal scrollbar */
+            scrollbarWidth: 'none' 
         }}
      >
-    <HomeNavbar/>
+    <HomeNavbar navRef={appBarRef}/>
     <Box 
         sx={{
+            marginTop : (appBarHeight)+'px',
             display : 'flex',
             justifyContent : 'center',
             alignItems : 'center',
-            height : '95%',
+            minHeight : 'calc(100% - '+(appBarHeight)+'px)',
             width : '90%',
-            m : '0 auto',
             flexDirection : 'column'
         }}
     >
@@ -37,8 +71,7 @@ const auth = useAuth()
         width : 150,
         background : 'white',
         borderRadius : 50,
-        boxShadow : 1,
-        my : 5
+        boxShadow : 1
     }}> 
 
 

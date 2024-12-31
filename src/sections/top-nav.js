@@ -20,13 +20,14 @@ import { projectName } from 'src/utils/util';
 
 
 
-function HomeNavbar() {
+function HomeNavbar(props) {
 
   const auth = useAuth();
   const router = useRouter()
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
   const [pages,setPages] = React.useState(['Products','Pricing','Blog'])
+
 // const settings = ['Profile', 'Account', 'Dashboard',"Register", 'Login'];
 
 
@@ -74,7 +75,7 @@ React.useEffect(()=>{
 
 
   return (
-    <AppBar position="fixed"  sx={{boxShadow : 0}}>
+    <AppBar ref={props.navRef} position='fixed' sx={{boxShadow : 0}}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Avatar src={logo.src} sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />

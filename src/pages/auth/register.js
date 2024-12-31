@@ -9,16 +9,31 @@ import { Layout as AuthLayout } from 'src/layouts/auth/layout';
 import HomeNavbar from 'src/sections/top-nav';
 import bg from 'public/assets/bg2.png'
 import styled from '@emotion/styled';
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 
 const Container = styled.div`
-  width : 40%;
+  width : 50%;
   background : white;
   border-radius : 20px;
+  padding : 60px;
   @media (max-width: 768px) {
     width : 98%;
+    padding : 30px;
   }
+  @media (min-width: 768px) and (max-width: 992px) {
+    width : 68%;
+    padding : 50px;
+  }
+  @media (min-width: 992px) and (max-width: 1200px) {
+    width : 40%;
+    padding : 80px;
+  }
+  @media (min-width: 1200px){
+    width : 40%;
+    padding : 80px;
+  }
+
 `;
 
 const Page = () => {
@@ -81,43 +96,65 @@ const Page = () => {
     },[auth.token])
   
 
+
+
+  const appBarRef = useRef(null);
+  const [appBarHeight, setAppBarHeight] = useState(0);
+
+  useEffect(() => {
+    const getAppBarHeight = () => {
+      if (appBarRef.current) {
+        setAppBarHeight(appBarRef.current.clientHeight);
+      }
+    };
+
+    getAppBarHeight(); 
+
+    const resizeObserver = new ResizeObserver(getAppBarHeight);
+    if (appBarRef.current) {
+      resizeObserver.observe(appBarRef.current);
+    }
+
+    return () => {
+      if (appBarRef.current) {
+        resizeObserver.unobserve(appBarRef.current);
+      }
+    };
+  }, []);
+
   return (
     <>
     <Box
         sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw', 
+            height: '100vh',
             backgroundImage:`url(${bg.src})`,
             backgroundRepeat: "no-repeat",
             backgroundSize: "cover",
-            height : '100vh',
+            overflowX: 'hidden', /* Hide horizontal scrollbar */
+            scrollbarWidth: 'none' 
+        }}
+     >
+    <HomeNavbar navRef = {appBarRef} />
+    <Box sx={{
+            mt : (appBarHeight+10)+'px',
             display : 'flex',
             flexDirection : 'row',
             justifyContent : 'center',
-            alignItems : 'center'
-        }}
-     >
-    <HomeNavbar />
+            alignItems : 'center',
+            minHeight : 'calc(100% - '+(appBarHeight+10)+'px)'
+          }}
+          >
     <Container>
       <Head>
         <title>
           Register | Swami Sales
         </title>
       </Head>
-      <Box
-        sx={{
-          flex: '1 1 auto',
-          alignItems: 'center',
-          display: 'flex',
-          justifyContent: 'center'
-        }}
-      >
-        <Box
-          sx={{
-            maxWidth: 650,
-            px: 3,
-            py: '100px',
-            width: '100%'
-          }}
-        >
+      <Box>
           <div>
             <Stack
               spacing={1}
@@ -231,8 +268,9 @@ const Page = () => {
             </form>
           </div>
         </Box>
-      </Box>
+
       </Container>
+      </Box>
       </Box>
     </>
   );
