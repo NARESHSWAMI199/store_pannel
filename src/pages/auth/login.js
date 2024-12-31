@@ -204,7 +204,8 @@ const Page = (props) => {
         <Grid md={4.2} xs={12}
         sx={{
           background : 'white',
-          p : 5,
+          px : 5,
+          py : 10,
           borderRadius : 2
         }}>
       <Head>

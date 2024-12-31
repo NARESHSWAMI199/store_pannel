@@ -68,13 +68,11 @@ const handlers = {
   [HANDLERS.SIGN_IN]: (state, action) => {
     const user = action.payload;
     const store = action.store;
-    const planIsActive = action.planIsActive;
     return {
       ...state,
       token : action.token,
       isAuthenticated: true,
-      user,store,
-      planIsActive
+      user,store
     };
   },
   [HANDLERS.SIGN_OUT]: (state) => {
@@ -169,16 +167,13 @@ export const AuthProvider = (props) => {
         window.sessionStorage.setItem('token', token);
         const user = res.data.user
         const store = res.data.store
-        const planIsActive = res.data.planIsActive;
         window.sessionStorage.setItem("user",JSON.stringify(user))
         window.sessionStorage.setItem("store",JSON.stringify(store))
-        window.sessionStorage.setItem("planIsActive",JSON.stringify(planIsActive))
         dispatch({
           type: HANDLERS.SIGN_IN,
           token: token,
           payload : user,
-          store : store,
-          planIsActive : planIsActive
+          store : store
         });
       })
       .catch (err =>{ 

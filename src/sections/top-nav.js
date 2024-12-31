@@ -100,7 +100,7 @@ React.useEffect(()=>{
                 color : 'inherit'
               }}
               href={{
-                  pathname : '/welcome'
+                  pathname : '/'
               }}>
               {projectName}
             </Link>

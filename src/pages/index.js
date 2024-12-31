@@ -39,6 +39,26 @@ const user = auth.user
 const router = useRouter();
 
 
+
+useEffect(()=>{
+  axios.defaults.headers = {
+    Authorization : auth.token
+  }
+  axios.get(host+"/wholesale/plan/is-active")
+  .then(res => {
+    let planIsActive = res.data.planIsActive;
+    if(planIsActive){
+      console.log(planIsActive)
+    }else{
+      router.push("/dashboard")
+    }
+  }).catch(err=>{
+    console.log(err)
+  })
+
+},[])
+
+
 // Getting All Stores 
 useEffect( ()=>{
     const getData = async () => {

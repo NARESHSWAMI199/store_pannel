@@ -127,7 +127,8 @@ const Page = () => {
               background : 'white',
               marginTop : (appBarHeight+10)+'px',
               borderRadius : 2,
-              p : 5
+              px : 5,
+              py : 10
             }}>
           <Head>
             <title>
