@@ -59,7 +59,7 @@ const auth = useAuth()
             justifyContent : 'center',
             alignItems : 'center',
             minHeight : 'calc(100% - '+(appBarHeight)+'px)',
-            width : '90%',
+            width : '100%',
             flexDirection : 'column'
         }}
     >
@@ -89,18 +89,19 @@ const auth = useAuth()
                 fontSize : '4vw',
                 textAlign : 'center',
                 fontWeight : 'light',
-                color : '#ffffff'
+                color : '#ffffff',
+                mt : 2
             }}
         >
             WELCOME TO <br/>
-            <span style={{  fontSize : '6vw',}}> SWAMI SALES </span>
+            <span style={{  fontSize : '120px',}}> SWAMI SALES </span>
         </Typography>
 
         <Typography 
             variant='h3'
             sx={{
                 fontFamily : 'serif',
-                fontSize : '1.5vw'
+                fontSize : '24px'
             }}
         >
          Grow your bussinus with swami sales.

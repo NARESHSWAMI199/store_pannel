@@ -2,6 +2,7 @@ import {
   Alert,
   Box,
   Button,
+  Grid,
   Link,
   Snackbar,
   Stack,
@@ -10,7 +11,7 @@ import {
   TextField,
   Typography
 } from '@mui/material';
-import { Spin } from 'antd';
+import {Spin } from 'antd';
 import axios from 'axios';
 import { useFormik } from 'formik';
 import Head from 'next/head';
@@ -25,30 +26,6 @@ import styled from '@emotion/styled';
 import HomeNavbar from 'src/sections/top-nav';
 import NextLink from 'next/link';
 
-
-const Container = styled.div`
-  width : 30%;
-  background : white;
-  border-radius : 20px;
-  padding : 60px;
-  @media (max-width: 768px) {
-    width : 98%;
-    padding : 30px;
-  }
-  @media (min-width: 768px) and (max-width: 992px) {
-    width : 50%;
-    padding : 50px;
-  }
-  @media (min-width: 992px) and (max-width: 1200px) {
-    width : 50%;
-    padding : 80px;
-  }
-  @media (min-width: 1200px){
-    width : 30%;
-    padding : 80px;
-  }
-
-`;
 
 const Page = (props) => {
 
@@ -215,22 +192,27 @@ const Page = (props) => {
         }}
      >
     <HomeNavbar navRef = {appBarRef} />
-    <Box sx={{
-            mt : (appBarHeight+10)+'px',
-            display : 'flex',
-            flexDirection : 'row',
-            justifyContent : 'center',
-            alignItems : 'center',
-            minHeight : 'calc(100% - '+(appBarHeight+10)+'px)'
-          }}
-          >
+      <Grid container sx={{
+              mt : (appBarHeight+10)+'px',
+              display : 'flex',
+              justifyContent : 'center',
+              alignItems : 'center',
+              minHeight : 'calc(100% - '+(appBarHeight+10)+'px)', 
+              p : 1
+            }}
+            >
+        <Grid md={4.2} xs={12}
+        sx={{
+          background : 'white',
+          p : 5,
+          borderRadius : 2
+        }}>
       <Head>
         <title>
           Login | Swami Sales
         </title>
       </Head>
-      <Container>
-        <Box >
+
           <div>
             <Stack
               spacing={1}
@@ -316,30 +298,30 @@ const Page = (props) => {
                 >
                   Login
                 </Button>
-         
+        
             
               </form>
             )}
             {method === 'otp' && (
-                 <form
-                 onSubmit={handleSubmit}
-               >
-                 <Stack spacing={3}>
-                   <TextField
-                     error={!!(formik.touched.email && formik.errors.email)}
-                     fullWidth
-                     helperText={formik.touched.email && formik.errors.email}
-                     label="Email Address"
-                     name="email"
-                     value={values.email}
-                     required
-                     onBlur={formik.handleBlur}
-                     onChange={handleChange}
-                     type="email"
-                   
-                   />
+                <form
+                onSubmit={handleSubmit}
+              >
+                <Stack spacing={3}>
+                  <TextField
+                    error={!!(formik.touched.email && formik.errors.email)}
+                    fullWidth
+                    helperText={formik.touched.email && formik.errors.email}
+                    label="Email Address"
+                    name="email"
+                    value={values.email}
+                    required
+                    onBlur={formik.handleBlur}
+                    onChange={handleChange}
+                    type="email"
+                  
+                  />
                   <Spin size='large' style={{display : showSpinner ? 'block' : 'none' ,marginTop : 20}} />
-                   {!showOtpInput ? 
+                  {!showOtpInput ? 
                     <Button
                         fullWidth
                         size="large"
@@ -351,48 +333,46 @@ const Page = (props) => {
                     </Button>
                   : ""}
                   {showOtpInput ? 
-                   <TextField
-                     fullWidth
-                     label="Otp"
-                     name="otp"
-                     value={values.otp}
-                     required
-                     onBlur={formik.handleBlur}
-                     onChange={handleChange}
-                     type="number"
- 
-                   /> : ""}
-                 </Stack>
+                  <TextField
+                    fullWidth
+                    label="Otp"
+                    name="otp"
+                    value={values.otp}
+                    required
+                    onBlur={formik.handleBlur}
+                    onChange={handleChange}
+                    type="number"
+
+                  /> : ""}
+                </Stack>
                 {showOtpInput ? 
-                 <Button
-                   fullWidth
-                   size="large"
-                   sx={{ mt: 3 }}
-                   type="submit"
-                   variant="contained"
-                 >
-                   Continue
-                 </Button> : ""
+                <Button
+                  fullWidth
+                  size="large"
+                  sx={{ mt: 3 }}
+                  type="submit"
+                  variant="contained"
+                >
+                  Continue
+                </Button> : ""
                 }
-             
-               </form>
+            
+              </form>
             )}
           </div>
-        </Box>
-
+        </Grid>
+      </Grid>
+    </Box>
 
       <Snackbar anchorOrigin={{ vertical : 'top', horizontal : 'right' }}
-        open={open}
-        onClose={handleClose}
-        key={'top' + 'right'}
-      >
-      <Alert onClose={handleClose} severity={flag} sx={{ width: '100%' }}>
-          {message}
-      </Alert>
-    </Snackbar>
-      </Container>
-      </Box>
-      </Box>
+          open={open}
+          onClose={handleClose}
+          key={'top' + 'right'}
+        >
+        <Alert onClose={handleClose} severity={flag} sx={{ width: '100%' }}>
+            {message}
+        </Alert>
+      </Snackbar>
     </>
   );
 };
