@@ -8,7 +8,9 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-
+import axios from 'axios'
+import { useAuth } from 'src/hooks/use-auth';
+import { host} from 'src/utils/util';
 
 function createData(planName, month, createdAt, updatedAt, status) {
   return { planName, month, createdAt, updatedAt, status };
@@ -22,6 +24,25 @@ function dashboard() {
 
    const appBarRef = useRef(null);
    const [appBarHeight, setAppBarHeight] = useState(0);
+  const [userPlans, setUserPlan] = useState([])
+  const auth = useAuth()
+
+
+  useEffect(()=>{
+      axios.defaults.headers = {
+        Authorization : auth.token
+      }
+      axios.get(host+"/wholesale/plan/all",{storeId : auth.store.id})
+      .then(res => {
+          const data = res.data;
+          setUserPlan(data);
+      })
+      .catch(err => {
+        console.log(err)
+      } )
+  },[])
+
+
     
   useEffect(() => {
     const getAppBarHeight = () => {
@@ -57,7 +78,7 @@ function dashboard() {
     justifyContent : 'center'
   }}>
     <Grid md={10} xs={12}>
-      <Grid xs={12} md={1.8}  sx={{
+      <Grid xs={12} md={2.5}  sx={{
         boxShadow : 3,
         borderRadius : 2,
         m : 10
@@ -150,19 +171,19 @@ function dashboard() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.map((row) => (
+              {userPlans.map((plan,i) => (
                 <TableRow
-                  key={row.name}
+                  key={i}
                   sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                 >
                   <TableCell component="th" scope="row">
-                    {row.planName}
+                    {plan.name}
                   </TableCell>
-                  <TableCell align="center">{row.month}</TableCell>
-                  <TableCell align="center">{row.createdAt}</TableCell>
-                  <TableCell align="center">{row.updatedAt}</TableCell>
+                  <TableCell align="center">{plan.months}</TableCell>
+                  <TableCell align="center">{plan.createdAt}</TableCell>
+                  <TableCell align="center">{plan.expiryDate}</TableCell>
                   <TableCell align="center">
-                    <Badge badgeContent={row.status} color='error' />
+                    <Badge badgeContent={"Expired"} color='error' />
                   </TableCell>
                 </TableRow>
               ))}

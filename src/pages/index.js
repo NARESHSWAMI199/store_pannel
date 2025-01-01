@@ -50,7 +50,7 @@ useEffect(()=>{
     if(planIsActive){
       console.log(planIsActive)
     }else{
-      router.push("/dashboard")
+      router.push("/plans")
     }
   }).catch(err=>{
     console.log(err)

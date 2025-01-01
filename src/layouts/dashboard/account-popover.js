@@ -4,6 +4,9 @@ import PropTypes from 'prop-types';
 import { Box, Divider, MenuItem, MenuList, Popover, Typography } from '@mui/material';
 import { useAuth } from 'src/hooks/use-auth';
 import Link from 'next/link';
+import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
+import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
+import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 
 export const AccountPopover = (props) => {
   const { anchorEl, onClose, open } = props;
@@ -37,25 +40,66 @@ export const AccountPopover = (props) => {
       open={open}
       PaperProps={{ sx: { width: 200 } }}
     >
+      <Typography     
+      sx={{
+          py: 1.5,
+          px: 2
+        }} variant="overline">
+        Account
+      </Typography>
       <Box
         sx={{
           py: 1.5,
           px: 2
         }}
       >
-        <Typography variant="overline">
-          Account
-        </Typography>
         <Typography
           color="text.secondary"
           variant="body2"
+          sx={{
+            display : 'flex',
+            alignContent : 'center',
+          }}
         >
-          <Link style={{textDecoration:'none',color:'black'}} href={{
+          <AccountCircleOutlinedIcon />
+          <Link style={{
+            textDecoration:'none',
+            color:'black',
+            marginLeft : 5
+          }} href={{
             pathname : "/account"
           }}> 
           {!!user.username ? (user.username).toUpperCase() : ""}
           </Link>
-     
+        </Typography>
+      </Box>
+
+      <Box
+        sx={{
+          px: 2,
+          py : 1.5
+        }}
+      >
+        <Typography
+          color="text.secondary"
+          variant="body2"
+          sx={{
+            display : 'flex',
+            alignContent : 'center',
+          }}
+        >
+          <AccountBalanceWalletOutlinedIcon/>
+          <Link style={{
+            textDecoration:'none',
+            color:'black',
+            marginLeft : 5
+          }} 
+            href={{
+            pathname : "/plans"
+          }}> 
+              My Plans
+          </Link>
+
         </Typography>
       </Box>
       <Divider />
@@ -70,6 +114,7 @@ export const AccountPopover = (props) => {
         }}
       >
         <MenuItem onClick={handleSignOut}>
+        <LogoutOutlinedIcon sx={{marginRight : 1}}/>
           Sign out
         </MenuItem>
       </MenuList>
