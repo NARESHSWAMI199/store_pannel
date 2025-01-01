@@ -11,6 +11,7 @@ import Paper from '@mui/material/Paper';
 import axios from 'axios'
 import { useAuth } from 'src/hooks/use-auth';
 import { host} from 'src/utils/util';
+import { format } from 'date-fns';
 
 function createData(planName, month, createdAt, updatedAt, status) {
   return { planName, month, createdAt, updatedAt, status };
@@ -64,7 +65,6 @@ function dashboard() {
       }
     };
   }, []);
-
 
   return (
  <>
@@ -171,8 +171,10 @@ function dashboard() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {userPlans.map((plan,i) => (
-                <TableRow
+              {userPlans.map((plan,i) => {
+                  const createdAt = format(plan.createdAt, 'dd/MM/yyyy');
+                  const expiryDate = format(plan.expiryDate, 'dd/MM/yyyy');
+                return <TableRow
                   key={i}
                   sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                 >
@@ -180,13 +182,17 @@ function dashboard() {
                     {plan.name}
                   </TableCell>
                   <TableCell align="center">{plan.months}</TableCell>
-                  <TableCell align="center">{plan.createdAt}</TableCell>
-                  <TableCell align="center">{plan.expiryDate}</TableCell>
+                  <TableCell align="center">{createdAt}</TableCell>
+                  <TableCell align="center">{expiryDate}</TableCell>
                   <TableCell align="center">
+                    {plan.status ? 
+                    <Badge badgeContent={"Active"} color='success' />
+                    :
                     <Badge badgeContent={"Expired"} color='error' />
+                    }
                   </TableCell>
-                </TableRow>
-              ))}
+                  </TableRow>
+              })}
             </TableBody>
           </Table>
         </TableContainer>
