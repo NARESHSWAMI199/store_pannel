@@ -31,3 +31,4 @@ export const toTitleCase = (str) => {
 
   export const projectName = "Swami Sales"
 
+  export const dataNotFoundImage = "https://cdn-icons-png.flaticon.com/512/7466/7466073.png";

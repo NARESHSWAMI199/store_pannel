@@ -10,21 +10,22 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import axios from 'axios'
 import { useAuth } from 'src/hooks/use-auth';
-import { host} from 'src/utils/util';
+import { host,dataNotFoundImage} from 'src/utils/util';
 import { format } from 'date-fns';
 
-function createData(planName, month, createdAt, updatedAt, status) {
-  return { planName, month, createdAt, updatedAt, status };
-}
-const rows = [
-  createData('Swami Sales Trial',1, '12 Dec 2024', '12 Jan 2025', "Expried"),
-];
 
 
 function dashboard() {
 
-   const appBarRef = useRef(null);
-   const [appBarHeight, setAppBarHeight] = useState(0);
+  const appBarRef = useRef(null);
+  const [appBarHeight, setAppBarHeight] = useState(0);
+  const [recentPlan, setResetPlan] = useState({
+    status : false,
+    price : 0,
+    months : 0,
+    createdAt : null,
+    expiryDate : null
+  })
   const [userPlans, setUserPlan] = useState([])
   const auth = useAuth()
 
@@ -37,12 +38,24 @@ function dashboard() {
       .then(res => {
           const data = res.data;
           setUserPlan(data);
+          if(data.length > 0){
+            setResetPlan(data[0])
+          }
       })
       .catch(err => {
         console.log(err)
       } )
   },[])
 
+
+
+  const fomratedDate = (millis) => {
+    if(!!millis){
+    return format(millis, 'dd/MM/yyyy');
+    }else{
+      "-"
+    }
+  }
 
     
   useEffect(() => {
@@ -84,8 +97,11 @@ function dashboard() {
         m : 10
       }}>
         <Box sx={{px: 5}}>
-          {/* <Badge badgeContent={"Active"} color="success" /> */}
+          {recentPlan.status ? 
+            <Badge badgeContent={"Active"} color="success" />
+            :
             <Badge badgeContent={"Expired"} color="error" />
+          }
         </Box>
 
       <Box sx={{
@@ -96,26 +112,27 @@ function dashboard() {
           flexDirection : 'column',
           justifyContent : 'center',
           alignItems : 'center',
+          textAlign : 'center'
         }}>
           <Typography  sx={{
             fontWeight : 'light',
             fontFamily : 'inherit',
             fontSize : 22
             }} variant='h4'>
-            Active Plan
+            Recent Plans
           </Typography>
 
 
           <Typography  sx={{
             my : 2
             }} variant='h4'>
-            ₹ 100
+            ₹ {recentPlan.price}
             <br/>
             <span style={{
               color : '#6c757d!important',
-              fontSize :14
+              fontSize :14,
             }}>
-              6 month's plan
+              {recentPlan.months} month's plan
             </span>
           </Typography>
 
@@ -135,7 +152,7 @@ function dashboard() {
               color : '#6c757d!important',
               fontSize : 14
             }}>
-              05 Dec 2024
+            {fomratedDate(recentPlan.createdAt)}
             </span>
           </Typography>
 
@@ -148,11 +165,10 @@ function dashboard() {
               color : '#6c757d!important',
               fontSize : 14
             }}>
-              12 Dec 2024
+              {fomratedDate(recentPlan.expiryDate)}
             </span>
           </Typography>
         </Box>
-            {/* <Badge badgeContent={"Expired"} color="error" /> */}
       </Box>
 
       </Grid>
@@ -164,6 +180,7 @@ function dashboard() {
             <TableHead>
               <TableRow>
                 <TableCell>Plan Name</TableCell>
+                <TableCell align="center">Amount</TableCell>
                 <TableCell align="center">Months</TableCell>
                 <TableCell align="center">Purcahsed At</TableCell>
                 <TableCell align="center">Expired At</TableCell>
@@ -171,28 +188,50 @@ function dashboard() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {userPlans.map((plan,i) => {
-                  const createdAt = format(plan.createdAt, 'dd/MM/yyyy');
-                  const expiryDate = format(plan.expiryDate, 'dd/MM/yyyy');
-                return <TableRow
-                  key={i}
-                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                >
-                  <TableCell component="th" scope="row">
-                    {plan.name}
-                  </TableCell>
-                  <TableCell align="center">{plan.months}</TableCell>
-                  <TableCell align="center">{createdAt}</TableCell>
-                  <TableCell align="center">{expiryDate}</TableCell>
-                  <TableCell align="center">
-                    {plan.status ? 
-                    <Badge badgeContent={"Active"} color='success' />
-                    :
-                    <Badge badgeContent={"Expired"} color='error' />
-                    }
-                  </TableCell>
-                  </TableRow>
-              })}
+              {userPlans.length > 0 ? 
+              userPlans.map((plan,i) => {
+                  const createdAt = format(!!plan.createdAt ? plan.createdAt : 0, 'dd/MM/yyyy');
+                  const expiryDate = format(!!plan.expiryDate ? plan.expiryDate : 0, 'dd/MM/yyyy');
+                  return <TableRow
+                    key={i}
+                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                  >
+                    <TableCell component="th" scope="row">
+                      {plan.name}
+                    </TableCell>
+                    <TableCell align="center">{plan.price}</TableCell>
+                    <TableCell align="center">{plan.months}</TableCell>
+                    <TableCell align="center">{fomratedDate(plan.createdAt)}</TableCell>
+                    <TableCell align="center">{fomratedDate(plan.expiryDate)}</TableCell>
+                    <TableCell align="center">
+                      {plan.status ? 
+                      <Badge badgeContent={"Active"} color='success' />
+                      :
+                      <Badge badgeContent={"Expired"} color='error' />
+                      }
+                    </TableCell>
+                    </TableRow>
+                })
+              : 
+              <TableRow>
+                <TableCell colSpan={6}> 
+                  <Box sx={{
+                      display : 'flex',
+                      flexDirection : 'column',
+                      justifyContent : 'center',
+                      alignItems : 'center',
+                      p : 5
+                  }} >
+                      <img src={dataNotFoundImage} height={120}  alt='data not found.' />
+                      <Typography variant='span'>
+                            Data not found.
+                      </Typography>
+                  </Box>
+                </TableCell>
+              </TableRow>
+
+              }
+        
             </TableBody>
           </Table>
         </TableContainer>
