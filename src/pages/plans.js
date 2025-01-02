@@ -1,4 +1,4 @@
-import { Badge, Box, Grid, Typography } from '@mui/material'
+import { Badge, Box, Button, Grid, Typography } from '@mui/material'
 import React, { useEffect, useRef, useState } from 'react'
 import HomeNavbar from 'src/sections/top-nav'
 import Table from '@mui/material/Table';
@@ -12,11 +12,12 @@ import axios from 'axios'
 import { useAuth } from 'src/hooks/use-auth';
 import { host,dataNotFoundImage} from 'src/utils/util';
 import { format } from 'date-fns';
-
+import { useRouter } from 'next/router';
 
 
 function dashboard() {
 
+  const router = useRouter()
   const appBarRef = useRef(null);
   const [appBarHeight, setAppBarHeight] = useState(0);
   const [recentPlan, setResetPlan] = useState({
@@ -104,72 +105,77 @@ function dashboard() {
           }
         </Box>
 
-      <Box sx={{
-        p : 2
-      }}>
         <Box sx={{
-          display : 'flex',
-          flexDirection : 'column',
-          justifyContent : 'center',
-          alignItems : 'center',
-          textAlign : 'center'
+          p : 2
         }}>
-          <Typography  sx={{
-            fontWeight : 'light',
-            fontFamily : 'inherit',
-            fontSize : 22
-            }} variant='h4'>
-            Recent Plans
-          </Typography>
+          <Box sx={{
+            display : 'flex',
+            flexDirection : 'column',
+            justifyContent : 'center',
+            alignItems : 'center',
+            textAlign : 'center'
+          }}>
+            <Typography  sx={{
+              fontWeight : 'light',
+              fontFamily : 'inherit',
+              fontSize : 22
+              }} variant='h4'>
+              Recent Plans
+            </Typography>
 
 
-          <Typography  sx={{
-            my : 2
-            }} variant='h4'>
-            ₹ {recentPlan.price}
-            <br/>
-            <span style={{
-              color : '#6c757d!important',
-              fontSize :14,
-            }}>
-              {recentPlan.months} month's plan
-            </span>
-          </Typography>
+            <Typography  sx={{
+              my : 2
+              }} variant='h4'>
+              ₹ {recentPlan.price}
+              <br/>
+              <span style={{
+                color : '#6c757d!important',
+                fontSize :14,
+              }}>
+                {recentPlan.months} month's plan
+              </span>
+            </Typography>
 
-        </Box>    
+            <Button sx={{mb : 2}} variant="contained" color='primary' onClick={(e)=>{
+                router.push("/pricing")
+              }}> 
+              Get New Plan 
+            </Button>
 
-        <Box sx={{
-          display : 'flex',
-          justifyContent : 'center',
-        }}>
-          <Typography  sx={{
-            fontWeight : 'light',
-            mx : 5
-            }} variant='small'>
-            Created Date
-            <br/>
-            <span style={{
-              color : '#6c757d!important',
-              fontSize : 14
-            }}>
-            {fomratedDate(recentPlan.createdAt)}
-            </span>
-          </Typography>
+          </Box>    
+          <Box sx={{
+            display : 'flex',
+            justifyContent : 'center',
+          }}>
+            <Typography  sx={{
+              fontWeight : 'light',
+              mx : 5
+              }} variant='small'>
+              Created Date
+              <br/>
+              <span style={{
+                color : '#6c757d!important',
+                fontSize : 14
+              }}>
+              {fomratedDate(recentPlan.createdAt)}
+              </span>
+            </Typography>
 
-          <Typography  sx={{
-            fontWeight : 'light'
-            }} variant='small'>
-            Expirys Date
-            <br/>
-            <span style={{
-              color : '#6c757d!important',
-              fontSize : 14
-            }}>
-              {fomratedDate(recentPlan.expiryDate)}
-            </span>
-          </Typography>
+            <Typography  sx={{
+              fontWeight : 'light'
+              }} variant='small'>
+              Expirys Date
+              <br/>
+              <span style={{
+                color : '#6c757d!important',
+                fontSize : 14
+              }}>
+                {fomratedDate(recentPlan.expiryDate)}
+              </span>
+            </Typography>
+          </Box>
         </Box>
-      </Box>
 
       </Grid>
       <Grid xs={12} md={12} sx={{
