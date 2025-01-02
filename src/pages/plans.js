@@ -136,13 +136,13 @@ function dashboard() {
                 {recentPlan.months} month's plan
               </span>
             </Typography>
-
+          {!recentPlan.status &&
             <Button sx={{mb : 2}} variant="contained" color='primary' onClick={(e)=>{
                 router.push("/pricing")
               }}> 
               Get New Plan 
             </Button>
-
+          }
           </Box>    
           <Box sx={{
             display : 'flex',
