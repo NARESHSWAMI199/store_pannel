@@ -30,7 +30,7 @@ import ImageInput from "src/sections/image-input";
 
 
 
-    const CreateUser = () =>{    
+    const Page = () =>{    
 
     const [open,setOpen] = useState(false)
     const [message,setMessage] = useState("")
@@ -488,10 +488,10 @@ import ImageInput from "src/sections/image-input";
     }
 
 
-    CreateUser.getLayout = (page) => (
+    Page.getLayout = (page) => (
     <DashboardLayout>
       {page}
     </DashboardLayout>
     );
 
-    export default CreateUser;
+    export default Page;

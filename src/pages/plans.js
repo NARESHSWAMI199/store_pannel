@@ -35,7 +35,7 @@ function dashboard() {
       axios.defaults.headers = {
         Authorization : auth.token
       }
-      axios.get(host+"/wholesale/plan/all",{storeId : auth.store.id})
+      axios.get(host+"/wholesale/plan/all")
       .then(res => {
           const data = res.data;
           setUserPlan(data);

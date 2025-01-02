@@ -65,7 +65,7 @@ useEffect( ()=>{
       axios.defaults.headers = {
         Authorization : auth.token
       }
-      await axios.post(host+"/wholesale/item/all",{storeId : auth.store.id})
+      await axios.post(host+"/wholesale/item/all",{storeId : auth.store?.id})
       .then(res => {
           const data = res.data.content;
           setItems(data);

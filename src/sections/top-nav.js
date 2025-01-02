@@ -34,9 +34,9 @@ function HomeNavbar(props) {
 React.useEffect(()=>{
   console.log(auth.token)
   if(!!auth.token){
-    setPages([...pages.filter(p => (((p != "Login") || (p !="Register")))) ,"Logout"])
+    setPages([...(pages.filter(p => ((p != "Login") || (p !="Register")))) ,"Logout"])
   }else{
-    setPages([...pages.filter(p => p != "Logout") ,"Login","Register"])
+    setPages([...(pages.filter(p => p != "Logout")) ,"Login","Register"])
   }
 },[auth.token])
 
