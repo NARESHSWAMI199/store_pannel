@@ -1,14 +1,13 @@
 
-import { Alert, Avatar, Box, Button, Grid, Link, Snackbar, Typography } from '@mui/material'
+import { CheckCircleOutline } from '@mui/icons-material'
+import { Alert, Box, Button, Grid, Link, Snackbar, Typography } from '@mui/material'
+import axios from 'axios'
+import { useRouter } from 'next/router'
 import bg from 'public/assets/bg.png'
+import { useEffect, useState } from 'react'
+import { useAuth } from 'src/hooks/use-auth'
 import HomeNavbar from 'src/sections/top-nav'
 import { host, projectName } from 'src/utils/util'
-import { CheckCircleOutline, CheckOutlined } from '@mui/icons-material'
-import { useEffect, useState } from 'react'
-import axios from 'axios'
-import {useRouter } from 'next/router'
-import { redirect } from 'next/dist/server/api-utils'
-import { useAuth } from 'src/hooks/use-auth'
 
 
 function Pricing() {
@@ -18,6 +17,7 @@ function Pricing() {
     const [open, setOpen] = useState()
     const [message, setMessage] = useState("")
     const [flag, setFlag] = useState("warning")
+    const router = useRouter();
 
 
     useEffect(()=>{
@@ -35,20 +35,31 @@ function Pricing() {
 
 
     const redirectForPayment = (slug) =>{
-        axios.defaults.headers = {
-            Authorization: auth.token
+        const redirect = async() => {
+            axios.defaults.headers = {
+                Authorization: auth.token
+            }
+            
+            await axios.get(host+"/pg/pay/"+slug)
+            .then(res => {
+                window.open(res.data.url);
+            })
+            .catch(err => {
+                console.log(err)
+                setMessage(!!err.respone ? err.response.data.message : err.message)
+                setFlag("error")
+                setOpen(true)
+            });
         }
-        
-        axios.get(host+"/pg/pay/"+slug)
-        .then(res => {
-            window.open(res.data.url);
-        })
-        .catch(err => {
-            console.log(err)
-            setMessage(!!err.respone ? err.response.data.message : err.message)
-            setFlag("error")
-            setOpen(true)
-        });
+
+        /* Before payment we will check user must be logged in. */
+        if(!!auth.token){
+            redirect();
+        }else{
+            router.push("/auth/register")
+        }
+
+  
     }
 
 

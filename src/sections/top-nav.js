@@ -67,7 +67,7 @@ React.useEffect(()=>{
     else if(pageName == "Register") {
       router.push("/auth/register")
     }else if(pageName == "Pricing"){
-      router.push(!!auth.token ? "/pricing" : "/auth/register")
+      router.push("/pricing")
     }else {
       router.push("/welcome")
     }

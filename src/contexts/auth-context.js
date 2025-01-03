@@ -203,7 +203,7 @@ export const AuthProvider = (props) => {
       .catch (err =>{ 
           const errorMessage = (!!err.response) ? err.response.data.message : err.message;
           console.log(errorMessage)
-          //throw new Error(errorMessage)
+          throw new Error(errorMessage)
       })
   };
 
@@ -224,6 +224,7 @@ export const AuthProvider = (props) => {
     .catch (err =>{ 
         const errorMessage = (!!err.response) ? err.response.data.message : err.message;
         console.log(errorMessage)
+        throw new Error(errorMessage)
     })
   };
 
