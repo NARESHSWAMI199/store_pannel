@@ -130,33 +130,6 @@ const CreateStore = () => {
         []
       );
 
-
-          
-    const appBarRef = useRef(null);
-    const [appBarHeight, setAppBarHeight] = useState(0);
-    
-    useEffect(() => {
-        const getAppBarHeight = () => {
-        if (appBarRef.current) {
-            setAppBarHeight(appBarRef.current.clientHeight);
-        }
-        };
-    
-        getAppBarHeight(); 
-    
-        const resizeObserver = new ResizeObserver(getAppBarHeight);
-        if (appBarRef.current) {
-        resizeObserver.observe(appBarRef.current);
-        }
-    
-        return () => {
-        if (appBarRef.current) {
-            resizeObserver.unobserve(appBarRef.current);
-        }
-        };
-    }, []);
-
-
     const handleSubmit = useCallback(
         (e) =>{
         e.preventDefault()

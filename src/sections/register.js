@@ -179,7 +179,7 @@ const Register = () => {
                 {formik.errors.submit}
               </Typography>
             )}
-            <Button
+            {/* <Button
               fullWidth
               size="large"
               sx={{ mt: 3 }}
@@ -187,7 +187,7 @@ const Register = () => {
               variant="contained"
             >
               Register
-            </Button>
+            </Button> */}
           </form>
         </div>
       </Box>

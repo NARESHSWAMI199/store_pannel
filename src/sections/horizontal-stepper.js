@@ -13,12 +13,13 @@ import HomeNavbar from 'src/sections/top-nav';
 
 const steps = ['Register', 'Create Your Own Store', 'Payment'];
 
+
 export default function HorizontalLinearStepper(props) {
   const [activeStep, setActiveStep] = React.useState(0);
   const router = useRouter()
   const { register, store } = props;
   const [skipped, setSkipped] = React.useState(new Set());
-
+  const [saveRegister, setSaveRegister] = useState(false)
   const isStepOptional = (step) => {
     return step === steps.length -1;
   };
@@ -27,10 +28,26 @@ export default function HorizontalLinearStepper(props) {
     return skipped.has(step);
   };
 
-  const handleNext = () => {
+
+
+    document.getElementById("register")?.addEventListener("submit", async (e) =>{
+        alert("herere.")
+        e.preventDefault();
+ 
+        props.saveProfile(data)
+    })
+
+
+
+
+  const handleNext = async () => {
     if(activeStep === 0 ){
-        userRegister();
-        return false
+        let success = await userRegister();
+        if(!success) return success;
+    }else if(activeStep === 1) {
+        /* for create a new store */
+        
+
     }
     else if(activeStep === steps.length - 1){
         router.push("/pricing")
@@ -93,10 +110,29 @@ export default function HorizontalLinearStepper(props) {
   }, []);
 
 
-    const userRegister  = () => {
+    const userRegister  =  async () => {
         let form = document.getElementById("register");
-        console.log(form)
-        form?.submit();
+        let formData = new FormData(form);
+
+        let name  = formData.get("name");
+        let email  = formData.get("email");
+        let contact  = formData.get("contact");
+        let  password  = formData.get("password");
+        let  password2  = formData.get("password2"); 
+        
+        if(!!name && !!email && !!password && !!contact){
+            let data = {
+                name : name,
+                email : email,
+                contact : contact,
+                password : password,
+                password2 : password2
+            }
+            return await props.saveProfile(data);
+        }else{
+            /** don't write this out side of else condition beacuse we want go for if first. but function is async */
+            return false;
+        }
     }
 
   return (
@@ -164,14 +200,14 @@ export default function HorizontalLinearStepper(props) {
                     >
                     Back
                     </Button>
-                    <Box sx={{ flex: '1 1 auto' }} />
+                    <Box sx={{ flex: '1 1 auto' }}  variant="contained" />
                     {isStepOptional(activeStep) && (
                     <Button color="inherit" onClick={handleSkip} sx={{ mr: 1 }}>
                         Skip
                     </Button>
                     )}
                     {activeStep !== steps.length &&
-                        <Button onClick={handleNext} >
+                        <Button onClick={handleNext} variant='contained' >
                         {activeStep === steps.length -1  ? 'Go for payment' : 'Save & Next'}
                         </Button>
                     }
