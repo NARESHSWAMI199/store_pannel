@@ -10,7 +10,7 @@ import bg from 'public/assets/bg2.png';
 import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import HomeNavbar from 'src/sections/top-nav';
-
+import { useAuth } from 'src/hooks/use-auth';
 const steps = ['Register', 'Create Your Own Store', 'Payment'];
 
 
@@ -19,7 +19,27 @@ export default function HorizontalLinearStepper(props) {
   const router = useRouter()
   const { register, store } = props;
   const [skipped, setSkipped] = React.useState(new Set());
-  const [saveRegister, setSaveRegister] = useState(false)
+  const auth = useAuth();
+
+
+
+  /* If user already has a account go for create store */
+  useEffect(()=>{
+    if(!!auth?.token){
+      let newSkipped = skipped;
+      setActiveStep(1);
+      setSkipped(newSkipped);
+    }
+  },[])
+
+
+  /* if store already created redirecting to home */
+  useEffect(()=>{
+    if(!!auth?.store){
+      router.push("/")
+    }
+  },[])
+
   const isStepOptional = (step) => {
     return step === steps.length -1;
   };
@@ -28,26 +48,13 @@ export default function HorizontalLinearStepper(props) {
     return skipped.has(step);
   };
 
-
-
-    document.getElementById("register")?.addEventListener("submit", async (e) =>{
-        alert("herere.")
-        e.preventDefault();
- 
-        props.saveProfile(data)
-    })
-
-
-
-
   const handleNext = async () => {
-    if(activeStep === 0 ){
+    if(activeStep === 0 && auth?.token === null ){
         let success = await userRegister();
         if(!success) return success;
-    }else if(activeStep === 1) {
-        /* for create a new store */
-        
-
+    }else if(activeStep === 1 && auth?.store === null) {
+        let success = await createStore();
+        if(!success) return success;
     }
     else if(activeStep === steps.length - 1){
         router.push("/pricing")
@@ -133,6 +140,12 @@ export default function HorizontalLinearStepper(props) {
             /** don't write this out side of else condition beacuse we want go for if first. but function is async */
             return false;
         }
+    }
+
+
+    const createStore = async() => {
+      let form = document.getElementById("createstore");
+      return await props.createStore(form);
     }
 
   return (

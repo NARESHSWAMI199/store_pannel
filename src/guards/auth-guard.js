@@ -2,11 +2,12 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import PropTypes from 'prop-types';
 import { useAuthContext } from 'src/contexts/auth-context';
+import { useAuth } from 'src/hooks/use-auth';
 
 export const AuthGuard = (props) => {
   const { children } = props;
   const router = useRouter();
-  const { isAuthenticated } = useAuthContext();
+  const auth = useAuth();
   const ignore = useRef(false);
   const [checked, setChecked] = useState(false);
 
@@ -27,7 +28,7 @@ export const AuthGuard = (props) => {
 
       ignore.current = true;
 
-      if (!isAuthenticated) {
+      if (auth?.token == null) {
         console.log('Not authenticated, redirecting');
         router
           .replace({

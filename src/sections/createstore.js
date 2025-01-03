@@ -1,17 +1,9 @@
 import {
     Alert,
     Box,
-    Button,
-    Card,
-    CardActions,
-    CardContent,
-    CardHeader,
-    colors,
-    Divider,
     FormControl,
     Unstable_Grid2 as Grid,
     InputLabel,
-    Link,
     MenuItem,
     Select,
     Snackbar,
@@ -21,21 +13,14 @@ import {
 } from "@mui/material";
 import axios from "axios";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "src/hooks/use-auth";
 import ImageInput from "src/sections/image-input";
-import { host,projectName } from "src/utils/util";
-import bg from 'public/assets/bg2.png'
-import HomeNavbar from 'src/sections/top-nav'
-import NextLink from 'next/link';
+import { host } from "src/utils/util";
 
 const CreateStore = () => {
 
-    const [open,setOpen] = useState(false)
-    const [message,setMessage] = useState("")
-    const [flag,setFlag] = useState("success")
     const auth = useAuth()
-    const user = auth.user
     const [store,setStore] = useState(auth.store)
     const[cityList,setCityList] = useState([])
     const[stateList,setStateList] = useState([])
@@ -57,11 +42,6 @@ const CreateStore = () => {
           setMessage(!!err.response ? err.response.data.message : err.message)
           setFlag("error")
           setOpen(true)
-          let status = (!!err.response ? err.response.status : 0);
-          if (status == 401) {
-            // auth.signOut();
-            // router.push("/auth/login")
-          }
         })
     },[])
 
@@ -130,50 +110,6 @@ const CreateStore = () => {
         []
       );
 
-    const handleSubmit = useCallback(
-        (e) =>{
-        e.preventDefault()
-        const form = e.target;
-        const formData = new FormData(form)
-        let data = {
-            // ...store,
-            addressSlug : store.address.slug,
-            description : formData.get("description"),
-            storeEmail : formData.get("storeEmail"),
-            storePhone : formData.get("storePhone"),
-            state:  formData.get("state"),
-            city :  formData.get("city"),
-            street:  formData.get("street"),
-            zipCode :  formData.get("zipCode"),
-            categoryId: formData.get("category"),
-            subCategoryId: formData.get("subcategory"),
-            storeName :  formData.get("storeName"),
-            storePic : store.storePic
-          }
-
-        axios.defaults.headers = {
-            Authorization : auth.token,
-            "Content-Type" : "multipart/form-data"
-        }
-        axios.post(host+"/wholesale/store/update",data)
-        .then(res => {
-          setMessage(res.data.message)
-          setFlag("success")
-          setOpen(true)
-          auth.updateUserDetail()
-        }).catch(err=>{
-            console.log(err)
-            setMessage(!!err.response ? err.response.data.message : err.message)
-            setFlag("error")
-            setOpen(true)
-        })
-    
-      })
-
-      const handleClose = useCallback(()=>{
-            setOpen(false)
-      })
-      
 
     const onSubmit = (image) =>{
     setStore((pervious)=>({
@@ -202,8 +138,8 @@ const CreateStore = () => {
         </Stack>        
             <form
             autoComplete="off"
+            id={"createstore"}
             // noValidate
-            onSubmit={handleSubmit}
             >
 
                 <Grid
@@ -213,10 +149,10 @@ const CreateStore = () => {
 
 
         {/* store image input */}
-
-        <div style={{marginLeft : '10px',marginTop: '10px'}}>
-                <ImageInput onChange={onSubmit} />
-                </div>
+        {/* Todo : Need to working on it */}
+        {/* <div style={{marginLeft : '10px',marginTop: '10px'}}>
+            <ImageInput onChange={onSubmit} />
+        </div> */}
 
                 <Grid
                     xs={12}
@@ -411,22 +347,7 @@ const CreateStore = () => {
                     />
                 </Grid>
                 </Grid>
-
-            <CardActions sx={{ justifyContent: 'flex-end', mt : 1 }}>
-                <Button type="submit" variant="contained">
-                    Save details
-                </Button>
-                </CardActions>
             </form>
-            <Snackbar anchorOrigin={{ vertical : 'top', horizontal : 'right' }}
-                open={open}
-                onClose={handleClose}
-                key={'top' + 'right'}
-            >
-            <Alert onClose={handleClose} severity={flag} sx={{ width: '100%' }}>
-                {message}
-            </Alert>
-        </Snackbar>
     </Box>
     </>
   )

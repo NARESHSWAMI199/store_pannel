@@ -230,7 +230,7 @@ const Page = (props) => {
                 &nbsp;
                 <Link
                   component={NextLink}
-                  href="/auth/register"
+                  href="/steps"
                   underline="hover"
                   variant="subtitle2"
                 >

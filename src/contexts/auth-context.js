@@ -183,9 +183,9 @@ export const AuthProvider = (props) => {
       })
   };
 
-    const updateUserDetail = async () => {
+    const updateUserDetail = async (token) => {
       axios.defaults.headers = {
-        Authorization : initialState.token
+        Authorization : token
       }
       await axios.get(host+"/wholesale/auth/detail")
       .then (res => {

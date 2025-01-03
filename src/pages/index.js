@@ -40,7 +40,7 @@ const router = useRouter();
 
 
 
-useEffect(()=>{
+/*useEffect(()=>{
   axios.defaults.headers = {
     Authorization : auth.token
   }
@@ -56,7 +56,15 @@ useEffect(()=>{
     console.log(err)
   })
 
+},[])*/
+
+
+useEffect(()=>{
+  if (auth.store === null){
+    router.push("/steps")
+  }
 },[])
+
 
 
 // Getting All Stores 

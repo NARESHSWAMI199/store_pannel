@@ -11,6 +11,7 @@ import * as Yup from 'yup';
 const Register = () => {
   const router = useRouter();
   const auth = useAuth();
+
   const formik = useFormik({
     initialValues: {
       email: '',
@@ -42,31 +43,21 @@ const Register = () => {
         .string()
         .max(10)
         .required('Contact is required')
-    }),
-    onSubmit: async (values, helpers) => {
-      try {
-        if(values.password == values.password2){
-          await auth.signUp(values.name, values.email, values.contact,values.password);
-        }else{
-          throw new Error("Password and confrim password doesn't match");
-        }
-        router.push('/');
-      } catch (err) {
-        helpers.setStatus({ success: false });
-        helpers.setErrors({ submit: err.message });
-        helpers.setSubmitting(false);
-      }
-    }
+    })
   });
 
 
 
-    useEffect(()=>{
-      if(!!auth.token){
-        router.push("/")
-      }
-    },[auth.token])
-  
+  useEffect(()=>{
+    if(!!auth.token){
+      let user = auth.user;
+      formik.values.name = user.username,
+      formik.values.email = user.email,
+      formik.values.contact = user.contact,
+      formik.values.password = user.password,
+      formik.values.password2 = user.password
+    }
+  },[])
 
   return (
     <>
