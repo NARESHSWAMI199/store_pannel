@@ -177,30 +177,7 @@ const Page = (props) => {
 
   return (
     <>
-       <Box
-        sx={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw', 
-            height: '100vh',
-            backgroundImage:`url(${bg.src})`,
-            backgroundRepeat: "no-repeat",
-            backgroundSize: "cover",
-            overflowX: 'hidden', /* Hide horizontal scrollbar */
-            scrollbarWidth: 'none' 
-        }}
-     >
-    <HomeNavbar navRef = {appBarRef} />
-      <Grid container sx={{
-              mt : (appBarHeight+10)+'px',
-              display : 'flex',
-              justifyContent : 'center',
-              alignItems : 'center',
-              minHeight : 'calc(100% - '+(appBarHeight+10)+'px)', 
-              p : 1
-            }}
-            >
+
         <Grid md={4.2} xs={12}
         sx={{
           background : 'white',
@@ -230,7 +207,7 @@ const Page = (props) => {
                 &nbsp;
                 <Link
                   component={NextLink}
-                  href="/steps"
+                  href="/auth/register"
                   underline="hover"
                   variant="subtitle2"
                 >
@@ -362,8 +339,7 @@ const Page = (props) => {
             )}
           </div>
         </Grid>
-      </Grid>
-    </Box>
+
 
       <Snackbar anchorOrigin={{ vertical : 'top', horizontal : 'right' }}
           open={open}
@@ -378,11 +354,11 @@ const Page = (props) => {
   );
 };
 
-// Page.getLayout = (page) => (
-//     <AuthLayout>
-//       {page}
-//     </AuthLayout>
-// );
+Page.getLayout = (page) => (
+    <HomeNavbar>
+      {page}
+    </HomeNavbar>
+);
 
 
 export default Page;

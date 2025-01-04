@@ -6,63 +6,17 @@ import logo from 'public/assets/logos/logo.png'
 import { useEffect, useRef, useState } from 'react'
 import { useAuth } from 'src/hooks/use-auth'
 import HomeNavbar from 'src/sections/top-nav'
-function Page() {
-
-
-    
-    const appBarRef = useRef(null);
-    const [appBarHeight, setAppBarHeight] = useState(0);
-    
-    useEffect(() => {
-        const getAppBarHeight = () => {
-        if (appBarRef.current) {
-            setAppBarHeight(appBarRef.current.clientHeight);
-        }
-        };
-    
-        getAppBarHeight(); 
-    
-        const resizeObserver = new ResizeObserver(getAppBarHeight);
-        if (appBarRef.current) {
-        resizeObserver.observe(appBarRef.current);
-        }
-    
-        return () => {
-        if (appBarRef.current) {
-            resizeObserver.unobserve(appBarRef.current);
-        }
-        };
-    }, []);
-      
+function Page() {     
 
 const auth = useAuth()
   return (
-    <Box
-        sx={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw', 
-            height: '100vh',
-            backgroundImage:`url(${bg.src})`,
-            backgroundRepeat: "no-repeat",
-            backgroundSize: "cover",
-            overflowX: 'hidden', /* Hide horizontal scrollbar */
-            scrollbarWidth: 'none' 
-        }}
-     >
-    <HomeNavbar navRef={appBarRef}/>
-    <Box 
-        sx={{
-            marginTop : (appBarHeight)+'px',
-            display : 'flex',
-            justifyContent : 'center',
-            alignItems : 'center',
-            minHeight : 'calc(100% - '+(appBarHeight)+'px)',
-            width : '100%',
-            flexDirection : 'column'
-        }}
-    >
+    <Box sx={{
+        display : 'flex' , 
+        flexDirection : 'column',
+        justifyContent : 'center',
+        alignItems : 'center'
+        
+    }}>
     <Box sx={{
         display :'flex',
         alignItems : 'center',
@@ -147,9 +101,14 @@ const auth = useAuth()
             </Box>
           </Link>
     </Box>
-   </Box>
   )
 }
+
+Page.getLayout = (page) => (
+    <HomeNavbar>
+        {page}
+    </HomeNavbar>
+)
 
 
 export default Page

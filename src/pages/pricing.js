@@ -70,129 +70,119 @@ function Pricing() {
     
 
   return (<>
-  
-<Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-    open={open}
-    onClose={handleClose}
-    key={'top' + 'right'}
->
-    <Alert onClose={handleClose} severity={flag} sx={{ width: '100%' }}>
-        {message}
-    </Alert>
-</Snackbar>
-<Box
-        sx={{
-            backgroundImage:`url(${bg.src})`,
-            backgroundRepeat: "no-repeat",
-            backgroundSize: "cover",
-            height : '100vh'
-        }}
-     >
-        <HomeNavbar />
+        <Grid md={10}>
+            <Box sx={{
+                textAlign : 'center',
+                color : 'white',
+                mb : 10,
+                alignItems : 'flex-start !important'
+            }}>
+                <Typography variant='h2' sx={{fontFamily : 'Georgia,Times,Times New Roman,serif;',fontWeight : 'light'}}>
+                    Starter plans your online store
+                </Typography>
+            </Box>
+                        
+            <Grid container>
+                    {plans.map( (plan,i) => {
+                    return (
+                        <Grid key={i} xs={12} md={4} sx={{
+                            px : 2
+                        }} >
+                            <Box sx={{
+                                    borderRadius : 2,
+                                    background : 'white',
+                                    // height : 550,
+                                    boxShadow : 6,
+                                    border : '4px solid #6366f1',
+                                    px : 3,
+                                    pb : 5,
+                                    mb : 5
+                                }}>
+                                <Box >
+                                        <Box sx={{mt : 2}}>
+                                            <Typography variant='h3'>
+                                            {projectName} {plan.name}
+                                            </Typography>
+                                        </Box>   
+                                
 
+                                            <Box sx={{my : 3}}>
+                                                
+                                                <Typography variant='h6'>
+                                                    ₹ {plan.price} <span> for {plan.months} month</span>
+                                                
+                                                </Typography>
 
-        <Grid md={10} sx={{m :'0 auto'}} container>
-        <Grid xs={12} md={12} sx={{
-                    textAlign : 'center',
-                    my : 10,
-                    mt : 20
-                }} >
-            
-                <Box>
-                    <Typography variant='h3'>
-                        Starter Plans For Your Online Store
-                    </Typography>
-                </Box>
-                    
-            </Grid>
+                                                <Typography variant='p'>
+                                                    <Link 
+                                                    style={{
+                                                        textDecoration : 'none'
+                                                    }}
+                                                    href="/welcome"
+                                                    > {plan.months} Months Plan</Link>
+                                                </Typography>
+                                            </Box>
 
-
-            {plans.map( (plan,i) => {
-            return (
-                <Grid key={i} xs={12} md={3} sx={{
-                    px : 2
-                }} >
-                    <Box sx={{
-                            borderRadius : 2,
-                            background : 'white',
-                            // height : 550,
-                            boxShadow : 6,
-                            border : '4px solid #6366f1',
-                            px : 3,
-                            pb : 5,
-                            mb : 5
-                        }}>
-                           <Box >
-                                 <Box sx={{mt : 2}}>
-                                    <Typography variant='h3'>
-                                       {projectName} {plan.name}
-                                    </Typography>
-                                </Box>   
-                         
-
-                                    <Box sx={{my : 3}}>
-                                         
-                                        <Typography variant='h6'>
-                                            ₹ {plan.price} <span> for {plan.months} month</span>
-                                          
-                                          </Typography>
-
-                                          <Typography variant='p'>
-                                            <Link 
-                                            style={{
-                                                textDecoration : 'none'
-                                            }}
-                                            href="/welcome"
-                                            > {plan.months} Months Plan</Link>
-                                          </Typography>
+                                            <Box sx={{
+                                                display : 'flex',
+                                                flexDirection : 'column'
+                                            }}>
+                                                <Typography variant='span'>
+                                                    *GST extra
+                                                </Typography>
+                                                <Button 
+                                                    sx={{width : 200, my : 1}} 
+                                                    variant="outlined" 
+                                                    type='button' 
+                                                    onClick={(e)=>redirectForPayment(plan.slug)} 
+                                                    >Get Trial Plan
+                                                </Button>
+                                            <Box sx={{my:1}}>
+                                                <Typography variant='h6'>Advanced Features</Typography>                                    
+                                                <Box sx={{ml : 2}}>
+                                                    {[1,2,3,4,5,6].map(i =>{
+                                                        return (
+                                                            <Box sx={{
+                                                                    my : 1,
+                                                                    display : 'flex',
+                                                                    alignItems : 'center',
+                                                                    textAlign : 'center'
+                                                                }}>
+                                                                <CheckCircleOutline sx={{color : 'green',mr : 1}}/>
+                                                                <Typography variant='p'>
+                                                                    Al Reply/Compose
+                                                                </Typography>
+                                                            </Box>
+                                                        )
+                                                    })}
+                                                </Box>         
+                                            </Box>                        
+                                        </Box>
                                     </Box>
-
-                                    <Box sx={{
-                                        display : 'flex',
-                                        flexDirection : 'column'
-                                    }}>
-                                        <Typography variant='span'>
-                                            *GST extra
-                                        </Typography>
-                                        <Button 
-                                            sx={{width : 200, my : 1}} 
-                                            variant="outlined" 
-                                            type='button' 
-                                            onClick={(e)=>redirectForPayment(plan.slug)} 
-                                            >Get Trial Plan
-                                        </Button>
-                                    <Box sx={{my:1}}>
-                                        <Typography variant='h6'>Advanced Features</Typography>                                    
-                                        <Box sx={{ml : 2}}>
-                                            {[1,2,3,4,5,6].map(i =>{
-                                                return (
-                                                    <Box sx={{
-                                                            my : 1,
-                                                            display : 'flex',
-                                                            alignItems : 'center',
-                                                            textAlign : 'center'
-                                                        }}>
-                                                        <CheckCircleOutline sx={{color : 'green',mr : 1}}/>
-                                                        <Typography variant='p'>
-                                                            Al Reply/Compose
-                                                        </Typography>
-                                                    </Box>
-                                                )
-                                            })}
-                                        </Box>         
-                                    </Box>                        
                                 </Box>
-                            </Box>
-                        </Box>
-                </Grid>
-            )
-         })}   
-   
-       
+                        </Grid>
+                    )
+                })}   
+                                
+            </Grid>
         </Grid>
-     </Box>
+        <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+            open={open}
+            onClose={handleClose}
+            key={'top' + 'right'}
+        >
+            <Alert onClose={handleClose} severity={flag} sx={{ width: '100%' }}>
+                {message}
+            </Alert>
+        </Snackbar>
      </>
   )
 }
+
+Pricing.getLayout = (page) => (
+    <HomeNavbar>
+        {page}
+    </HomeNavbar>
+)
 
 export default Pricing

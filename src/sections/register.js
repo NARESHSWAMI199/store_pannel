@@ -43,7 +43,26 @@ const Register = () => {
         .string()
         .max(10)
         .required('Contact is required')
-    })
+    }),
+    onSubmit : async (values) => {
+      try {
+          if(values.password == values.password2){
+              await auth.signUp(values.name, values.email, values.contact,values.password);
+              setMessage("User profile successfully saved");
+              setFlag("success")
+              setOpen(true)
+              return true;
+          }else{
+              throw new Error("Password and confrim password doesn't match");
+          }
+      } catch (err) {
+          let errResponse = err.response
+          setMessage(!!errResponse ? errResponse.data.message : err.message)
+          setFlag("error")
+          setOpen(true)
+          return false;
+      }
+    }
   });
 
 

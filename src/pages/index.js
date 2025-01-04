@@ -60,8 +60,8 @@ const router = useRouter();
 
 
 useEffect(()=>{
-  if (auth.store === null){
-    router.push("/steps")
+  if (auth?.store === null){
+    router.push("/createstore")
   }
 },[])
 
