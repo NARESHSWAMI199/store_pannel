@@ -183,11 +183,11 @@ export const AuthProvider = (props) => {
       })
   };
 
-    const updateUserDetail = async () => {
+    const updateUserDetail = () => {
       axios.defaults.headers = {
-        Authorization : initialState.token
+        Authorization : authToken()
       }
-      await axios.get(host+"/wholesale/auth/detail")
+      axios.get(host+"/wholesale/auth/detail")
       .then (res => {
         const user = res.data.user
         window.sessionStorage.setItem("user",JSON.stringify(user))

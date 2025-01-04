@@ -177,7 +177,12 @@ const Page = (props) => {
 
   return (
     <>
-
+  <Grid container 
+      sx={{
+          justifyContent : 'center',
+          alignItems : 'center',
+          display : 'flex'
+      }}>
         <Grid md={4.2} xs={12}
         sx={{
           background : 'white',
@@ -339,8 +344,7 @@ const Page = (props) => {
             )}
           </div>
         </Grid>
-
-
+        </Grid>
       <Snackbar anchorOrigin={{ vertical : 'top', horizontal : 'right' }}
           open={open}
           onClose={handleClose}

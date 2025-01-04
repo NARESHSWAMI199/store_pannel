@@ -203,6 +203,12 @@ const CreateStore = () => {
     }
 
   return (
+    <Grid container 
+        sx={{
+            justifyContent : 'center',
+            alignItems : 'center',
+            display : 'flex'
+        }}>
     <Grid xs={12} md={8} sx={{
         background : 'white',
         px : 3,
@@ -462,6 +468,7 @@ const CreateStore = () => {
                     {message}
                 </Alert>
             </Snackbar>
+    </Grid>
     </Grid>
   )
 }

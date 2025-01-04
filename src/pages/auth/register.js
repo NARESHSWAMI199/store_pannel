@@ -63,13 +63,18 @@ const Register = () => {
 
 
   return (
-  <Grid md={5} xs={12} 
+  <Grid container 
       sx={{
-          background : 'white',
-          borderRadius : 2,
-          px : 3,
-          py : 5,
+          justifyContent : 'center',
+          alignItems : 'center',
+          display : 'flex'
       }}>
+        <Grid md={5} xs={12}  sx={{
+            background : 'white',
+            borderRadius : 2,
+            px : 3,
+            py : 5,
+        }}>
     <Head>
       <title>
         Register | Swami Sales
@@ -191,6 +196,7 @@ const Register = () => {
         </form>
       </div>
     </Box>
+  </Grid>
   </Grid>
   );
 };

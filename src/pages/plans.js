@@ -15,7 +15,7 @@ import { format } from 'date-fns';
 import { useRouter } from 'next/router';
 
 
-function dashboard() {
+function Plans() {
 
   const router = useRouter()
   const appBarRef = useRef(null);
@@ -58,44 +58,21 @@ function dashboard() {
     }
   }
 
-    
-  useEffect(() => {
-    const getAppBarHeight = () => {
-      if (appBarRef.current) {
-        setAppBarHeight(appBarRef.current.clientHeight);
-      }
-    };
-
-    getAppBarHeight(); 
-
-    const resizeObserver = new ResizeObserver(getAppBarHeight);
-    if (appBarRef.current) {
-      resizeObserver.observe(appBarRef.current);
-    }
-
-    return () => {
-      if (appBarRef.current) {
-        resizeObserver.unobserve(appBarRef.current);
-      }
-    };
-  }, []);
 
   return (
  <>
- 
-  <HomeNavbar  navRef={appBarRef} />
-
-
 <Grid container sx={{
-    marginTop : (appBarHeight+10)+"px",
-    display : 'flex',
-    justifyContent : 'center'
+    justifyContent : 'center',
   }}>
-    <Grid md={10} xs={12}>
+    <Grid md={10} xs={12} sx={{
+        background : 'white',
+        borderRadius : 2,
+        p : 5
+    }}>
       <Grid xs={12} md={2.5}  sx={{
         boxShadow : 3,
         borderRadius : 2,
-        m : 10
+        m : 5
       }}>
         <Box sx={{px: 5}}>
           {recentPlan.status ? 
@@ -248,4 +225,10 @@ function dashboard() {
   )
 }
 
-export default dashboard
+Plans.getLayout = (page) =>(
+  <HomeNavbar>
+  {page}
+</HomeNavbar>
+)
+
+export default Plans

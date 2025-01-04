@@ -70,6 +70,10 @@ function Pricing() {
     
 
   return (<>
+    <Grid container 
+      sx={{
+          justifyContent : 'center'
+      }}>
         <Grid md={10}>
             <Box sx={{
                 textAlign : 'center',
@@ -165,6 +169,7 @@ function Pricing() {
                 })}   
                                 
             </Grid>
+        </Grid>
         </Grid>
         <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
             open={open}

@@ -199,11 +199,8 @@ React.useEffect(()=>{
             }}
         >
       <Grid container sx={{
-            marginTop : (appBarHeight+10)+'px',
-            minHeight : 'calc(100vh - '+(appBarHeight+10)+'px)',
-            justifyContent : 'center',
-            alignItems : 'center',
-            display : 'flex'
+            marginTop : (appBarHeight)+'px',
+            minHeight : 'calc(100vh - '+(appBarHeight)+'px)',
           }}>
             {children}
 

@@ -1,5 +1,5 @@
 import { ArrowRightAltOutlined } from '@mui/icons-material'
-import { Avatar, Box, Button, SvgIcon, Typography } from '@mui/material'
+import { Avatar, Box, Button, Grid, SvgIcon, Typography } from '@mui/material'
 import Link from 'next/link'
 import bg from 'public/assets/bg2.png'
 import logo from 'public/assets/logos/logo.png'
@@ -10,6 +10,12 @@ function Page() {
 
 const auth = useAuth()
   return (
+    <Grid container 
+    sx={{
+        justifyContent : 'center',
+        alignItems : 'center',
+        display : 'flex'
+    }}>
     <Box sx={{
         display : 'flex' , 
         flexDirection : 'column',
@@ -101,6 +107,7 @@ const auth = useAuth()
             </Box>
           </Link>
     </Box>
+    </Grid>
   )
 }
 
