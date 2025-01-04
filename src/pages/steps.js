@@ -63,7 +63,7 @@ const Page = () => {
           setMessage(res.data.message)
           setFlag("success")
           setOpen(true)
-          auth.updateUserDetail(auth.token)
+          auth.updateUserDetail()
           return true;
         }).catch(err=>{
             console.log(err)

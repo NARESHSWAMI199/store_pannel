@@ -55,7 +55,7 @@ export const AccountProfile = (props) => {
 
   const handleUpdateLoggedUser = useCallback(
     () => {
-      auth.updateUserDetail(user.slug)
+      auth.updateUserDetail()
     },
     [auth]
   );
