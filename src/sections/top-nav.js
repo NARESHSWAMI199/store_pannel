@@ -190,7 +190,7 @@ React.useEffect(()=>{
                 left: 0,
                 width: '100vw', 
                 height: '100vh',
-                backgroundImage:`url(${bg.src})`,
+                backgroundImage:`url(${props.bg?.src})`,
                 backgroundRepeat: "no-repeat",
                 backgroundSize: "cover",
                 overflowX: 'hidden', /* Hide horizontal scrollbar */

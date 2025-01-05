@@ -40,7 +40,7 @@ const router = useRouter();
 
 
 
-/*useEffect(()=>{
+useEffect(()=>{
   axios.defaults.headers = {
     Authorization : auth.token
   }
@@ -56,7 +56,7 @@ const router = useRouter();
     console.log(err)
   })
 
-},[])*/
+},[])
 
 
 useEffect(()=>{

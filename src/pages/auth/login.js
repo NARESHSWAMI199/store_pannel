@@ -359,7 +359,7 @@ const Page = (props) => {
 };
 
 Page.getLayout = (page) => (
-    <HomeNavbar>
+    <HomeNavbar bg={bg}>
       {page}
     </HomeNavbar>
 );

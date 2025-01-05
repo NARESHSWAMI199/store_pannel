@@ -77,8 +77,7 @@ function Pricing() {
         <Grid md={10}>
             <Box sx={{
                 textAlign : 'center',
-                color : 'white',
-                mb : 10,
+                m : 10,
                 alignItems : 'flex-start !important'
             }}>
                 <Typography variant='h2' sx={{fontFamily : 'Georgia,Times,Times New Roman,serif;',fontWeight : 'light'}}>
@@ -185,7 +184,7 @@ function Pricing() {
 }
 
 Pricing.getLayout = (page) => (
-    <HomeNavbar>
+    <HomeNavbar bg={bg}>
         {page}
     </HomeNavbar>
 )

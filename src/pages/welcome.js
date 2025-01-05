@@ -112,7 +112,7 @@ const auth = useAuth()
 }
 
 Page.getLayout = (page) => (
-    <HomeNavbar>
+    <HomeNavbar bg={bg}>
         {page}
     </HomeNavbar>
 )

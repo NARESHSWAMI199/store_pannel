@@ -14,7 +14,6 @@ import { host,dataNotFoundImage} from 'src/utils/util';
 import { format } from 'date-fns';
 import { useRouter } from 'next/router';
 
-
 function Plans() {
 
   const router = useRouter()
@@ -65,7 +64,6 @@ function Plans() {
     justifyContent : 'center',
   }}>
     <Grid md={10} xs={12} sx={{
-        background : 'white',
         borderRadius : 2,
         p : 5
     }}>
@@ -104,7 +102,8 @@ function Plans() {
             <Typography  sx={{
               my : 2
               }} variant='h4'>
-              ₹ {recentPlan.price}
+                {recentPlan.price > 0  ?   "₹ "+ recentPlan.price : "Free"}
+            
               <br/>
               <span style={{
                 color : '#6c757d!important',
@@ -113,12 +112,18 @@ function Plans() {
                 {recentPlan.months} month's plan
               </span>
             </Typography>
-          {!recentPlan.status &&
+          {!recentPlan.status ?
             <Button sx={{mb : 2}} variant="contained" color='primary' onClick={(e)=>{
                 router.push("/pricing")
               }}> 
               Get New Plan 
             </Button>
+            :
+            <Button sx={{mb : 2}} variant="contained" color='primary' onClick={(e)=>{
+              router.push("/")
+            }}> 
+            GO TO DASHBOARD 
+          </Button>
           }
           </Box>    
           <Box sx={{
@@ -182,7 +187,13 @@ function Plans() {
                     <TableCell component="th" scope="row">
                       {plan.name}
                     </TableCell>
-                    <TableCell align="center">{plan.price}</TableCell>
+                    <TableCell align="center">
+                    {plan.price === 0 ? 
+                      <Badge badgeContent={"Free"} color='success' />
+                      :
+                      plan.price
+                    }
+                    </TableCell> 
                     <TableCell align="center">{plan.months}</TableCell>
                     <TableCell align="center">{fomratedDate(plan.createdAt)}</TableCell>
                     <TableCell align="center">{fomratedDate(plan.expiryDate)}</TableCell>

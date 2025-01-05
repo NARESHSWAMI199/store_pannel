@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 import { useAuth } from 'src/hooks/use-auth';
 import * as Yup from 'yup';
 import HomeNavbar from 'src/sections/top-nav'
-
+import bg from 'public/assets/bg2.png'
 
 const Register = () => {
   const router = useRouter();
@@ -202,7 +202,7 @@ const Register = () => {
 };
 
 Register.getLayout = (page)=> ( 
-  <HomeNavbar>
+  <HomeNavbar bg={bg}>
     {page}
   </HomeNavbar>
 )
