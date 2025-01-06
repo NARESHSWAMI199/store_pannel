@@ -38,8 +38,6 @@ const auth = useAuth()
 const user = auth.user
 const router = useRouter();
 
-
-
 useEffect(()=>{
   axios.defaults.headers = {
     Authorization : auth.token
@@ -50,7 +48,11 @@ useEffect(()=>{
     if(planIsActive){
       console.log(planIsActive)
     }else{
-      router.push("/plans")
+      if (auth === null || auth.store === null){
+        router.push("/createstore")
+      }else{
+        router.push("/plans")
+      }
     }
   }).catch(err=>{
     console.log(err)
@@ -58,12 +60,6 @@ useEffect(()=>{
 
 },[])
 
-
-useEffect(()=>{
-  if (auth?.store === null){
-    router.push("/createstore")
-  }
-},[])
 
 
 

@@ -45,14 +45,14 @@ import ImageInput from "src/sections/image-input";
     const [categories,setItemCategories] = useState([])
     const [subcategories,setItemSubCategories] = useState([])
     const [values,setValues] = useState({...store, ...user,
-      city : store.address.city, 
-      state : store.address.state,
-      street : store.address.street,
-      zipCode : store.address.zipCode,
-      storeEmail : store.email,
-      storePhone : store.phone,
-      category : store.storeCategory.id,
-      subcategory : store.storeSubCategory.id,
+      city : store?.address?.city, 
+      state : store?.address?.state,
+      street : store?.address?.street,
+      zipCode : store?.address?.zipCode,
+      storeEmail : store?.email,
+      storePhone : store?.phone,
+      category : store?.storeCategory?.id,
+      subcategory : store?.storeSubCategory?.id,
     })
 
 
@@ -253,7 +253,7 @@ import ImageInput from "src/sections/image-input";
                 {/* store image input */}
 
                 <div style={{marginLeft : '10px',marginTop: '10px'}}>
-                      <ImageInput onChange={onSubmit} avtar={storeImage+store.slug+"/"+store.avtar}/>
+                      <ImageInput onChange={onSubmit} avtar={storeImage+store?.slug+"/"+store?.avtar}/>
                       </div>
 
                         <Grid

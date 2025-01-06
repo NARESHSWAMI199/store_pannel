@@ -19,6 +19,8 @@ import { useAuth } from "src/hooks/use-auth";
 import HomeNavbar from 'src/sections/top-nav';
 import { host } from "src/utils/util";
 import ImageInput from "src/sections/image-input";
+import bg from 'public/assets/bg2.png'
+import Spinner from '../sections/spinner';
 
 
 const CreateStore = () => {
@@ -36,6 +38,7 @@ const CreateStore = () => {
     const [categories,setItemCategories] = useState([])
     const [subcategories,setItemSubCategories] = useState([])
     const [values,setValues] = useState({})
+    const [showSpinner , setShowSpinner] = useState("none")
 
 
     useEffect(()=>{
@@ -49,11 +52,6 @@ const CreateStore = () => {
           setMessage(!!err.response ? err.response.data.message : err.message)
           setFlag("error")
           setOpen(true)
-          let status = (!!err.response ? err.response.status : 0);
-          if (status == 401) {
-            auth.signOut();
-            router.push("/auth/login")
-          }
         })
     },[])
 
@@ -170,6 +168,7 @@ const CreateStore = () => {
             storePic : store.storePic
           }
 
+        setShowSpinner("block")
         axios.defaults.headers = {
             Authorization : auth.token,
             "Content-Type" : "multipart/form-data"
@@ -181,11 +180,13 @@ const CreateStore = () => {
           setOpen(true)
           auth.updateUserDetail()
           router.push("/")
+          setShowSpinner("none")
         }).catch(err=>{
             console.log(err)
             setMessage(!!err.response ? err.response.data.message : err.message)
             setFlag("error")
             setOpen(true)
+            setShowSpinner("none")
         })
     
       })
@@ -209,7 +210,7 @@ const CreateStore = () => {
             alignItems : 'center',
             display : 'flex'
         }}>
-    <Grid xs={12} md={8} sx={{
+    <Grid xs={12} md={6} sx={{
         background : 'white',
         px : 3,
         py : 3,
@@ -231,7 +232,7 @@ const CreateStore = () => {
             </Typography>
         </Stack>        
 
-        
+            <Spinner show={showSpinner}/>
             <form
                 autoComplete="off"
                 id={"createstore"}
@@ -475,7 +476,7 @@ const CreateStore = () => {
 
 
 CreateStore.getLayout = (page) => (
-    <HomeNavbar>
+    <HomeNavbar bg={bg}>
         {page}
     </HomeNavbar>
 )
