@@ -1,27 +1,26 @@
 import {
+    Alert,
     Box,
     Button,
     FormControl,
+    Grid,
     InputLabel,
     MenuItem,
     Select,
+    Snackbar,
     Stack,
     TextField,
-    Typography,
-    Grid,
-    Snackbar,
-    Alert
+    Typography
 } from "@mui/material";
+import CircularProgress from '@mui/material/CircularProgress';
 import axios from "axios";
 import { useRouter } from "next/router";
+import bg from 'public/assets/bg2.png';
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "src/hooks/use-auth";
+import ImageInput from "src/sections/image-input";
 import HomeNavbar from 'src/sections/top-nav';
 import { host } from "src/utils/util";
-import ImageInput from "src/sections/image-input";
-import bg from 'public/assets/bg2.png'
-import Spinner from '../sections/spinner';
-
 
 const CreateStore = () => {
     const [open,setOpen] = useState(false)
@@ -38,7 +37,7 @@ const CreateStore = () => {
     const [categories,setItemCategories] = useState([])
     const [subcategories,setItemSubCategories] = useState([])
     const [values,setValues] = useState({})
-    const [showSpinner , setShowSpinner] = useState("none")
+    const [disable , setDisable] = useState(false)
 
 
 
@@ -154,6 +153,7 @@ const CreateStore = () => {
 
       const handleSubmit = useCallback(
         (e) =>{
+        setDisable(true)
         e.preventDefault()
         if(store.storePic === ''){
             alert("Store Image can't be blank.")
@@ -177,7 +177,6 @@ const CreateStore = () => {
             storePic : store.storePic
           }
 
-        setShowSpinner("block")
         axios.defaults.headers = {
             Authorization : auth.token,
             "Content-Type" : "multipart/form-data"
@@ -189,13 +188,13 @@ const CreateStore = () => {
           setOpen(true)
           auth.updateUserDetail()
           router.push("/")
-          setShowSpinner("none")
+          setDisable(false)
         }).catch(err=>{
             console.log(err)
             setMessage(!!err.response ? err.response.data.message : err.message)
             setFlag("error")
             setOpen(true)
-            setShowSpinner("none")
+            setDisable(false)
         })
     
       })
@@ -241,7 +240,6 @@ const CreateStore = () => {
             </Typography>
         </Stack>        
 
-            <Spinner show={showSpinner}/>
             <form
                 autoComplete="off"
                 id={"createstore"}
@@ -462,7 +460,14 @@ const CreateStore = () => {
                         sx={{ mt: 3 }}
                         type="submit"
                         variant="contained"
+                        disabled={disable}
                     >
+                        {disable && 
+                        <CircularProgress size={20} sx={{
+                            color  : 'white',
+                            mx  : 1
+                        }} />
+                    }
                         Save Store
                     </Button> 
 
