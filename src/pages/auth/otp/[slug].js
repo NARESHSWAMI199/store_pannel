@@ -64,6 +64,7 @@ const validateOtp = async (e) => {
                           required={true}
                           InputLabelProps={{shrink: true}}
                           sx={{my:1}}
+                          onChange={()=>setError('')}
                       />
               </Grid>
               <Grid item md={3} xs={12} sx={{
