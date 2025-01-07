@@ -8,6 +8,8 @@ import { useAuth } from 'src/hooks/use-auth';
 import * as Yup from 'yup';
 import HomeNavbar from 'src/sections/top-nav'
 import bg from 'public/assets/bg2.png'
+import {host} from 'src/utils/util';
+import axios from 'axios';  
 
 const Register = () => {
   const router = useRouter();
@@ -46,19 +48,38 @@ const Register = () => {
         .required('Contact is required')
     }),
     onSubmit : async (values,helpers) => {
-      try {
-          if(values.password == values.password2){
-              await auth.signUp(values.name, values.email, values.contact,values.password);
-              router.push("/createstore")
-          }else{
-              throw new Error("Password and confrim password doesn't match");
-          }
-      } catch (err) {
+
+        const {email, name, password, contact, password2} = values;
+
+        if(password != password2){
           helpers.setStatus({ success: false });
-          helpers.setErrors({ submit: err.message });
+          helpers.setErrors({ submit: "Password and confrim password doesn't match"});
           helpers.setSubmitting(false);
-      }
-    }
+          return false;
+        }
+        // await auth.signUp(values.name, values.email, values.contact,values.password);
+        let baseUrl = host+"/wholesale/auth/register" 
+        await axios.post(baseUrl , {
+            email : email,
+            password : password,
+            username : name,
+            contact : contact
+        })
+        .then (res => {
+          let response = res.data
+          let user = response.user;
+          if(user != null){
+            router.push('/auth/otp/'+user.slug);
+          }
+
+          })
+        .catch (err =>{ 
+            const errorMessage = (!!err.response) ? err.response.data.message : err.message;
+            helpers.setStatus({ success: false });
+            helpers.setErrors({ submit: errorMessage });
+            helpers.setSubmitting(false);
+        })
+  }
   });
 
 

@@ -41,6 +41,15 @@ const CreateStore = () => {
     const [showSpinner , setShowSpinner] = useState("none")
 
 
+
+    useEffect(()=>{
+        if(!auth.token){
+            router.push("/auth/login")
+        }else if(auth.store !== null){
+            router.push("/")
+        }
+    },[])
+
     useEffect(()=>{
         axios.defaults.headers={
             Authorization : auth.token

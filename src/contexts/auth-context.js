@@ -183,11 +183,11 @@ export const AuthProvider = (props) => {
       })
   };
 
-    const updateUserDetail = () => {
+    const updateUserDetail = async () => {
       axios.defaults.headers = {
         Authorization : authToken()
       }
-      axios.get(host+"/wholesale/auth/detail")
+      await axios.get(host+"/wholesale/auth/detail")
       .then (res => {
         const user = res.data.user
         window.sessionStorage.setItem("user",JSON.stringify(user))
@@ -250,6 +250,35 @@ export const AuthProvider = (props) => {
   };
 
 
+
+  const validateOtp = async (otp , slug) => {
+    await axios.post(host+"/wholesale/auth/validate-otp",{
+      password : otp,
+      slug : slug
+    })
+    .then(res => {
+      const token = res.data.token
+      window.sessionStorage.setItem('authenticated', 'true');
+      window.sessionStorage.setItem('token', token);
+      const user = res.data.user
+      const store = res.data.store
+      window.sessionStorage.setItem("user",JSON.stringify(user))
+      window.sessionStorage.setItem("store",JSON.stringify(store))
+
+      dispatch({
+        type: HANDLERS.SIGN_IN,
+        token: token,
+        payload : user,
+        store : store
+      });
+    }).catch(err => {
+      const errorMessage = (!!err.response) ? err.response.data.message : err.message;
+      console.log(errorMessage)
+      throw new Error(errorMessage)
+    })
+}
+
+
   return (
     <AuthContext.Provider
       value={{
@@ -257,7 +286,8 @@ export const AuthProvider = (props) => {
         signIn,
         signUp,
         signOut,
-        updateUserDetail
+        updateUserDetail,
+        validateOtp
       }}
     >
       {children}
