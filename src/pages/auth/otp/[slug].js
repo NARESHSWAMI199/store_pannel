@@ -1,16 +1,25 @@
-import { Button, Grid, Stack, TextField, Typography } from '@mui/material'
+import { Alert, Box, Button, Grid, Snackbar, Stack, TextField, Typography } from '@mui/material'
 import { useRouter } from 'next/router'
 import bg from 'public/assets/bg2.png'
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useAuth } from 'src/hooks/use-auth'
 import HomeNavbar from 'src/sections/top-nav'
+import axios from 'axios'
+import {host} from 'src/utils/util'
 
 function ValidateOtp() {
 
+const [open,setOpen] = useState(false)
+const [message,setMessage] = useState("")
+const [flag,setFlag] = useState("success")
 const auth = useAuth();
 const router = useRouter();
 const { slug } = router.query;
-const [error, setError] = useState('')
+
+
+const handleClose = useCallback(()=>{
+  setOpen(false)
+},[])
 
 const validateOtp = async (e) => {
     e.preventDefault();
@@ -19,12 +28,33 @@ const validateOtp = async (e) => {
     let otp = formData.get('otp');
     try{
       await auth.validateOtp(otp,slug);
-      router.push('/createstore')
-    }catch(e){
-      setError(e.message)
+      if(auth.store == null){
+        router.push('/createstore')
+      }else{
+        router.push('/')
+      }
+    }catch(err){
+      setMessage(!!err.response ? err?.response?.data.message : err.message)
+      setFlag("error")
+      setOpen(true)
     }
-
   }
+
+const sendOtp = ()=>{
+  axios.post(host+"/wholesale/auth/sendOtp",{
+    slug  : slug
+  })
+  .then(res => {
+      setMessage(res.data.message)
+      setOpen(true)
+  })
+  .catch(err => {
+    const errorMessage = (!!err.response) ? err.response.data.message : err.message;
+    setMessage(errorMessage)
+    setFlag("error")
+    setOpen(true)
+  })
+}
 
   return (
     <Grid container 
@@ -35,7 +65,7 @@ const validateOtp = async (e) => {
         }}>
 
 
-        <Grid container md={3} xs={12} sx={{
+        <Grid container md={4} xs={12} sx={{
             background : 'white',
             borderRadius : 2,
             px : 3,
@@ -46,9 +76,7 @@ const validateOtp = async (e) => {
         }}> 
 
               <Grid item xs={12} md={12}>
-                <Stack
-                sx={{ my: 2}}
-                >
+                <Stack sx={{my : 1}}>
                 <Typography variant="h6" color="text.secondary">
                     Validate OTP
                 </Typography>
@@ -64,7 +92,6 @@ const validateOtp = async (e) => {
                           required={true}
                           InputLabelProps={{shrink: true}}
                           sx={{my:1}}
-                          onChange={()=>setError('')}
                       />
               </Grid>
               <Grid item md={3} xs={12} sx={{
@@ -78,9 +105,30 @@ const validateOtp = async (e) => {
                   </Button>
               </Grid>
             </form>
-            <Typography variant='body2' color='error'> {error !== '' && error} </Typography>
+            <Box sx={{
+                display : 'flex', 
+                flex : '1 1',
+                width : '100%',
+                alignItems : 'center'
+              }}>
+              <Button variant='text' onClick={sendOtp}  color='primary'> 
+                    Resend otp ?
+                </Button>
+            </Box>
+        
         </Grid>
         
+
+          <Snackbar anchorOrigin={{ vertical : 'bottom', horizontal : 'left' }}
+                    open={open}
+                    onClose={handleClose}
+                    key={'bottom' + 'left'}
+                >
+                <Alert onClose={handleClose} severity={flag} sx={{ width: '100%' }}>
+                    {message}
+                </Alert>
+            </Snackbar>
+
     </Grid>
 
   )
