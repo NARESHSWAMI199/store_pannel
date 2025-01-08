@@ -14,7 +14,8 @@
         Snackbar,
         Alert,
         Container,
-        Stack
+        Stack,
+        Autocomplete
     } from "@mui/material";
     import axios from "axios";
     import { useRouter } from "next/router";
@@ -45,23 +46,30 @@ import ImageInput from "src/sections/image-input";
     const [categories,setItemCategories] = useState([])
     const [subcategories,setItemSubCategories] = useState([])
     const [values,setValues] = useState({...store, ...user,
-      city : store?.address?.city, 
-      state : store?.address?.state,
       street : store?.address?.street,
       zipCode : store?.address?.zipCode,
       storeEmail : store?.email,
       storePhone : store?.phone,
-      category : store?.storeCategory?.id,
-      subcategory : store?.storeSubCategory?.id,
+      category : {label : store?.storeCategory?.category, id : store?.storeCategory?.id},
+      subcategory : {label : store?.storeSubCategory?.subcategory, id : store?.storeSubCategory?.id},
     })
 
+
+    useEffect(()=>{ 
+      console.log(store)  
+    }  ,[store])
 
     useEffect(()=>{
         axios.defaults.headers={
             Authorization : auth.token
         }
         axios.get(host+"/wholesale/address/state")
-        .then(res=>setStateList(res.data))
+        .then(res=>{
+          setStateList(res.data)
+          let selectedState  = res.data.find(state=>state.id == store.address.state);
+          setValues((prevState)=>({...prevState, state : {label : selectedState?.stateName  || '', id : selectedState.id} }))
+        }
+        )
         .catch(err=>{
           console.log(err)
           setMessage(!!err.response ? err.response.data.message : err.message)
@@ -78,20 +86,25 @@ import ImageInput from "src/sections/image-input";
 
 
     useEffect(()=>{
-      axios.defaults.headers={
-        Authorization : auth.token
-      }
-      axios.get(host+`/wholesale/address/city/${selectedState}`)
+      const getCity = async () => { 
+      axios.get(host+`/wholesale/address/city/${values.state?.id}`)
       .then(res=>{
-          setCityList(res.data)}
-          )
+          setCityList(res.data);
+          let selectedCity = res.data.find(city=>city.id == store.address.city)
+          setValues((prevState)=>({...prevState, city : {label : selectedCity?.cityName || '', id : selectedCity?.id}}))
+      })
       .catch(err=>{
         console.log(err)
         setMessage(!!err.response ? err.response.data.message : err.message)
         setFlag("error")
         setOpen(true)
       })
-    },[selectedState])
+    } 
+
+    if(values.state != undefined){
+      getCity()
+    }
+    },[values.state])
 
 
 
@@ -102,12 +115,12 @@ import ImageInput from "src/sections/image-input";
             setSelectedState(stateId)
         },
         []
-      );
+    );
 
 
 
 
-      useEffect(() => {
+    useEffect(() => {
         const getData = async () => {
             axios.defaults.headers = {
                 Authorization: auth.token
@@ -133,10 +146,11 @@ import ImageInput from "src/sections/image-input";
           axios.defaults.headers = {
               Authorization: auth.token
           }
-          await axios.get(host + "/wholesale/store/subcategory/"+values.category)
+          await axios.get(host + "/wholesale/store/subcategory/"+values.category?.id)
               .then(res => {
                   const data = res.data;
                   setItemSubCategories(data)
+                  setValues((prevState)=>({...prevState, subcategory : {label : store?.storeSubCategory?.subcategory || '', id : store?.storeSubCategory?.id}}))
               })
               .catch(err => {
                   setMessage(!!err.response ? err.response.data.message : err.message)
@@ -171,16 +185,16 @@ import ImageInput from "src/sections/image-input";
         let data = {
             // ...store,
             addressSlug : store.address.slug,
-            description : formData.get("description"),
-            storeEmail : formData.get("storeEmail"),
-            storePhone : formData.get("storePhone"),
-            state:  formData.get("state"),
-            city :  formData.get("city"),
-            street:  formData.get("street"),
-            zipCode :  formData.get("zipCode"),
-            categoryId: formData.get("category"),
-            subCategoryId: formData.get("subcategory"),
-            storeName :  formData.get("storeName"),
+            description : values.description,
+            storeEmail : values.storeEmail,
+            storePhone : values.storePhone,
+            state:  values.state?.id,
+            city :  values.city?.id,
+            street:  values.street,
+            zipCode :  values.zipCode,
+            categoryId: values.category?.id,
+            subCategoryId: values.subcategory?.id,
+            storeName :  values.storeName,
             storePic : store.storePic
           }
 
@@ -312,103 +326,83 @@ import ImageInput from "src/sections/image-input";
 
 
 
-                        {/* address */}
+                         {/* address */}
 
-                        <Grid
-                          xs={12}
-                          md={6}
-                        >      
-                        <FormControl fullWidth>
-                        <InputLabel  style={{background : 'white'}}  id="stateLabel">State</InputLabel>
-                          <Select
-                            labelId="stateLable"
-                            id="demo-simple-select"
-                            name='state'
-                            value={values.state}
-                            onChange={changeState}
-                            required
-                            InputLabelProps={{shrink : true}}
-                          >
-                          {stateList.map((state,i)=>{
-                              return (<MenuItem key={i+state.stateName} value={state.id}>{state.stateName}</MenuItem>)
-                          })}
-                  
-                          </Select>
-                      </FormControl>
-                        </Grid>
-
-
-                        <Grid
-                          xs={12}
-                          md={6}
-                        >
-                        <FormControl fullWidth>
-                          <InputLabel style={{background : 'white'}} id="cityLabel">City</InputLabel>
-                          <Select
+                         <Grid
+                        xs={12}
+                        md={6}
+                        item
+                    >      
+                    <FormControl fullWidth>
+                        <Autocomplete
+                            disablePortal
+                            options={[...stateList.map((state)=>({label : state.stateName, id : state.id}))]}
                             fullWidth
-                            labelId="cityLabel"
-                            name='city'
-                            value={values.city}
-                            onChange={handleChange}
-                            required
-                            InputLabelProps={{shrink : true,values:'filled'}}
-                          >
-                          {cityList.map((city,i) => {
-                              return (<MenuItem key={i} value={city.id}>{city.cityName}</MenuItem>)
-                          })}
-                          </Select> 
-                          </FormControl>
-                        </Grid>
+                            name="state"
+                            value={values.state?.label || ''}
+                            onChange={(e,value)=>setValues((prevState)=>({...prevState, state : value }))}
+                            renderInput={(params) => <TextField required {...params} label="State" />} >
+                        </Autocomplete> 
+                    </FormControl>
+                    </Grid>
 
-                      {/* Category */}
-                      <Grid
+
+                    <Grid
                         xs={12}
                         md={6}
+                        item
                     >
-                        <FormControl fullWidth>
-                            <InputLabel  style={{background : 'white'}}  id="itemLabel">Category</InputLabel>
-                            <Select
-                                labelId="itemLabel"
-                                id="category"
-                                name='category'
-                                value={values.category !=undefined ? ""+values.category : ""}
-                                onChange={handleChange}
-                                required
-                            >
-                            {categories.map((categroyObj , i) => {
-                                if(categroyObj.id !=0)
-                                return ( <MenuItem key={i} value={categroyObj.id}>{categroyObj.category}</MenuItem>
-                                )})
-                            }
-                             <MenuItem value={0}>{"Other"}</MenuItem>
-                            </Select>
+                    <FormControl fullWidth>
+                        <Autocomplete
+                            disablePortal
+                            options={[...cityList.map((city)=>({label : city.cityName, id : city.id}))]}
+                            fullWidth
+                            value={values.city?.label || ''}
+                            onChange={(e,value)=>setValues((prevState)=>({  ...prevState, city : value}))}
+                            renderInput={(params) => <TextField name="city" required {...params} label="City" />} >
+                        </Autocomplete> 
                         </FormControl>
                     </Grid>
 
-                      {/* Subcategory */}
-                      <Grid
+                    {/* Category */}
+                    <Grid
                         xs={12}
                         md={6}
+                        item
                     >
                         <FormControl fullWidth>
-                            <InputLabel  style={{background : 'white'}}  id="itemLabel">Subcategory</InputLabel>
-                            <Select
-                                labelId="itemLabel"
-                                id="subcategory"
-                                name='subcategory'
-                                value={values.subcategory !=undefined ? ""+values.subcategory : ""}
-                                onChange={handleChange}
-                                required
-                            >
-                            {subcategories.map((subcategroyObj , i) => {
-                                if(subcategroyObj.id !=0)
-                                return ( <MenuItem key={i} value={subcategroyObj.id}>{subcategroyObj.subcategory}</MenuItem>
-                                )})
-                            }
-                             <MenuItem value={0}>{"Other"}</MenuItem>
-                            </Select>
+                            <Autocomplete
+                                disablePortal
+                                options={[...categories.filter(category=> category.id !== 0).map((category)=>({label : category.category, id : category.id})),{label : 'Other', id : 0}]} 
+                                fullWidth
+                                name={"category"}
+                                value={values.category?.label || ''}
+                                onChange={(e,value)=>setValues((prevState)=>({...prevState, category : value    }))}
+                                renderInput={(params) => <TextField required {...params} label="Categeory" />} >
+                            </Autocomplete> 
                         </FormControl>
                     </Grid>
+
+                    {/* Subcategory */}
+                    <Grid
+                        xs={12}
+                        md={6}
+                        item
+                    >
+                        <FormControl fullWidth>
+                            <Autocomplete
+                                disablePortal
+                                required
+                                options={[...subcategories.filter(subcategory => subcategory.id !== 0).map((subcategory)=>({label : subcategory?.subcategory, id : subcategory?.id})),{label : 'Other', id : 0}]}
+                                fullWidth
+                                name="subcategory"
+                                value={values.subcategory?.label || ''}
+                                onChange={(e,value)=>setValues((prevState)=>({  ...prevState, subcategory : value}))}
+                                renderInput={(params) => <TextField  required {...params} label="Subcategory" />} >
+                            </Autocomplete> 
+                        </FormControl>
+                    </Grid>
+
 
 
                         <Grid

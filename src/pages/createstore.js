@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import CircularProgress from '@mui/material/CircularProgress';
 import axios from "axios";
-import { id } from "date-fns/locale";
+import { ca, id } from "date-fns/locale";
 import { useRouter } from "next/router";
 import { set } from "nprogress";
 import bg from 'public/assets/bg2.png';
@@ -343,7 +343,7 @@ const CreateStore = () => {
                         <FormControl fullWidth>
                             <Autocomplete
                                 disablePortal
-                                options={[...categories.map((category)=>({label : category.category, id : category.id}))]}
+                                options={[...categories.filter(category=> category.id !== 0).map((category)=>({label : category.category, id : category.id})),{label : 'Other', id : 0}]} 
                                 fullWidth
                                 name={"category"}
                                 value={values.category?.label || ''}
@@ -363,7 +363,7 @@ const CreateStore = () => {
                             <Autocomplete
                                 disablePortal
                                 required
-                                options={[...subcategories.map((subcategory)=>({label : subcategory.subcategory, id : subcategory.id}))]}
+                                options={[...subcategories.filter(subcategory => subcategory.id !== 0).map(subcategory=>({label : subcategory?.subcategory, id : subcategory?.id})),{label : 'Other', id : 0}]}
                                 fullWidth
                                 name="subcategory"
                                 value={values.subcategory?.label || ''}
