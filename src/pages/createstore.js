@@ -1,5 +1,6 @@
 import {
     Alert,
+    Autocomplete,
     Box,
     Button,
     FormControl,
@@ -14,7 +15,9 @@ import {
 } from "@mui/material";
 import CircularProgress from '@mui/material/CircularProgress';
 import axios from "axios";
+import { id } from "date-fns/locale";
 import { useRouter } from "next/router";
+import { set } from "nprogress";
 import bg from 'public/assets/bg2.png';
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "src/hooks/use-auth";
@@ -32,11 +35,10 @@ const CreateStore = () => {
     })
     const[cityList,setCityList] = useState([])
     const[stateList,setStateList] = useState([])
-    const [selectedState , setSelectedState] = useState(1)
     const router = useRouter()
     const [categories,setItemCategories] = useState([])
     const [subcategories,setItemSubCategories] = useState([])
-    const [values,setValues] = useState({})
+    const [values,setValues] = useState({state : { id : 1}})
     const [disable , setDisable] = useState(false)
 
 
@@ -66,35 +68,25 @@ const CreateStore = () => {
 
 
     useEffect(()=>{
-      axios.defaults.headers={
-        Authorization : auth.token
-      }
-      axios.get(host+`/wholesale/address/city/${selectedState}`)
-      .then(res=>{
-          setCityList(res.data)}
-          )
-      .catch(err=>{
-        console.log(err)
-        setMessage(!!err.response ? err.response.data.message : err.message)
-        setFlag("error")
-        setOpen(true)
-      })
-    },[selectedState])
+        const getCity = async() =>{
+            await axios.get(host+`/wholesale/address/city/${values.state?.id}`)
+            .then(res=>{
+                setCityList(res.data) 
+                setValues((prevState)=>({  ...prevState, city : {label : ''}}))
+            })
+            .catch(err=>{
+            console.log(err)
+            setMessage(!!err.response ? err.response.data.message : err.message)
+            setFlag("error")
+            setOpen(true)
+            })
+        }
 
+        if(values.state != undefined){
+            getCity()
+        }
 
-
-
-    const changeState = useCallback(
-          async (event) => {
-            let stateId =  event.target.value
-            setSelectedState(stateId)
-        },
-        []
-      );
-
-
-
-
+    },[values.state])
       useEffect(() => {
         const getData = async () => {
             axios.defaults.headers = {
@@ -125,6 +117,7 @@ const CreateStore = () => {
               .then(res => {
                   const data = res.data;
                   setItemSubCategories(data)
+                  setValues((prevState)=>({  ...prevState, subcategory : {label : ''}}))
               })
               .catch(err => {
                   setMessage(!!err.response ? err.response.data.message : err.message)
@@ -157,6 +150,7 @@ const CreateStore = () => {
         e.preventDefault()
         if(store.storePic === ''){
             alert("Store Image can't be blank.")
+            setDisable(false)
             return false
         }
         const form = e.target;
@@ -164,16 +158,16 @@ const CreateStore = () => {
         let data = {
             // ...store,
             // addressSlug : store.address.slug,
-            description : formData.get("description"),
-            storeEmail : formData.get("storeEmail"),
-            storePhone : formData.get("storePhone"),
-            state:  formData.get("state"),
-            city :  formData.get("city"),
-            street:  formData.get("street"),
-            zipCode :  formData.get("zipCode"),
-            categoryId: formData.get("category"),
-            subCategoryId: formData.get("subcategory"),
-            storeName :  formData.get("storeName"),
+            description : values.description,
+            storeEmail : values.storeEmail,
+            storePhone : values.storePhone,
+            state:  values.state?.id,
+            city :  values.city?.id,
+            street:  values.street,
+            zipCode :  values.zipCode,
+            categoryId: values.category,
+            subCategoryId: values.subcategory,
+            storeName :  values.storeName,
             storePic : store.storePic
           }
 
@@ -202,7 +196,6 @@ const CreateStore = () => {
       const handleClose = useCallback(()=>{
             setOpen(false)
       })
-      
 
     const onSubmit = (image) =>{
       setStore((pervious)=>({
@@ -311,20 +304,15 @@ const CreateStore = () => {
                         item
                     >      
                     <FormControl fullWidth>
-                    <InputLabel  style={{background : 'white'}}  id="stateLabel">State</InputLabel>
-                        <Select
-                        labelId="stateLable"
-                        id="demo-simple-select"
-                        name='state'
-                        onChange={changeState}
-                        required
-                        InputLabelProps={{shrink : true}}
-                        >
-                        {stateList.map((state,i)=>{
-                            return (<MenuItem key={i+state.stateName} value={state.id}>{state.stateName}</MenuItem>)
-                        })}
-                
-                        </Select>
+                        <Autocomplete
+                            disablePortal
+                            options={[...stateList.map((state)=>({label : state.stateName, id : state.id}))]}
+                            fullWidth
+                            name="state"
+                            value={values.state?.label || ''}
+                            onChange={(e,value)=>setValues((prevState)=>({...prevState, state : value }))}
+                            renderInput={(params) => <TextField required {...params} label="State" />} >
+                        </Autocomplete> 
                     </FormControl>
                     </Grid>
 
@@ -335,19 +323,14 @@ const CreateStore = () => {
                         item
                     >
                     <FormControl fullWidth>
-                        <InputLabel style={{background : 'white'}} id="cityLabel">City</InputLabel>
-                        <Select
-                        fullWidth
-                        labelId="cityLabel"
-                        name='city'
-                        onChange={handleChange}
-                        required
-                        InputLabelProps={{shrink : true,values:'filled'}}
-                        >
-                        {cityList.map((city,i) => {
-                            return (<MenuItem key={i} value={city.id}>{city.cityName}</MenuItem>)
-                        })}
-                        </Select> 
+                        <Autocomplete
+                            disablePortal
+                            options={[...cityList.map((city)=>({label : city.cityName, id : city.id}))]}
+                            fullWidth
+                            value={values.city?.label || ''}
+                            onChange={(e,value)=>setValues((prevState)=>({  ...prevState, city : value}))}
+                            renderInput={(params) => <TextField name="city" required {...params} label="City" />} >
+                        </Autocomplete> 
                         </FormControl>
                     </Grid>
 
@@ -358,21 +341,14 @@ const CreateStore = () => {
                         item
                     >
                         <FormControl fullWidth>
-                            <InputLabel  style={{background : 'white'}}  id="itemLabel">Category</InputLabel>
-                            <Select
-                                labelId="itemLabel"
-                                id="category"
-                                name='category'
-                                onChange={handleChange}
-                                required
-                            >
-                            {categories.map((categroyObj , i) => {
-                                if(categroyObj.id !=0)
-                                return ( <MenuItem key={i} value={categroyObj.id}>{categroyObj.category}</MenuItem>
-                                )})
-                            }
-                                <MenuItem value={0}>{"Other"}</MenuItem>
-                            </Select>
+                            <Autocomplete
+                                disablePortal
+                                options={[...categories.map((category)=>({label : category.category, id : category.id}))]}
+                                fullWidth
+                                value={values.category?.label || ''}
+                                onChange={(e,value)=>setValues((prevState)=>({...prevState, category : value?.id, subcategory : null}))}
+                                renderInput={(params) => <TextField name={"category"} required {...params} label="Categeory" />} >
+                            </Autocomplete> 
                         </FormControl>
                     </Grid>
 
@@ -382,23 +358,17 @@ const CreateStore = () => {
                         md={6}
                         item
                     >
-                    <FormControl fullWidth>
-                        <InputLabel  style={{background : 'white'}}  id="itemLabel">Subcategory</InputLabel>
-                        <Select
-                            labelId="itemLabel"
-                            id="subcategory"
-                            name='subcategory'
-                            onChange={handleChange}
-                            required
-                        >
-                        {subcategories.map((subcategroyObj , i) => {
-                            if(subcategroyObj.id !=0)
-                            return ( <MenuItem key={i} value={subcategroyObj.id}>{subcategroyObj.subcategory}</MenuItem>
-                            )})
-                        }
-                            <MenuItem value={0}>{"Other"}</MenuItem>
-                        </Select>
-                    </FormControl>
+                        <FormControl fullWidth>
+                            <Autocomplete
+                                disablePortal
+                                required
+                                options={[...subcategories.map((subcategory)=>({label : subcategory.subcategory, id : subcategory.id}))]}
+                                fullWidth
+                                value={values.subcategory?.label || ''}
+                                onChange={(e,value)=>setValues((prevState)=>({  ...prevState, subcategory : value?.id}))}
+                                renderInput={(params) => <TextField name="subcategory" required {...params} label="Subcategory" />} >
+                            </Autocomplete> 
+                        </FormControl>
                     </Grid>
 
 
@@ -413,7 +383,6 @@ const CreateStore = () => {
                         name="storeEmail"
                         onChange={handleChange}
                         required
-                        value={values.storeEmail}
                         InputLabelProps={{shrink : true}}
                         />
                     </Grid>

@@ -62,7 +62,7 @@ export const BasicSearch = (props) => {
     <form id={"search"} onSubmit={(e)=>{handleSubmit(e)}}>
       <Grid spacing={1} container>
 
-      <Grid xs={12} md={2}>
+      <Grid item xs={12} md={2}>
           <OutlinedInput
           value={values.searchKey}
           onChange={handleChange}
@@ -88,7 +88,7 @@ export const BasicSearch = (props) => {
 
 
   { props.type !== "A" &&  props.type !== "item" &&
-  <Grid xs={12} md={2}>
+  <Grid item xs={12} md={2}>
     <OutlinedInput
           sx={{height : 54}}
           value={values.slug}
@@ -112,7 +112,7 @@ export const BasicSearch = (props) => {
 
 
 
-          { props.type === "A" &&  <Grid xs={12} md={2}><Select
+          { props.type === "A" &&  <Grid item xs={12} md={2}><Select
                 fullWidth
                 sx={{height : 54}}
                 labelId="demo-simple-select-label"
@@ -128,7 +128,7 @@ export const BasicSearch = (props) => {
                 <MenuItem value={'R'}>Retailer</MenuItem>
               </Select></Grid>}
 
-             {props.type !== "G" && <Grid xs={12} md={2}><Select
+             {props.type !== "G" && <Grid item xs={12} md={2}><Select
                 fullWidth
                 sx={{height : 54}}
                 labelId="demo-simple-select-label"
@@ -143,7 +143,7 @@ export const BasicSearch = (props) => {
               </Select></Grid>}
 
 
-              {props.type == "item" && <Grid xs={12} md={2}><Select
+              {props.type == "item" && <Grid item xs={12} md={2}><Select
                 fullWidth
                 sx={{height : 54}}
                 labelId="demo-simple-select-label"
@@ -157,7 +157,7 @@ export const BasicSearch = (props) => {
                 <MenuItem value={"N"}>Out of stock</MenuItem>
               </Select></Grid>}
      
-        <Grid xs={12} md={2}>
+        <Grid item xs={12} md={2}>
           <TextField
             fullWidth
             sx={{height : 54}}
@@ -174,7 +174,7 @@ export const BasicSearch = (props) => {
           />
       </Grid>
 
-      <Grid xs={12} md={2}>
+      <Grid item xs={12} md={2}>
       <TextField
           fullWidth
           sx={{height : 54}}
@@ -190,7 +190,7 @@ export const BasicSearch = (props) => {
           }}
         />
       </Grid>
-      <Grid xs={6} md={1}>
+      <Grid item xs={6} md={1}>
       <Button type='submit' sx={{height : 54,width: '100%'}} 
         startIcon={(
             <SvgIcon fontSize="small">
@@ -202,7 +202,7 @@ export const BasicSearch = (props) => {
         </Grid>
 
 
-        <Grid xs={6} md={1}>
+        <Grid item xs={6} md={1}>
         <Button type='reset' onClick={resetFilters} sx={{height : 54,width: '100%',background:'red',mx:1}} 
           startIcon={(
               <SvgIcon fontSize="small">
