@@ -113,7 +113,7 @@ const CreateStore = () => {
           axios.defaults.headers = {
               Authorization: auth.token
           }
-          await axios.get(host + "/wholesale/store/subcategory/"+values.category)
+          await axios.get(host + "/wholesale/store/subcategory/"+values.category?.id)
               .then(res => {
                   const data = res.data;
                   setItemSubCategories(data)
@@ -165,8 +165,8 @@ const CreateStore = () => {
             city :  values.city?.id,
             street:  values.street,
             zipCode :  values.zipCode,
-            categoryId: values.category,
-            subCategoryId: values.subcategory,
+            categoryId: values.category?.id,
+            subCategoryId: values.subcategory?.id,
             storeName :  values.storeName,
             storePic : store.storePic
           }
@@ -345,9 +345,10 @@ const CreateStore = () => {
                                 disablePortal
                                 options={[...categories.map((category)=>({label : category.category, id : category.id}))]}
                                 fullWidth
+                                name={"category"}
                                 value={values.category?.label || ''}
-                                onChange={(e,value)=>setValues((prevState)=>({...prevState, category : value?.id, subcategory : null}))}
-                                renderInput={(params) => <TextField name={"category"} required {...params} label="Categeory" />} >
+                                onChange={(e,value)=>setValues((prevState)=>({...prevState, category : value    }))}
+                                renderInput={(params) => <TextField required {...params} label="Categeory" />} >
                             </Autocomplete> 
                         </FormControl>
                     </Grid>
@@ -364,9 +365,10 @@ const CreateStore = () => {
                                 required
                                 options={[...subcategories.map((subcategory)=>({label : subcategory.subcategory, id : subcategory.id}))]}
                                 fullWidth
+                                name="subcategory"
                                 value={values.subcategory?.label || ''}
-                                onChange={(e,value)=>setValues((prevState)=>({  ...prevState, subcategory : value?.id}))}
-                                renderInput={(params) => <TextField name="subcategory" required {...params} label="Subcategory" />} >
+                                onChange={(e,value)=>setValues((prevState)=>({  ...prevState, subcategory : value}))}
+                                renderInput={(params) => <TextField  required {...params} label="Subcategory" />} >
                             </Autocomplete> 
                         </FormControl>
                     </Grid>
