@@ -54,7 +54,7 @@ const Page = () => {
     })
 
     useEffect(()=>{
-        setData((previous)=>({...data , storeId : wholesale.id}))
+        setData((previous)=>({...data , storeId : wholesale?.id}))
     },[])
     
 
@@ -94,7 +94,7 @@ const Page = () => {
         axios.defaults.headers = {
             Authorization: auth.token
         }
-        await axios.post(host + '/admin/item/importExcel/' + wholesale.slug, formData, {
+        await axios.post(host + '/admin/item/importExcel/' + wholesale?.slug, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
@@ -163,7 +163,7 @@ const Page = () => {
             </Snackbar>
             <Head>
                 <title>
-                    {toTitleCase(wholesale.storeName)} | Swami Sales
+                    {toTitleCase(wholesale?.storeName)} | Swami Sales
                 </title>
             </Head>
             <Box
@@ -207,7 +207,7 @@ const Page = () => {
                                     href={{
                                         pathname: '/items/create/',
                                         query: {
-                                            slug: wholesale.slug,
+                                            slug: wholesale?.slug,
                                             us: userSlug
                                         },
                                     }}>

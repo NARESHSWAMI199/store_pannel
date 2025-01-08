@@ -65,7 +65,7 @@ const sendOtp = ()=>{
         }}>
 
 
-        <Grid container md={4} xs={12} sx={{
+        <Grid md={3.6} xs={12} sx={{
             background : 'white',
             borderRadius : 2,
             px : 3,
@@ -82,8 +82,13 @@ const sendOtp = ()=>{
                 </Typography>
                 </Stack>
              </Grid>
-             <form onSubmit={(e) => validateOtp(e)} style={{ width : '100%' , display : 'flex', justifyContent : 'center', alignItems : 'center'}}>
-              <Grid item md={9} xs={12}  sx={{}}>
+             <form onSubmit={(e) => validateOtp(e)} style={{ width : '100%',
+                 display : 'flex',
+                  justifyContent : 'center',
+                  alignItems : 'center',
+                  flexDirection : 'column'
+              }}>
+              {/* <Grid item md={12} xs={12}  sx={{}}> */}
                   <TextField                    
                           fullWidth
                           label="Otp"
@@ -93,28 +98,30 @@ const sendOtp = ()=>{
                           InputLabelProps={{shrink: true}}
                           sx={{my:1}}
                       />
-              </Grid>
-              <Grid item md={3} xs={12} sx={{
+              {/* </Grid> */}
+              {/* <Grid item md={12} xs={12} sx={{
                       background : 'white',
                       display : 'flex',
                       justifyContent : 'center',
                       my:1
-              }} >
-                  <Button variant='contained' type='submit' color='primary' sx={{height : 55,width: '100%'}}> 
-                              Validate OTP    
-                  </Button>
-              </Grid>
-            </form>
+              }} > */}
             <Box sx={{
                 display : 'flex', 
-                flex : '1 1',
+                justifyContent : 'flex-end',
                 width : '100%',
                 alignItems : 'center'
               }}>
-              <Button variant='text' onClick={sendOtp}  color='primary'> 
+                <Button variant='text' onClick={sendOtp}  color='primary' sx={{}}> 
                     Resend otp ?
                 </Button>
-            </Box>
+                </Box>
+                  <Button variant='contained' type='submit' color='primary' sx={{height : 55,width: '100%'}}> 
+                              Validate OTP    
+                  </Button>
+              {/* </Grid> */}
+            </form>
+       
+       
         
         </Grid>
         

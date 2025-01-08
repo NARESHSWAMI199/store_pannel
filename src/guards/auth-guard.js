@@ -36,7 +36,16 @@ export const AuthGuard = (props) => {
             query: router.asPath !== '/' ? { continueUrl: router.asPath } : undefined
           })
           .catch(console.error);
-      } else {
+      }else if(auth?.store == null){
+        console.log("Don't have any store, redirecting");
+        router
+          .replace({
+            pathname: '/createstore',
+            query: router.asPath !== '/' ? { continueUrl: router.asPath } : undefined
+          })
+          .catch(console.error);
+      }
+      else {
         setChecked(true);
       }
     },

@@ -62,7 +62,7 @@ const Page = () => {
     useEffect(()=>{
         setData((previous)=>({...data , 
             inStock : stock,
-            storeId : wholesale.id}))
+            storeId : wholesale?.id}))
     },[stock])
     
 
@@ -102,7 +102,7 @@ const Page = () => {
         axios.defaults.headers = {
             Authorization: auth.token
         }
-        await axios.post(host + '/wholesale/item/importExcel/' + wholesale.slug, formData, {
+        await axios.post(host + '/wholesale/item/importExcel/' + wholesale?.slug, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
@@ -229,7 +229,7 @@ const Page = () => {
             </Snackbar>
             <Head>
                 <title>
-                    {toTitleCase(wholesale.storeName)} | Swami Sales
+                    {toTitleCase(wholesale?.storeName)} | Swami Sales
                 </title>
             </Head>
             <Box

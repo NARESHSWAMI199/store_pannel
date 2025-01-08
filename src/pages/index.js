@@ -48,11 +48,7 @@ useEffect(()=>{
     if(planIsActive){
       console.log(planIsActive)
     }else{
-      if (auth === null || auth.store === null){
-        router.push("/createstore")
-      }else{
         router.push("/plans")
-      }
     }
   }).catch(err=>{
     console.log(err)
