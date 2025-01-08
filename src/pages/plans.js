@@ -35,7 +35,7 @@ function Plans() {
       axios.defaults.headers = {
         Authorization : auth.token
       }
-      axios.get(host+"/wholesale/plan/all")
+      axios.get(host+"/wholesale/plan/my-plans")
       .then(res => {
           const data = res.data;
           setUserPlan(data);

@@ -21,7 +21,7 @@ function Pricing() {
 
 
     useEffect(()=>{
-        axios(host+"/plans/all")
+        axios(host+"/wholesale/plan/all")
         .then(res => {
             setPlans(res.data)
         })
