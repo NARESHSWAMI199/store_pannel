@@ -1,4 +1,4 @@
-import { Badge, Box, Button, Grid, Typography } from '@mui/material'
+import { Badge, Box, Button, Grid, SvgIcon, Typography } from '@mui/material'
 import React, { useEffect, useRef, useState } from 'react'
 import HomeNavbar from 'src/sections/top-nav'
 import Table from '@mui/material/Table';
@@ -13,6 +13,7 @@ import { useAuth } from 'src/hooks/use-auth';
 import { host,dataNotFoundImage} from 'src/utils/util';
 import { format } from 'date-fns';
 import { useRouter } from 'next/router';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 function Plans() {
 
@@ -115,13 +116,24 @@ function Plans() {
           {!recentPlan.status ?
             <Button sx={{mb : 2}} variant="contained" color='primary' onClick={(e)=>{
                 router.push("/pricing")
-              }}> 
-              Get New Plan 
+              }}
+              startIcon={
+                <SvgIcon>
+                    <ArrowForwardIcon size="small" />
+                </SvgIcon>
+              }>
+              GET NEW PLAN
             </Button>
             :
             <Button sx={{mb : 2}} variant="contained" color='primary' onClick={(e)=>{
               router.push("/")
-            }}> 
+            }}
+            startIcon={
+              <SvgIcon>
+                  <ArrowForwardIcon size="small" />
+              </SvgIcon>
+              }
+            > 
             GO TO DASHBOARD 
           </Button>
           }
