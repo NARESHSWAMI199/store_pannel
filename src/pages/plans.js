@@ -35,9 +35,9 @@ function Plans() {
       axios.defaults.headers = {
         Authorization : auth.token
       }
-      axios.get(host+"/wholesale/plan/my-plans")
+      axios.post(host+"/wholesale/plan/my-plans",{})
       .then(res => {
-          const data = res.data;
+          const data = res.data.content;
           setUserPlan(data);
           if(data.length > 0){
             setResetPlan(data[0])
@@ -74,7 +74,7 @@ function Plans() {
         m : 5
       }}>
         <Box sx={{px: 5}}>
-          {recentPlan.status ? 
+          {recentPlan.createdAt <= recentPlan.expiryDate ? 
             <Badge badgeContent={"Active"} color="success" />
             :
             <Badge badgeContent={"Expired"} color="error" />
@@ -103,17 +103,17 @@ function Plans() {
             <Typography  sx={{
               my : 2
               }} variant='h4'>
-                {recentPlan.price > 0  ?   "₹ "+ recentPlan.price : "Free"}
+                {recentPlan.servicePlan?.price > 0  ?   "₹ "+ recentPlan.servicePlan?.price : "Free"}
             
               <br/>
               <span style={{
                 color : '#6c757d!important',
                 fontSize :14,
               }}>
-                {recentPlan.months} month's plan
+                {recentPlan.servicePlan?.months} month's plan
               </span>
             </Typography>
-          {!recentPlan.status ?
+          {recentPlan.createdAt > recentPlan.expiryDate ?
             <Button sx={{mb : 2}} variant="contained" color='primary' onClick={(e)=>{
                 router.push("/pricing")
               }}
@@ -197,20 +197,20 @@ function Plans() {
                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                   >
                     <TableCell component="th" scope="row">
-                      {plan.name}
+                      {plan.servicePlan?.name}
                     </TableCell>
                     <TableCell align="center">
                     {plan.price === 0 ? 
                       <Badge badgeContent={"Free"} color='success' />
                       :
-                      plan.price
+                      plan.servicePlan?.price
                     }
                     </TableCell> 
-                    <TableCell align="center">{plan.months}</TableCell>
+                    <TableCell align="center">{plan.servicePlan?.months}</TableCell>
                     <TableCell align="center">{fomratedDate(plan.createdAt)}</TableCell>
                     <TableCell align="center">{fomratedDate(plan.expiryDate)}</TableCell>
                     <TableCell align="center">
-                      {plan.status ? 
+                      {plan.createdAt <= plan.expiryDate ? 
                       <Badge badgeContent={"Active"} color='success' />
                       :
                       <Badge badgeContent={"Expired"} color='error' />
