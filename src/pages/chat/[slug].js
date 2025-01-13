@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Client } from '@stomp/stompjs';
 import { Alert, Avatar, Box, Button, Grid, Link, Snackbar, SvgIcon, TextField, Typography } from '@mui/material'
 import SendIcon from '@mui/icons-material/Send';
@@ -39,7 +39,8 @@ function Page() {
         axios.get(host+`/wholesale/auth/last-seen`)
         .then(res => {
             let response = res.data;
-            setUserStatus("Last seen at "+format(!!user?.lastSeen ? user?.lastSeen : 0,"hh:mm"));
+            console.log(response.message)
+            // setUserStatus("Last seen at "+format(!!user?.lastSeen ? user?.lastSeen : 0,"hh:mm"));
         }).catch(err => {
             console.log(err.message)
         })
@@ -57,13 +58,9 @@ function Page() {
         });
         client.onConnect = (frame) => {
             console.log('Connected: ' + frame);
-            // /** send a request to connect */
             client.publish({destination : `/app/chat/connect/${user?.slug}` , body : JSON.stringify({slug : user?.slug})}); 
-
-            /** send a request for update status */
-            client.publish({ destination: `/app/chat/${slug}/userStatus`});
-    
-            client.subscribe('/topic/public/status', (user) => {
+          
+            client.subscribe('/topic/status', (user) => {
                 const data = JSON.parse(user.body);
                 if(data.online){
                     setUserStatus("Online");
@@ -81,7 +78,7 @@ function Page() {
         };
 
         client.onDisconnect = (frame) => {
-            /** using servlet api here beacuse here client is closed or deactive */
+            /** using servlet api here beacuse here client is closed */
             updateUserLastSeen()
         };
 
@@ -119,6 +116,14 @@ function Page() {
         setMessages((previous) => [...previous ,messageBody ])
     }
 
+
+    useEffect(()=>{
+        if (client && client.connected) {
+             /** send a request for update status */
+             client.publish({ destination: `/app/chat/${slug}/userStatus`});
+        }
+    },[userStatus])
+
     return (
         <Box>
             {/* <Typography variant='h6'>
@@ -146,7 +151,7 @@ function Page() {
                 </Typography>
 
             </Box>
-      
+
             <Box sx={{
                 display : 'flex',
                 flexDirection :'column',
