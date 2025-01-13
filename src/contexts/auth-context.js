@@ -193,6 +193,10 @@ export const AuthProvider = (props) => {
         window.sessionStorage.setItem("user",JSON.stringify(user))
         const store = res.data.store
         window.sessionStorage.setItem("store",JSON.stringify(store))
+        
+        setTimeout(()=>{
+          signOut();
+        },5 * 60 * 60 * 1000)
 
         dispatch({
           type: HANDLERS.UPDATE_USER,

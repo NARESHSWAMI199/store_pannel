@@ -7,6 +7,7 @@ import { useRouter } from 'next/router'
 import { format, setDate } from 'date-fns';
 import axios from 'axios';
 import { host, userImage } from 'src/utils/util';
+import { fr } from 'date-fns/locale';
 
 
 function Page() {
@@ -36,12 +37,9 @@ function Page() {
 
 
     const updateUserLastSeen = () => {
-        axios.get(host+`/wholesale/auth/last-seen`)
-        .then(res => {
-            let response = res.data;
-            console.log(response.message)
-            // setUserStatus("Last seen at "+format(!!user?.lastSeen ? user?.lastSeen : 0,"hh:mm"));
-        }).catch(err => {
+        return axios.get(host+`/wholesale/auth/last-seen`)
+        .then(res => res.data )
+        .catch(err => {
             console.log(err.message)
         })
     }
@@ -62,6 +60,7 @@ function Page() {
           
             client.subscribe('/topic/status', (user) => {
                 const data = JSON.parse(user.body);
+                // alert(data.slug + " : "+data.online)
                 if(data.online){
                     setUserStatus("Online");
                 }
@@ -77,20 +76,37 @@ function Page() {
             setClient(client)
         };
 
-        client.onDisconnect = (frame) => {
-            /** using servlet api here beacuse here client is closed */
-            updateUserLastSeen()
-        };
-
         client.activate();
+
+
+        client.onDisconnect = (frame) => {
+            console.log("Disconnected : "+frame)
+        }
+
+        window.addEventListener('beforeunload', async (event) => {
+            event.preventDefault();
+                await updateUserLastSeen()
+                .then(data =>{
+                      client.deactivate();
+                }).catch(err=>{
+                    alert(err)
+                })
+          });
+      
 
         return () => {
             client.deactivate();
+            window.removeEventListener('beforeunload', () => {});
         };
     }, [slug]);
 
     
-
+    useEffect(()=>{
+        if(slug == undefined && client && client.connected) return;
+        if(client && client.connected){
+            client.publish({ destination: `/app/chat/${slug}/userStatus`});
+        }
+    },[slug,client,userStatus])
 
 
     const sendMessage = (message) => {
@@ -115,14 +131,6 @@ function Page() {
         sendMessage(messageBody);
         setMessages((previous) => [...previous ,messageBody ])
     }
-
-
-    useEffect(()=>{
-        if (client && client.connected) {
-             /** send a request for update status */
-             client.publish({ destination: `/app/chat/${slug}/userStatus`});
-        }
-    },[userStatus])
 
     return (
         <Box>
