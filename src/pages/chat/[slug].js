@@ -4,7 +4,7 @@ import { Alert, Avatar, Box, Button, Grid, Link, Snackbar, SvgIcon, TextField, T
 import SendIcon from '@mui/icons-material/Send';
 import { useAuth } from 'src/hooks/use-auth'
 import { useRouter } from 'next/router'
-import { format } from 'date-fns';
+import { format, setDate } from 'date-fns';
 import axios from 'axios';
 import { host, userImage } from 'src/utils/util';
 
@@ -17,7 +17,8 @@ function Page() {
     const router = useRouter()
     const {slug} = router.query
     const [reciver,setReciver] = useState()
-
+    const [userStatus,setUserStatus] = useState()
+    
     useEffect(()=>{
         if(slug == undefined || slug == null) return;
         axios.defaults.headers = {
@@ -25,15 +26,28 @@ function Page() {
         }
         axios.get(host + `/wholesale/auth/detail/${slug}`)
         .then(res => {
-            setReciver(res.data.user)
+            let user = res.data?.user;
+            setReciver(user)
+            setUserStatus("Last seen at "+format(!!user?.lastSeen ? user?.lastSeen : 0,"hh:mm"));
         }).catch(err => {
             alert(err.message)
         })
     },[slug])
 
+
+    const updateUserLastSeen = () => {
+        axios.get(host+`/wholesale/auth/last-seen`)
+        .then(res => {
+            let response = res.data;
+            setUserStatus("Last seen at "+format(!!user?.lastSeen ? user?.lastSeen : 0,"hh:mm"));
+        }).catch(err => {
+            console.log(err.message)
+        })
+    }
+
     useEffect(() => {
-        if(slug == undefined || slug == null) return;
-        document.cookie = "X-Username="+user?.slug+"_"+slug+"; path=/"
+        if(slug == undefined) return;
+        document.cookie = `X-Username=${user?.slug}_${slug}; path=/`
         const client = new Client({
             brokerURL: 'ws://localhost:8080/chat', // Replace with your WebSocket server URL
             reconnectDelay: 5000, 
@@ -43,15 +57,32 @@ function Page() {
         });
         client.onConnect = (frame) => {
             console.log('Connected: ' + frame);
+            // /** send a request to connect */
+            client.publish({destination : `/app/chat/connect/${user?.slug}` , body : JSON.stringify({slug : user?.slug})}); 
+
+            /** send a request for update status */
+            client.publish({ destination: `/app/chat/${slug}/userStatus`});
+    
+            client.subscribe('/topic/public/status', (user) => {
+                const data = JSON.parse(user.body);
+                if(data.online){
+                    setUserStatus("Online");
+                }
+            
+              });
+
+             /** reciving the message */ 
             client.subscribe(`/user/${user?.slug}_${slug}/queue/private`, (message) => {
                 const data = JSON.parse(message.body);
                 setMessages((prevMessages) => [...prevMessages, data]);
             });
+
             setClient(client)
         };
 
         client.onDisconnect = (frame) => {
-            console.log('Disconnected: ' + frame);
+            /** using servlet api here beacuse here client is closed or deactive */
+            updateUserLastSeen()
         };
 
         client.activate();
@@ -61,19 +92,32 @@ function Page() {
         };
     }, [slug]);
 
+    
+
 
 
     const sendMessage = (message) => {
         client.activate();
         if (client && client.connected) {
             console.log(client)
-        //   client.send('/app/chat/private/rakesh",', {}, JSON.stringify(message)); 
         client.publish({ destination: `/app/chat/private/${slug}_${user?.slug}`, body:  JSON.stringify(message)});
 
         } else {
           console.warn('Client not connected, unable to send message.');
         }
     };
+
+
+    const handleSendMessage = () =>{
+        let message= document.getElementById("message").value
+        let messageBody = { 
+            type: 'chat', 
+            message: message,
+            time : new Date().getTime()
+          }
+        sendMessage(messageBody);
+        setMessages((previous) => [...previous ,messageBody ])
+    }
 
     return (
         <Box>
@@ -97,7 +141,7 @@ function Page() {
                 }}>
                     {reciver?.username}
                     <small>
-                        online
+                        {userStatus}
                     </small>
                 </Typography>
 
@@ -106,10 +150,12 @@ function Page() {
             <Box sx={{
                 display : 'flex',
                 flexDirection :'column',
-                mt : 3
+                mt : 3,
+                mb : 10
+
             }}>
                 {messages.map((message, index) => {
-                let time = format(!!message.time ? message.time : 0, "HH:mm"  )
+                let time = format(!!message.time ? message.time : 0, "hh:mm"  )
                 let justifyMessage = 'flex-end';
                 if(!!message.sender && message.sender != `${auth.slug}_${slug}`) {
                     justifyMessage = 'flex-start';
@@ -121,9 +167,9 @@ function Page() {
                     boxShadow : 2,
                     background : '#f0f0f5',
                     borderRadius : 2,
-                    maxWidth : 200,
+                    maxWidth : 400,
                     mx : 1,
-                    // my : 1,
+                    my : 0.5,
                     alignSelf  : justifyMessage
                 }}>
                     <Box sx={{
@@ -150,26 +196,24 @@ function Page() {
 
 
         <Box sx={{
-            position : 'absolute',
-            bottom : 1,
+            position : 'fixed',
+            bottom : 0,
             left : 0,
             right : 0,
             display : 'flex',
             justifyContent : 'center',
             alignItems : 'center',
-            w : '100%'
+            w : '100%',
+            background : 'white'
         }}>
             <TextField alignItems={'center'}  fullWidth id='message' label='Type your message.' />
-                <Button sx={{height : 55}} variant='contained' color='primary' onClick={() => {
-                    let message= document.getElementById("message").value
-                    let messageBody = { 
-                        type: 'chat', 
-                        message: message,
-                        time : new Date().getTime()
-                      }
-                    sendMessage(messageBody);
-                    setMessages((previous) => [...previous ,messageBody ])
-                }}
+                <Button sx={{height : 55}} variant='contained' color='primary' onClick={handleSendMessage}
+                onKeyDown={(e) =>{
+                    if (e.key === 'Enter') {
+                    e.preventDefault(); 
+                    handleSendMessage();
+                  }}
+                }
                 endIcon = {
                     <SvgIcon>
                        <SendIcon/> 
