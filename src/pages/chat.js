@@ -1,11 +1,11 @@
 import SendIcon from '@mui/icons-material/Send';
-import { Avatar, Box, Button, Grid, Stack, SvgIcon, TextField, Typography } from '@mui/material';
+import { Avatar, Box, Button, Grid, InputAdornment, Stack, SvgIcon, TextField, Typography } from '@mui/material';
 import { Client } from '@stomp/stompjs';
 import axios from 'axios';
 import { format } from 'date-fns';
 import TimeAgo from 'javascript-time-ago';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAuth } from 'src/hooks/use-auth';
 import { host, userImage,defaultChatImage } from 'src/utils/util';
 
@@ -17,7 +17,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import IconButton from '@mui/material/IconButton';
 import InputBase from '@mui/material/InputBase';
 import Paper from '@mui/material/Paper';
-
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 
 TimeAgo.addDefaultLocale(en)
@@ -49,11 +49,30 @@ function Page() {
         }
     },[receiver])
 
+// Get all chats
+    useEffect(()=>{
+        axios.defaults.headers = {
+            Authorization : auth.token
+        }
+        if(!!senderChatKey && !!recevierChatKey){
+            axios.post(host+`/chats/all`,{
+                senderKey : senderChatKey,
+                receiverKey : recevierChatKey
+            })
+            .then(res => {
+                setMessages(res.data)
+                console.log(res.data)
+            })
+            .catch(err=>{
+                console.log(err.message)
+            })
+        }
+    },[senderChatKey,recevierChatKey])
 
 
     useEffect(()=>{
         if(!!receiver){
-            setUserStatus(<div>Last seen at <ReactTimeAgo date={!!user?.lastSeen ? user?.lastSeen : new Date} locale="en-US"/></div>)
+            setUserStatus(<div>Last seen at <ReactTimeAgo date={!!receiver?.lastSeen ? receiver?.lastSeen : new Date} locale="en-US"/></div>)
         }
     },[receiver])
 
@@ -76,7 +95,6 @@ function Page() {
             wsClient.publish({destination : `/app/chat/connect/${user?.slug}` , body : JSON.stringify({slug : user?.slug})}); 
         
             wsClient.subscribe('/topic/status', (user) => {
-                const data = JSON.parse(user.body);
                 if(data.online){
                     setUserStatus("Online");
                 }
@@ -104,7 +122,7 @@ function Page() {
                     client.deactivate();
                     window.removeEventListener('beforeunload', () => {});
                 }).catch(err=>{
-                    alert(err)
+                    console.log(err.message)
                 })
             });
 
@@ -142,12 +160,12 @@ function Page() {
 
     
     useEffect(()=>{
-    if(!!client){
-        client.activate();
-        if(client && client.connected){
-            client.publish({ destination: `/app/chat/${receiver?.slug}/userStatus`});
+        if(!!client){
+            client.activate();
+            if(client && client.connected){
+                client.publish({ destination: `/app/chat/${receiver?.slug}/userStatus`});
+            }
         }
-    }
     },[client,receiver])
 
 
@@ -171,14 +189,58 @@ function Page() {
             let messageBody = { 
                 type: 'chat', 
                 message: message,
-                sender : senderChatKey,
+                senderKey : senderChatKey,
                 time : new Date().getTime()
             }
             sendMessage(messageBody);
             setMessages((previous) => [...previous ,messageBody ])
             messageInputBox.value = ''
+        }else{
+            console.log("Message : "+message)
         }
     }
+
+
+
+
+    const menuDivRef = useRef(null);
+    const [menuDivWidth, setMenuDivWidth] = useState(0);
+    const chatDivRef = useRef(null)
+  
+    useEffect(() => {
+      const getAppBarHeight = () => {
+        if (menuDivRef.current) {
+            setMenuDivWidth(menuDivRef.current.clientWidth);
+        }
+      };
+  
+      getAppBarHeight(); 
+  
+      const resizeObserver = new ResizeObserver(getAppBarHeight);
+      if (menuDivRef.current) {
+        resizeObserver.observe(menuDivRef.current);
+      }
+  
+      return () => {
+        if (menuDivRef.current) {
+          resizeObserver.unobserve(menuDivRef.current);
+        }
+      };
+    }, []);
+
+
+    useEffect(() => {
+        const listener = event => {
+          if (event.code === "Enter" || event.code === "NumpadEnter") {
+            event.preventDefault();
+            handleSendMessage()
+          }
+        };
+        document.addEventListener("keydown", listener);
+        return () => {
+          document.removeEventListener("keydown", listener);
+        };
+      }, []);
 
     return (
         <Box sx={{
@@ -188,7 +250,7 @@ function Page() {
             right : 0
         }}>
             <Grid container>
-                <Grid item xs={12} md={3} lg={2} sx={{
+                <Grid ref={menuDivRef} item xs={3} md={3} lg={2} sx={{
                     backgroundColor: 'neutral.800',
                     color : 'white',
                     height : '100vh'
@@ -255,7 +317,7 @@ function Page() {
                 </Grid>
 
                 {/* Receiver top bar */}
-                <Grid item xs={12} md={9} lg={10}
+                <Grid item xs={9} md={9} lg={10}
                     spacing = {5}
                     sx={{
                         height : '100vh'
@@ -267,8 +329,6 @@ function Page() {
                             display : 'flex',
                             background : '#f0f0f5',
                             minHeight : 65,
-                            // justifyContent : 'center',
-                            mx  : 1 ,
                             alignItems : 'center'
                         }}>
 
@@ -285,30 +345,33 @@ function Page() {
 
                         </Box>
 
-                        <Box sx={{
+                        <Box ref={chatDivRef} sx={{
                             display : 'flex',
                             flexDirection :'column',
                             mt : 3,
-                            // mb : 10,
-                            height : '85.7vh',
-                            overflowY : 'scroll'
+                            mx : 5,
+                            pb : 50,
+                            height : '85.1vh',
+                            overflowY : 'scroll',
+                            msOverflowStyle: 'none',
+                            scrollbarWidth: 'none'
                         }}>
                             {messages.map((message, index) => {
                             let time = format(!!message.time ? message.time : 0, "hh:mm"  )
                             let justifyMessage = 'flex-end';
-                            if(message.sender != senderChatKey) {
+                            if(message.senderKey != senderChatKey) {
                                 justifyMessage = 'flex-start';
                             }
          
                         return (
-                            ((message.sender == senderChatKey) || (message.sender == recevierChatKey)) ?
+                            ((message.senderKey == senderChatKey) || (message.senderKey == recevierChatKey)) &&
                             <Box key={index} sx={{
                                     px : 1.5,
                                     py : 1,
                                     boxShadow : 2,
                                     background : '#f0f0f5',
                                     borderRadius : 2,
-                                    maxWidth : 400,
+                                    maxWidth : 500,
                                     mx : 1,
                                     my : 0.5,
                                     alignSelf  : justifyMessage
@@ -329,35 +392,61 @@ function Page() {
                                     </Typography>
                                 </Box>
                             </Box>
-                            : <></>
-                
-                            )})}
+                            )
+                        }
+                            )}
 
                         </Box> 
                         <Box sx={{
+                            position : 'absolute',
+                            bottom : 0,
+                            minWidth : `calc(100% - ${menuDivWidth}px)`,
                             display : 'flex',
                             justifyContent : 'center',
                             alignItems : 'center'
                         }}>
-                            <TextField alignItems={'center'} sx={{
-                                backgroundColor : 'white'
-                            }} fullWidth id='message' label='Type your message.' />
-                                <Button sx={{height : 56.5,width : 120}} variant='contained' color='primary' onClick={handleSendMessage}
-                                onKeyDown={(e) =>{
-                                    if (e.key === 'Enter') {
-                                    e.preventDefault(); 
-                                    handleSendMessage();
+                            <TextField  sx={{
+                                backgroundColor : 'white',
+                                justifyContent : 'flex-end'
+                            }} fullWidth id='message' label='Type your message.'  
+                                InputProps={{
+                                    endAdornment : 
+                                    <InputAdornment position='end' >
+                                        <SendIcon 
+                                            sx={{
+                                                cursor : 'pointer'
+                                            }}
+                                            onClick={handleSendMessage}
+                                            /> 
+                                    </InputAdornment>
                                 }}
-                                }
-                                endIcon = {
-                                    <SvgIcon>
-                                    <SendIcon/> 
-                                    </SvgIcon>
-                                }
-                                >
-                                    Send
-                                </Button>
+                            />
+                        
                         </Box>
+
+
+                        <Box sx={{
+                            position : 'absolute',
+                            right : 20,
+                            bottom : 100,
+                            borderRadius : 50,
+                            height : 50,
+                            width : 50,
+                            display : 'flex',
+                            justifyContent : 'center',
+                            alignItems : 'center',
+                            boxShadow : 6,
+                            cursor : 'pointer'
+                        }}
+                        onClick={()=>{
+                            if (chatDivRef.current) {
+                                chatDivRef.current.scrollTo(0, chatDivRef.current.scrollHeight);
+                              }
+                        }}>
+                    <KeyboardArrowDownIcon />
+                </Box>
+
+
                     </Box>
                     :
                     <Box sx={{
@@ -367,7 +456,7 @@ function Page() {
                         alignItems : 'center',
                         height : '100vh'
                     }}>
-                        <img  src={"https://static.vecteezy.com/system/resources/thumbnails/008/508/957/small_2x/3d-chat-mail-message-notification-chatting-illustration-png.png"} style={{
+                        <img  src={defaultChatImage} style={{
                             minHeight : 200,
                             minWidth : 200
                         }} alt="Live chat"/>
@@ -379,9 +468,6 @@ function Page() {
                 </Grid>
 
             </Grid>
-
-        
-
         </Box>
     );
 }
