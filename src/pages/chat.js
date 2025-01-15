@@ -28,98 +28,41 @@ function Page() {
     const [client, setClient] = useState(null);
     const auth = useAuth();
     const user = auth.user
-    // const router = useRouter()
-    // const {slug} = router.query
-    const [reciver,setReciver] = useState()
+    const [receiver,setReceiver] = useState()
     const [userStatus,setUserStatus] = useState()
-    const [chatUserSlug,setChatUserSlug] = useState()
-    // const result = useTimeAgo(new Date())
 
-    const [senderChatKey,setSenderChatKey] = useState(`${user.slug}_${chatUserSlug}`)
-    const [recevierChatKey,setRecevierChatKey] = useState(`${chatUserSlug}_${user.slug}`)
+    const [senderChatKey,setSenderChatKey] = useState()
+    const [recevierChatKey,setRecevierChatKey] = useState()
  
-    const [chatUsers,setChatUsers] = useState([ {
-                "id": 157,
-                "slug": "349b224a-199d-4fa4-88ce-701435f074aa",
-                "otp": null,
-                "avatar": "folder-626332_1280.jpg",
-                "username": "Naresh Swami (Permitted)",
-                "email": "permmited993@gmail.com",
-                "contact": "9787765468",
-                "userType": "W",
-                "status": "A",
-                "isDeleted": "N",
-                "createdAt": 1728318656448,
-                "updatedAt": 1729702722272,
-                "createdBy": 0,
-                "updatedBy": 157,
-                "activePlan": 1,
-                "lastSeen": 1736911558195,
-                "isOnline": false,
-                "online": false
-        },
+    const [chatUsers,setChatUsers] = useState([])
 
-        {
-            "id": 157,
-            "slug": "15d84f32-a2b3-43fc-a409-d6afff97f645",
-            "otp": null,
-            "avatar": "folder-626332_1280.jpg",
-            "username": "Manish Swami (Test user)",
-            "email": "permmited993@gmail.com",
-            "contact": "9787765468",
-            "userType": "W",
-            "status": "A",
-            "isDeleted": "N",
-            "createdAt": 1728318656448,
-            "updatedAt": 1729702722272,
-            "createdBy": 0,
-            "updatedBy": 157,
-            "activePlan": 1,
-            "lastSeen": 1736911558195,
-            "isOnline": false,
-            "online": false
-    }
-    ])
+
+    
 
 
 
-    // Set sender and reciver key
+    // Set sender and receiver key
     useEffect(()=>{
-        setSenderChatKey(`${user.slug}_${chatUserSlug}`)
-        setRecevierChatKey(`${chatUserSlug}_${user.slug}`)
-    },[chatUserSlug])
-
-    useEffect(()=>{
-        if(chatUserSlug == undefined || chatUserSlug == null) return;
-        axios.defaults.headers = {
-            Authorization : auth.token
+        if(!!receiver){
+            setSenderChatKey(`${user.slug}_${receiver?.slug}`)
+            setRecevierChatKey(`${receiver?.slug}_${user.slug}`)
         }
-        axios.get(host + `/wholesale/auth/detail/${chatUserSlug}`)
-        .then(res => {
-            let user = res.data?.user;
-            setReciver(user)
-            setUserStatus(<div>
-                Last seen at <ReactTimeAgo date={!!user.lastSeen ? user.lastSeen : new Date} locale="en-US"/>
-            </div>);
-        }).catch(err => {
-            alert(err.message)
-        })
-    },[chatUserSlug])
+    },[receiver])
 
 
-    const updateUserLastSeen = async () => {
-        return axios.get(host+`/wholesale/auth/last-seen`)
-        .then(res => res.data )
-        .catch(err => {
-            console.log(err.message)
-        })
-    }
+
+    useEffect(()=>{
+        if(!!receiver){
+            setUserStatus(<div>Last seen at <ReactTimeAgo date={!!user?.lastSeen ? user?.lastSeen : new Date} locale="en-US"/></div>)
+        }
+    },[receiver])
+
 
     useEffect(() => {
-        if(chatUserSlug == undefined) return;
         if(!!client && client.connected){
             client.deactivate()
         }
+        if(senderChatKey == undefined) return;
         document.cookie = `X-Username=${senderChatKey}; path=/`
         const wsClient = new Client({
             brokerURL: 'ws://localhost:8080/chat', // Replace with your WebSocket server URL
@@ -134,14 +77,13 @@ function Page() {
         
             wsClient.subscribe('/topic/status', (user) => {
                 const data = JSON.parse(user.body);
-                // alert(data.slug + " : "+data.online)
                 if(data.online){
                     setUserStatus("Online");
                 }
             
             });
 
-            /** reciving the message */ 
+            /** reciving the message */
             wsClient.subscribe(`/user/${senderChatKey}/queue/private`, (message) => {
                 const data = JSON.parse(message.body);
                 setMessages((prevMessages) => [...prevMessages, data]);
@@ -151,47 +93,73 @@ function Page() {
         };
 
         wsClient.activate();
-
-
         wsClient.onDisconnect = (frame) => {
             console.log("Disconnected : "+frame)
         }
-
         window.addEventListener('beforeunload', async (event) => {
             event.preventDefault();
                 await updateUserLastSeen()
                 .then(data =>{
-                    wsClient.deactivate();
+                    if(!!client)
+                    client.deactivate();
                     window.removeEventListener('beforeunload', () => {});
                 }).catch(err=>{
                     alert(err)
                 })
-        });
-    
+            });
 
         return () => {
-            wsClient.deactivate();
+            if(!!client)
+            client.deactivate();
             window.removeEventListener('beforeunload', () => {});
-        };
-    }, [chatUserSlug]);
+        }
+    }, [senderChatKey]);
+
+
+
+    // Get all users
+    useEffect(()=>{
+        axios.defaults.headers = {
+            Authorization : auth.token
+        }
+        axios.post(host + `/admin/auth/W/all`,{})
+        .then(res => {
+            let users = res.data?.content;
+            setChatUsers(users)
+        }).catch(err => {
+            alert(err.message)
+        })
+    },[])
+
+
+    const updateUserLastSeen = async () => {
+        return axios.get(host+`/wholesale/auth/last-seen`)
+        .then(res => res.data )
+        .catch(err => {
+            console.log(err.message)
+        })
+    }
 
     
     useEffect(()=>{
-        if(chatUserSlug == undefined && client && client.connected) return;
+    if(!!client){
+        client.activate();
         if(client && client.connected){
-            client.publish({ destination: `/app/chat/${chatUserSlug}/userStatus`});
+            client.publish({ destination: `/app/chat/${receiver?.slug}/userStatus`});
         }
-    },[chatUserSlug,client,userStatus])
+    }
+    },[client,receiver])
 
 
     const sendMessage = (message) => {
-        client.activate();
-        if (client && client.connected) {
-            console.log(client)
-        client.publish({ destination: `/app/chat/private/${recevierChatKey}`, body:  JSON.stringify(message)});
-
-        } else {
-            console.warn('Client not connected, unable to send message.');
+        if(!!client){
+            client.activate();
+            if (client && client.connected) {
+                console.log(client)
+            client.publish({ destination: `/app/chat/private/${recevierChatKey}`, body:  JSON.stringify(message)});
+            } else {
+                console.warn('Client not connected, unable to send message.');
+            }
         }
     };
 
@@ -204,7 +172,6 @@ function Page() {
                 type: 'chat', 
                 message: message,
                 sender : senderChatKey,
-                receiver : recevierChatKey,
                 time : new Date().getTime()
             }
             sendMessage(messageBody);
@@ -221,7 +188,7 @@ function Page() {
             right : 0
         }}>
             <Grid container>
-                <Grid item xs={12} md={2} sx={{
+                <Grid item xs={12} md={3} lg={2} sx={{
                     backgroundColor: 'neutral.800',
                     color : 'white',
                     height : '100vh'
@@ -261,7 +228,9 @@ function Page() {
                             cursor : 'pointer'
                         }}
                         key={index}
-                        onClick={(e) => setChatUserSlug(chatUser.slug)}
+                        onClick={(e) => {
+                            setReceiver(chatUser)
+                        }}
                             
                         >
                             <Avatar  src={`${userImage}${chatUser.slug}/${chatUser?.avatar}`}/>
@@ -277,7 +246,7 @@ function Page() {
                                     mx  : 2
                                 }}>
                                     <div>
-                                        Last seen at <ReactTimeAgo date={!!chatUser.lastSeen ? chatUser.lastSeen : new Date} locale="en-US"/>
+                                        Last seen at <ReactTimeAgo date={!!chatUser.lastSeen ? chatUser?.lastSeen : new Date} locale="en-US"/>
                                     </div>
                                 </Typography>
                             </Box>
@@ -285,30 +254,30 @@ function Page() {
                 } )}
                 </Grid>
 
-                {/* Reciver top bar */}
-                <Grid item xs={12} md={10}
+                {/* Receiver top bar */}
+                <Grid item xs={12} md={9} lg={10}
                     spacing = {5}
                     sx={{
                         height : '100vh'
                     }}
                 >
-                    {!!chatUserSlug ? 
+                    {!!receiver ? 
                     <Box>
                         <Box sx={{
                             display : 'flex',
                             background : '#f0f0f5',
-                            minHeight : 60,
+                            minHeight : 65,
                             // justifyContent : 'center',
                             mx  : 1 ,
                             alignItems : 'center'
                         }}>
 
-                            <Avatar sx={{mx : 1}} src = {`${userImage}${chatUserSlug}/${reciver?.avatar}`} />
+                            <Avatar sx={{mx : 1}} src = {`${userImage}${receiver?.slug}/${receiver?.avatar}`} />
                             <Typography variant='subtitle2' sx={{
                                 display : 'flex',
                                 flexDirection : 'column'
                             }}>
-                                {reciver?.username}
+                                {receiver?.username}
                                 <small>
                                     {userStatus}
                                 </small>
@@ -332,7 +301,7 @@ function Page() {
                             }
          
                         return (
-                            ((message.sender == senderChatKey &&  message.receiver == recevierChatKey) || (message.sender == recevierChatKey &&  message.receiver == senderChatKey)) ?
+                            ((message.sender == senderChatKey) || (message.sender == recevierChatKey)) ?
                             <Box key={index} sx={{
                                     px : 1.5,
                                     py : 1,
