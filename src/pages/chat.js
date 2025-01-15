@@ -18,6 +18,7 @@ import IconButton from '@mui/material/IconButton';
 import InputBase from '@mui/material/InputBase';
 import Paper from '@mui/material/Paper';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { status } from 'nprogress';
 
 
 TimeAgo.addDefaultLocale(en)
@@ -62,7 +63,6 @@ function Page() {
             })
             .then(res => {
                 setMessages(res.data)
-                console.log(res.data)
             })
             .catch(err=>{
                 console.log(err.message)
@@ -95,8 +95,10 @@ function Page() {
             console.log('Connected: ' + frame);
             wsClient.publish({destination : `/app/chat/connect/${user?.slug}` , body : JSON.stringify({slug : user?.slug})}); 
         
-            wsClient.subscribe('/topic/status', (user) => {
-                if(data.online){
+            wsClient.subscribe('/topic/status', (data) => {
+                let statusUser = data.body
+                statusUser = JSON.parse(statusUser);
+                if(statusUser.isOnline){
                     setUserStatus("Online");
                 }
             
@@ -174,7 +176,6 @@ function Page() {
         if(!!client){
             client.activate();
             if (client && client.connected) {
-                console.log(client)
             client.publish({ destination: `/app/chat/private/${recevierChatKey}`, body:  JSON.stringify(message)});
             } else {
                 console.warn('Client not connected, unable to send message.');
