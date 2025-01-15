@@ -35,6 +35,7 @@ function Page() {
     const [recevierChatKey,setRecevierChatKey] = useState()
  
     const [chatUsers,setChatUsers] = useState([])
+    const [chatMessage,setChatMessage] = useState()
 
 
     
@@ -183,20 +184,18 @@ function Page() {
 
 
     const handleSendMessage = () =>{
-        let messageInputBox = document.getElementById("message");
-        let message = messageInputBox.value
-        if (!!message){
+        if (!!chatMessage){
             let messageBody = { 
                 type: 'chat', 
-                message: message,
+                message: chatMessage,
                 senderKey : senderChatKey,
                 time : new Date().getTime()
             }
             sendMessage(messageBody);
             setMessages((previous) => [...previous ,messageBody ])
-            messageInputBox.value = ''
+            setChatMessage('')
         }else{
-            console.log("Message : "+message)
+            console.log("Message : "+chatMessage)
         }
     }
 
@@ -231,16 +230,21 @@ function Page() {
 
     useEffect(() => {
         const listener = event => {
-          if (event.code === "Enter" || event.code === "NumpadEnter") {
-            event.preventDefault();
-            handleSendMessage()
-          }
+            if ((event.code === "Enter" || event.code === "NumpadEnter") && !event.shiftKey) {
+                handleSendMessage()
+                event.preventDefault(); 
+            }
         };
         document.addEventListener("keydown", listener);
         return () => {
           document.removeEventListener("keydown", listener);
         };
-      }, []);
+      }, [chatMessage]);
+
+
+    const handleChange = (event) => {
+        setChatMessage(event.target.value); 
+    };
 
     return (
         <Box sx={{
@@ -399,7 +403,7 @@ function Page() {
                         </Box> 
                         <Box sx={{
                             position : 'absolute',
-                            bottom : 0,
+                            bottom : 2,
                             minWidth : `calc(100% - ${menuDivWidth}px)`,
                             display : 'flex',
                             justifyContent : 'center',
@@ -408,7 +412,14 @@ function Page() {
                             <TextField  sx={{
                                 backgroundColor : 'white',
                                 justifyContent : 'flex-end'
-                            }} fullWidth id='message' label='Type your message.'  
+                            }} 
+                                fullWidth 
+                                multiline
+                                id='message' 
+                                label='Type your message.' 
+                                name = 'message'
+                                value={chatMessage}
+                                onChange={handleChange}
                                 InputProps={{
                                     endAdornment : 
                                     <InputAdornment position='end' >
@@ -419,7 +430,7 @@ function Page() {
                                             onClick={handleSendMessage}
                                             /> 
                                     </InputAdornment>
-                                }}
+                                    }}
                             />
                         
                         </Box>
