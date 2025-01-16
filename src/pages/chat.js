@@ -19,6 +19,7 @@ import InputBase from '@mui/material/InputBase';
 import Paper from '@mui/material/Paper';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { status } from 'nprogress';
+import UserStatus from '../sections/user-status';
 
 
 TimeAgo.addDefaultLocale(en)
@@ -30,10 +31,10 @@ function Page() {
     const auth = useAuth();
     const user = auth.user
     const [receiver,setReceiver] = useState()
-    const [userStatus,setUserStatus] = useState()
+ 
 
-    const [senderChatKey,setSenderChatKey] = useState()
-    const [recevierChatKey,setRecevierChatKey] = useState()
+    // const [senderChatKey,setSenderChatKey] = useState()
+    // const [recevierChatKey,setRecevierChatKey] = useState()
  
     const [chatUsers,setChatUsers] = useState([])
     const [chatMessage,setChatMessage] = useState()
@@ -44,22 +45,22 @@ function Page() {
 
 
     // Set sender and receiver key
-    useEffect(()=>{
-        if(!!receiver){
-            setSenderChatKey(`${user.slug}_${receiver?.slug}`)
-            setRecevierChatKey(`${receiver?.slug}_${user.slug}`)
-        }
-    },[receiver])
+    // useEffect(()=>{
+    //     if(!!receiver){
+    //         setSenderChatKey(`${user.slug}_${receiver?.slug}`)
+    //         setRecevierChatKey(`${receiver?.slug}_${user.slug}`)
+    //     }
+    // },[receiver])
 
 // Get all chats
     useEffect(()=>{
         axios.defaults.headers = {
             Authorization : auth.token
         }
-        if(!!senderChatKey && !!recevierChatKey){
+        if(!!receiver){
             axios.post(host+`/chats/all`,{
-                senderKey : senderChatKey,
-                receiverKey : recevierChatKey
+                sender : user.slug,
+                receiver : receiver.slug
             })
             .then(res => {
                 setMessages(res.data)
@@ -68,49 +69,33 @@ function Page() {
                 console.log(err.message)
             })
         }
-    },[senderChatKey,recevierChatKey])
-
-
-    useEffect(()=>{
-        if(!!receiver){
-            setUserStatus(<div>Last seen at <ReactTimeAgo date={!!receiver?.lastSeen ? receiver?.lastSeen : new Date} locale="en-US"/></div>)
-        }
     },[receiver])
 
-
     useEffect(() => {
-        if(!!client && client.connected){
-            client.deactivate()
-        }
-        if(senderChatKey == undefined) return;
-        document.cookie = `X-Username=${senderChatKey}; path=/`
+        document.cookie = `X-Username=${user?.slug}; path=/`
         const wsClient = new Client({
             brokerURL: 'ws://localhost:8080/chat', // Replace with your WebSocket server URL
-            reconnectDelay: 5000, 
+            reconnectDelay: 5000,
             debug: function (str) {
                 console.log(str);
             },
         });
+
+        /** On connect */
         wsClient.onConnect = (frame) => {
             console.log('Connected: ' + frame);
-            wsClient.publish({destination : `/app/chat/connect/${user?.slug}` , body : JSON.stringify({slug : user?.slug})}); 
-        
-            wsClient.subscribe('/topic/status', (data) => {
-                let statusUser = data.body
-                statusUser = JSON.parse(statusUser);
-                if(statusUser.isOnline){
-                    setUserStatus("Online");
-                }
-            
-            });
+            wsClient.publish({
+            destination : `/app/chat/connect/${user?.slug}`
+        }); 
 
-            /** reciving the message */
-            wsClient.subscribe(`/user/${senderChatKey}/queue/private`, (message) => {
-                const data = JSON.parse(message.body);
-                setMessages((prevMessages) => [...prevMessages, data]);
-            });
+        /** reciving the message */
+        wsClient.subscribe(`/user/${user?.slug}/queue/private`, (message) => {
+            const data = JSON.parse(message.body);
+            console.log(message.body)
+            setMessages((prevMessages) => [...prevMessages, data]);
+        });
 
-            setClient(wsClient)
+        setClient(wsClient)
         };
 
         wsClient.activate();
@@ -134,7 +119,7 @@ function Page() {
             client.deactivate();
             window.removeEventListener('beforeunload', () => {});
         }
-    }, [senderChatKey]);
+    }, []);
 
 
 
@@ -161,22 +146,11 @@ function Page() {
         })
     }
 
-    
-    useEffect(()=>{
-        if(!!client){
-            client.activate();
-            if(client && client.connected){
-                client.publish({ destination: `/app/chat/${receiver?.slug}/userStatus`});
-            }
-        }
-    },[client,receiver])
-
-
     const sendMessage = (message) => {
         if(!!client){
             client.activate();
             if (client && client.connected) {
-            client.publish({ destination: `/app/chat/private/${recevierChatKey}`, body:  JSON.stringify(message)});
+            client.publish({ destination: `/app/chat/private/${receiver?.slug}`, body:  JSON.stringify(message)});
             } else {
                 console.warn('Client not connected, unable to send message.');
             }
@@ -189,7 +163,8 @@ function Page() {
             let messageBody = { 
                 type: 'chat', 
                 message: chatMessage,
-                senderKey : senderChatKey,
+                sender : user?.slug,
+                receiver : receiver?.slug,
                 time : new Date().getTime()
             }
             sendMessage(messageBody);
@@ -344,7 +319,7 @@ function Page() {
                             }}>
                                 {receiver?.username}
                                 <small>
-                                    {userStatus}
+                                    <UserStatus receiver={receiver} client={client} loggedUserSlug={user.slug} />
                                 </small>
                             </Typography>
 
@@ -364,12 +339,15 @@ function Page() {
                             {messages.map((message, index) => {
                             let time = format(!!message.time ? message.time : 0, "hh:mm"  )
                             let justifyMessage = 'flex-end';
-                            if(message.senderKey != senderChatKey) {
+                            if(message.sender != user?.slug) {
                                 justifyMessage = 'flex-start';
                             }
          
-                        return (
-                            ((message.senderKey == senderChatKey) || (message.senderKey == recevierChatKey)) &&
+                        return (<>
+                            {(
+                                (message.sender == user?.slug && message.receiver == receiver?.slug) || 
+                                (message.sender == receiver?.slug && message.receiver == user?.slug)
+                            ) &&
                             <Box key={index} sx={{
                                     px : 1.5,
                                     py : 1,
@@ -397,7 +375,9 @@ function Page() {
                                     </Typography>
                                 </Box>
                             </Box>
-                            )
+                            }
+                        </>)
+                        
                         }
                             )}
 
