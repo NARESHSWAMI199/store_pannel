@@ -41,6 +41,9 @@ function Page() {
 
 
     
+    useEffect(()=>{
+        console.log("reciver changed.")
+    },[receiver])
 
 
 
@@ -76,9 +79,9 @@ function Page() {
         const wsClient = new Client({
             brokerURL: 'ws://localhost:8080/chat', // Replace with your WebSocket server URL
             reconnectDelay: 5000,
-            debug: function (str) {
-                console.log(str);
-            },
+            // debug: function (str) {
+            //     console.log(str);
+            // },
         });
 
         /** On connect */
@@ -116,7 +119,7 @@ function Page() {
 
         return () => {
             if(!!client)
-            client.deactivate();
+            // client.deactivate();
             window.removeEventListener('beforeunload', () => {});
         }
     }, []);

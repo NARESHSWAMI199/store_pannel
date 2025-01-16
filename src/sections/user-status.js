@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
 
-import ReactTimeAgo from 'react-time-ago';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import ru from 'javascript-time-ago/locale/ru';
+import ReactTimeAgo from 'react-time-ago';
 
 TimeAgo.addDefaultLocale(en)
 TimeAgo.addLocale(ru)
@@ -12,6 +12,10 @@ TimeAgo.addLocale(ru)
 function UserStatus({client,receiver}) {
 
     const [online,setOnline] = useState(false)
+
+    useEffect(()=>{
+        console.log("status reciver changed.")
+    },[receiver])
 
     useEffect(() => {
         if (!!client) {
@@ -22,8 +26,12 @@ function UserStatus({client,receiver}) {
                 client.subscribe('/topic/status', (data) => {
                     let user = data.body
                     user = JSON.parse(user);
-                    alert(user.isOnline)
-                    setOnline(user.isOnline)
+                    console.log(user)
+                    if(user.slug == receiver.slug){
+                        setOnline(user.isOnline)
+                    } else{
+                        setOnline(false)
+                    }
                 });
             }
         }
