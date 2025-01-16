@@ -13,10 +13,6 @@ function UserStatus({client,receiver}) {
 
     const [online,setOnline] = useState(false)
 
-    useEffect(()=>{
-        console.log("status reciver changed.")
-    },[receiver])
-
     useEffect(() => {
         if (!!client) {
             client.activate();
@@ -35,7 +31,7 @@ function UserStatus({client,receiver}) {
                 });
             }
         }
-    }, [receiver]);
+    }, [receiver,client]);
     
     return (
         <>

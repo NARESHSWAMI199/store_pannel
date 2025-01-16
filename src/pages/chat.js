@@ -40,13 +40,6 @@ function Page() {
     const [chatMessage,setChatMessage] = useState()
 
 
-    
-    useEffect(()=>{
-        console.log("reciver changed.")
-    },[receiver])
-
-
-
     // Set sender and receiver key
     // useEffect(()=>{
     //     if(!!receiver){
@@ -79,9 +72,9 @@ function Page() {
         const wsClient = new Client({
             brokerURL: 'ws://localhost:8080/chat', // Replace with your WebSocket server URL
             reconnectDelay: 5000,
-            // debug: function (str) {
-            //     console.log(str);
-            // },
+            debug: function (str) {
+                console.log(str);
+            },
         });
 
         /** On connect */
@@ -290,9 +283,7 @@ function Page() {
                                     fontSize : 10,
                                     mx  : 2
                                 }}>
-                                    <div>
-                                        Last seen at <ReactTimeAgo date={!!chatUser.lastSeen ? chatUser?.lastSeen : new Date} locale="en-US"/>
-                                    </div>
+                                     <UserStatus receiver={chatUser} client={client}/>
                                 </Typography>
                             </Box>
                         </Box>)
@@ -322,7 +313,7 @@ function Page() {
                             }}>
                                 {receiver?.username}
                                 <small>
-                                    <UserStatus receiver={receiver} client={client} loggedUserSlug={user.slug} />
+                                    <UserStatus receiver={receiver} client={client} />
                                 </small>
                             </Typography>
 
