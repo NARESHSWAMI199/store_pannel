@@ -79,10 +79,8 @@ function Page() {
                 .then(res => {
                     let user = res.data;
                     if(user.slug == chatUser.slug){
-                        console.log("if herere....")
                         chatUser.isOnline = user.isOnline;
                     }else{
-                        console.log("else herere....")
                         chatUser.isOnline = false;
                     }
                 })
@@ -105,9 +103,9 @@ function Page() {
         const wsClient = new Client({
             brokerURL: 'ws://localhost:8080/chat', // Replace with your WebSocket server URL
             reconnectDelay: 5000,
-            debug: function (str) {
-                console.log(str);
-            },
+            // debug: function (str) {
+            //     console.log(str);
+            // },
         });
 
         /** On connect */
@@ -118,10 +116,17 @@ function Page() {
             }); 
 
             /** reciving the message */
-            wsClient.subscribe(`/user/${user?.slug}/queue/private`, (message) => {
-                const data = JSON.parse(message.body);
-                console.log(message.body)
-                setMessages((prevMessages) => [...prevMessages, data]);
+            wsClient.subscribe(`/user/${user?.slug}/queue/private`, (data) => {
+                const message = JSON.parse(data.body);
+                // console.log(message.body)
+                setMessages((prevMessages) => [...prevMessages, message]);
+                setChatUsers(previousChatUsers => previousChatUsers.map(chatUser => {
+                    console.log(chatUser.slug + " : "+ message.sender+ " : "+ chatUser.username)
+                    if(chatUser.slug == message.sender && !message.seen){
+                        chatUser.chatNotification = (chatUser.chatNotification + 1);
+                    }
+                    return chatUser;
+                }))
             });
 
             setClient(wsClient)
@@ -345,12 +350,14 @@ function Page() {
                                 </Box>
                             </Box>
                             
-                            {/* <Badge sx ={{
+                            {chatUser.chatNotification > 0 &&
+                            <Badge sx ={{
                                 justifySelf : 'flex-end',
                                 alignSelf : 'center',
                                 mx : 2
                             }}
-                             color="error" badgeContent={1} /> */}
+                             color="error" badgeContent={chatUser.chatNotification / 2} />
+                        }
                         </Box>)
                 } )}
                 </Grid>
