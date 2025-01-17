@@ -3,13 +3,9 @@ import { useAuth } from 'src/hooks/use-auth';
 import axios from 'axios';
 import { host } from 'src/utils/util';
 import { Box } from '@mui/material';
-
-import TimeAgo from 'javascript-time-ago';
-import en from 'javascript-time-ago/locale/en';
-import ru from 'javascript-time-ago/locale/ru';
 import ReactTimeAgo from 'react-time-ago';
 
-function UserStatus({receiver,fontSize,mx}) {
+function UserStatus({receiver,client}) {
 
     const [online,setOnline] = useState(false)
     const auth = useAuth()
@@ -28,21 +24,21 @@ function UserStatus({receiver,fontSize,mx}) {
         .catch(err => {
             console.log(err.message)
         })
-    }, [receiver]);
+    }, [receiver,client]);
 
 
 
 
 
     return (
-        <Box fontSize={fontSize} mx={mx}>
+        <>
             {online ? 
                 "Online" :
                 <div>
                     Last seen at <ReactTimeAgo date={!!receiver?.lastSeen ? receiver?.lastSeen : receiver?.createdAt} locale="en-US"/>
                 </div>
             }
-        </Box>
+        </>
     )
 }
 

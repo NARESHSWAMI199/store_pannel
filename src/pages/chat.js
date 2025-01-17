@@ -13,7 +13,6 @@ import SearchIcon from '@mui/icons-material/Search';
 import IconButton from '@mui/material/IconButton';
 import InputBase from '@mui/material/InputBase';
 import Paper from '@mui/material/Paper';
-import UserStatus from '../sections/user-status';
 
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
@@ -343,8 +342,7 @@ function Page() {
                                     {chatUser?.isOnline ? 
                                         "Online" :
                                         <div>
-                                            Last seen at 
-                                            <ReactTimeAgo date={!!chatUser?.lastSeen ? chatUser?.lastSeen : chatUser?.createdAt} locale="en-US"/>
+                                            Last seen at  <ReactTimeAgo date={!!chatUser?.lastSeen ? chatUser?.lastSeen : chatUser?.createdAt} locale="en-US"/>
                                         </div>
                                     }
                                 </Box>
@@ -384,9 +382,12 @@ function Page() {
                             }}>
                                 {receiver?.username}
                                 <small>
-                                    <UserStatus 
-                                        receiver={receiver}
-                                     />
+                                    {receiver?.isOnline ? 
+                                        "Online" :
+                                        <div>
+                                            Last seen at <ReactTimeAgo date={!!receiver?.lastSeen ? receiver?.lastSeen : receiver?.createdAt} locale="en-US"/>
+                                        </div>
+                                    }
                                 </small>
                             </Typography>
 
