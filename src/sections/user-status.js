@@ -9,11 +9,6 @@ import en from 'javascript-time-ago/locale/en';
 import ru from 'javascript-time-ago/locale/ru';
 import ReactTimeAgo from 'react-time-ago';
 
-
-TimeAgo.addDefaultLocale(en)
-TimeAgo.addLocale(ru)
-
-
 function UserStatus({receiver,fontSize,mx}) {
 
     const [online,setOnline] = useState(false)
