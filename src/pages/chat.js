@@ -81,39 +81,43 @@ function Page() {
         wsClient.onConnect = (frame) => {
             console.log('Connected: ' + frame);
             wsClient.publish({
-            destination : `/app/chat/connect/${user?.slug}`
-        }); 
+                destination : `/app/chat/connect/${user?.slug}`
+            }); 
 
-        /** reciving the message */
-        wsClient.subscribe(`/user/${user?.slug}/queue/private`, (message) => {
-            const data = JSON.parse(message.body);
-            console.log(message.body)
-            setMessages((prevMessages) => [...prevMessages, data]);
-        });
+            /** reciving the message */
+            wsClient.subscribe(`/user/${user?.slug}/queue/private`, (message) => {
+                const data = JSON.parse(message.body);
+                console.log(message.body)
+                setMessages((prevMessages) => [...prevMessages, data]);
+            });
 
-        setClient(wsClient)
+            setClient(wsClient)
         };
 
-        wsClient.activate();
         wsClient.onDisconnect = (frame) => {
             console.log("Disconnected : "+frame)
         }
+
+
+        
+        wsClient.activate();
+        
         window.addEventListener('beforeunload', async (event) => {
             event.preventDefault();
                 await updateUserLastSeen()
                 .then(data =>{
+                    /** @warning : Don't replace client with wsClient */
                     if(!!client)
-                    client.deactivate();
+                        client.deactivate();
                     window.removeEventListener('beforeunload', () => {});
                 }).catch(err=>{
                     console.log(err.message)
                 })
-            });
+        });
 
-        return () => {
-            if(!!client)
-            // client.deactivate();
+        return async() => {
             window.removeEventListener('beforeunload', () => {});
+            wsClient.deactivate();
         }
     }, []);
 
@@ -283,7 +287,7 @@ function Page() {
                                     fontSize : 10,
                                     mx  : 2
                                 }}>
-                                     <UserStatus receiver={chatUser} client={client}/>
+                                     <UserStatus receiver={chatUser}/>
                                 </Typography>
                             </Box>
                         </Box>)
@@ -313,7 +317,7 @@ function Page() {
                             }}>
                                 {receiver?.username}
                                 <small>
-                                    <UserStatus receiver={receiver} client={client} />
+                                    <UserStatus receiver={receiver} />
                                 </small>
                             </Typography>
 
@@ -337,44 +341,41 @@ function Page() {
                                 justifyMessage = 'flex-start';
                             }
          
-                        return (<>
-                            {(
-                                (message.sender == user?.slug && message.receiver == receiver?.slug) || 
-                                (message.sender == receiver?.slug && message.receiver == user?.slug)
-                            ) &&
+                        return (    
                             <Box key={index} sx={{
-                                    px : 1.5,
-                                    py : 1,
-                                    boxShadow : 2,
-                                    background : '#f0f0f5',
-                                    borderRadius : 2,
-                                    maxWidth : 500,
-                                    mx : 1,
-                                    my : 0.5,
-                                    alignSelf  : justifyMessage
-                                }}>
-                                <Box sx={{
-                                    display : 'flex',
-                                    // flexDirection : 'column'
-                                }}>
-                                    <Typography sx={{mx : 1}}>
-                                        {message.message}
-                                    </Typography>
-                                    <Typography variant='small' sx={{
-                                        fontSize : 10,
-                                        alignSelf : 'flex-end',
-                                        mr : 1
+                                px : 1.5,
+                                py : 1,
+                                boxShadow : 2,
+                                background : '#f0f0f5',
+                                borderRadius : 2,
+                                maxWidth : 500,
+                                mx : 1,
+                                my : 0.5,
+                                alignSelf  : justifyMessage
+                            }}>
+                                {(
+                                    (message.sender == user?.slug && message.receiver == receiver?.slug) || 
+                                    (message.sender == receiver?.slug && message.receiver == user?.slug)
+                                ) &&
+                            
+                                    <Box sx={{
+                                        display : 'flex',
+                                        // flexDirection : 'column'
                                     }}>
-                                        {time}
-                                    </Typography>
-                                </Box>
-                            </Box>
-                            }
-                        </>)
-                        
-                        }
-                            )}
-
+                                        <Typography sx={{mx : 1}}>
+                                            {message.message}
+                                        </Typography>
+                                        <Typography variant='small' sx={{
+                                            fontSize : 10,
+                                            alignSelf : 'flex-end',
+                                            mr : 1
+                                        }}>
+                                            {time}
+                                        </Typography>
+                                    </Box>
+                            
+                                }
+                            </Box>)})}
                         </Box> 
                         <Box sx={{
                             position : 'absolute',
