@@ -1,25 +1,24 @@
 import SendIcon from '@mui/icons-material/Send';
-import { Avatar, Box, Button, Grid, InputAdornment, Stack, SvgIcon, TextField, Typography } from '@mui/material';
+import { Avatar, Badge, Box, Grid, InputAdornment, Stack, TextField, Typography } from '@mui/material';
 import { Client } from '@stomp/stompjs';
 import axios from 'axios';
 import { format } from 'date-fns';
-import TimeAgo from 'javascript-time-ago';
-import { useRouter } from 'next/router';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth } from 'src/hooks/use-auth';
-import { host, userImage,defaultChatImage } from 'src/utils/util';
+import { defaultChatImage, host, userImage } from 'src/utils/util';
 
-import en from 'javascript-time-ago/locale/en';
-import ru from 'javascript-time-ago/locale/ru';
-import ReactTimeAgo from 'react-time-ago';
 
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import SearchIcon from '@mui/icons-material/Search';
 import IconButton from '@mui/material/IconButton';
 import InputBase from '@mui/material/InputBase';
 import Paper from '@mui/material/Paper';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { status } from 'nprogress';
 import UserStatus from '../sections/user-status';
+
+import TimeAgo from 'javascript-time-ago';
+import en from 'javascript-time-ago/locale/en';
+import ru from 'javascript-time-ago/locale/ru';
+import ReactTimeAgo from 'react-time-ago';
 
 
 TimeAgo.addDefaultLocale(en)
@@ -66,6 +65,40 @@ function Page() {
             })
         }
     },[receiver])
+
+
+
+       // Calling in each 10 second
+       useEffect(() => {
+        axios.defaults.headers = {
+            Authorization : auth.token
+        }
+        const intervalId = setInterval(() => {
+            setChatUsers(previousUsers => previousUsers.map((chatUser)=>{
+                axios.get(`${host}/chat/status/${chatUser.slug}`)
+                .then(res => {
+                    let user = res.data;
+                    if(user.slug == chatUser.slug){
+                        console.log("if herere....")
+                        chatUser.isOnline = user.isOnline;
+                    }else{
+                        console.log("else herere....")
+                        chatUser.isOnline = false;
+                    }
+                })
+                .catch(err => {
+                    console.log(err.message)
+                })
+                return chatUser;
+            }
+        ))
+        }, 10000)
+
+        return () => clearInterval(intervalId);
+
+    }, []);
+
+
 
     useEffect(() => {
         document.cookie = `X-Username=${user?.slug}; path=/`
@@ -222,6 +255,20 @@ function Page() {
         setChatMessage(event.target.value); 
     };
 
+
+    const scrollDown = useCallback(()=>{
+        if (chatDivRef.current) {
+            chatDivRef.current.scrollTo(0, chatDivRef.current.scrollHeight);
+        }
+    },[])
+
+    useEffect(()=>{
+        if (chatDivRef.current) {
+            chatDivRef.current.scrollTo(0, chatDivRef.current.scrollHeight);
+        }
+    },[messages])
+
+
     return (
         <Box sx={{
             position : 'fixed',
@@ -267,7 +314,8 @@ function Page() {
                             p : 2,
                             borderWidth : 1,
                             borderColor : '#f0f0f5',
-                            cursor : 'pointer'
+                            cursor : 'pointer',
+                            flex : '1'
                         }}
                         key={index}
                         onClick={(e) => {
@@ -276,27 +324,39 @@ function Page() {
                             
                         >
                             <Avatar  src={`${userImage}${chatUser.slug}/${chatUser?.avatar}`}/>
-                            <Box>
+                            <Box sx={{
+                                width : menuDivWidth+'px'
+                            }}>
                                 <Typography sx={{
                                     mx  : 2,
                                     fontSize : 14,
                                 }}>
                                     {chatUser.username}
                                 </Typography>
-                                <Typography sx={{
-                                    fontSize : 10,
-                                    mx  : 2
-                                }}>
-                                     <UserStatus receiver={chatUser}/>
-                                </Typography>
+             
+                                <Box fontSize={10} mx={2}>
+                                    {chatUser?.isOnline ? 
+                                        "Online" :
+                                        <div>
+                                            Last seen at 
+                                            <ReactTimeAgo date={!!chatUser?.lastSeen ? chatUser?.lastSeen : chatUser?.createdAt} locale="en-US"/>
+                                        </div>
+                                    }
+                                </Box>
                             </Box>
+                            
+                            {/* <Badge sx ={{
+                                justifySelf : 'flex-end',
+                                alignSelf : 'center',
+                                mx : 2
+                            }}
+                             color="error" badgeContent={1} /> */}
                         </Box>)
                 } )}
                 </Grid>
 
                 {/* Receiver top bar */}
                 <Grid item xs={9} md={9} lg={10}
-                    spacing = {5}
                     sx={{
                         height : '100vh'
                     }}
@@ -317,7 +377,9 @@ function Page() {
                             }}>
                                 {receiver?.username}
                                 <small>
-                                    <UserStatus receiver={receiver} />
+                                    <UserStatus 
+                                        receiver={receiver}
+                                     />
                                 </small>
                             </Typography>
 
@@ -341,41 +403,44 @@ function Page() {
                                 justifyMessage = 'flex-start';
                             }
          
-                        return (    
+                        return (
+                            (
+                                (message.sender == user?.slug && message.receiver == receiver?.slug) || 
+                                (message.sender == receiver?.slug && message.receiver == user?.slug)
+                            ) &&
                             <Box key={index} sx={{
-                                px : 1.5,
-                                py : 1,
-                                boxShadow : 2,
-                                background : '#f0f0f5',
-                                borderRadius : 2,
-                                maxWidth : 500,
-                                mx : 1,
-                                my : 0.5,
-                                alignSelf  : justifyMessage
-                            }}>
-                                {(
-                                    (message.sender == user?.slug && message.receiver == receiver?.slug) || 
-                                    (message.sender == receiver?.slug && message.receiver == user?.slug)
-                                ) &&
-                            
-                                    <Box sx={{
-                                        display : 'flex',
-                                        // flexDirection : 'column'
+                                    px : 1.5,
+                                    py : 1,
+                                    boxShadow : 2,
+                                    background : '#f0f0f5',
+                                    borderRadius : 2,
+                                    maxWidth : 500,
+                                    mx : 1,
+                                    my : 0.5,
+                                    alignSelf  : justifyMessage
+                                }}>
+                                <Box sx={{
+                                    display : 'flex',
+                                    // flexDirection : 'column'
+                                }}>
+                                    <Typography sx={{mx : 1}}>
+                                        {message.message}
+                                    </Typography>
+                                    <Typography variant='small' sx={{
+                                        fontSize : 10,
+                                        alignSelf : 'flex-end',
+                                        mr : 1
                                     }}>
-                                        <Typography sx={{mx : 1}}>
-                                            {message.message}
-                                        </Typography>
-                                        <Typography variant='small' sx={{
-                                            fontSize : 10,
-                                            alignSelf : 'flex-end',
-                                            mr : 1
-                                        }}>
-                                            {time}
-                                        </Typography>
-                                    </Box>
+                                        {time}
+                                    </Typography>
+                                </Box>
+                            </Box>
                             
-                                }
-                            </Box>)})}
+                        )
+                        
+                        }
+                            )}
+
                         </Box> 
                         <Box sx={{
                             position : 'absolute',
@@ -425,11 +490,7 @@ function Page() {
                             boxShadow : 6,
                             cursor : 'pointer'
                         }}
-                        onClick={()=>{
-                            if (chatDivRef.current) {
-                                chatDivRef.current.scrollTo(0, chatDivRef.current.scrollHeight);
-                              }
-                        }}>
+                        onClick={scrollDown}>
                     <KeyboardArrowDownIcon />
                 </Box>
 
