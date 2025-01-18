@@ -1,9 +1,12 @@
 import SendIcon from '@mui/icons-material/Send';
-import { Avatar, Badge, Box, Grid, InputAdornment, Stack, TextField, Typography } from '@mui/material';
+import { Avatar, Badge, Box, ƒ
+    , Grid, InputAdornment, Stack, TextField, Typography, 
+    Button,
+    SvgIcon} from '@mui/material';
 import { Client } from '@stomp/stompjs';
 import axios from 'axios';
 import { format } from 'date-fns';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAuth } from 'src/hooks/use-auth';
 import { defaultChatImage, host, userImage } from 'src/utils/util';
 
@@ -18,6 +21,7 @@ import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import ru from 'javascript-time-ago/locale/ru';
 import ReactTimeAgo from 'react-time-ago';
+import AddIcon from '@mui/icons-material/Add';
 
 
 TimeAgo.addDefaultLocale(en)
@@ -29,40 +33,28 @@ function Page() {
     const auth = useAuth();
     const user = auth.user
     const [receiver,setReceiver] = useState()
- 
-
-    // const [senderChatKey,setSenderChatKey] = useState()
-    // const [recevierChatKey,setRecevierChatKey] = useState()
- 
+    const soundRef = useRef(null)
     const [chatUsers,setChatUsers] = useState([])
     const [chatMessage,setChatMessage] = useState()
-
-
-    // Set sender and receiver key
-    // useEffect(()=>{
-    //     if(!!receiver){
-    //         setSenderChatKey(`${user.slug}_${receiver?.slug}`)
-    //         setRecevierChatKey(`${receiver?.slug}_${user.slug}`)
-    //     }
-    // },[receiver])
+    const [activeTab ,setActiveTab] = useState("contacts")
 
 // Get all chats
     useEffect(()=>{
         axios.defaults.headers = {
             Authorization : auth.token
         }
-        if(!!receiver){
-            axios.post(host+`/chats/all`,{
-                sender : user.slug,
-                receiver : receiver.slug
-            })
-            .then(res => {
-                setMessages(res.data)
-            })
-            .catch(err=>{
-                console.log(err.message)
-            })
-        }
+            if(!!receiver){
+                axios.post(host+`/chats/all`,{
+                    receiver : receiver.slug
+                })
+                .then(res => {
+                    setMessages(res.data)
+                })
+                .catch(err=>{
+                    console.log(err.message)
+                })
+            }
+        
     },[receiver])
 
 
@@ -97,14 +89,14 @@ function Page() {
 
 
 
+    // Websocket client
     useEffect(() => {
         document.cookie = `X-Username=${user?.slug}; path=/`
         const wsClient = new Client({
-            brokerURL: 'ws://localhost:8080/chat', // Replace with your WebSocket server URL
-            reconnectDelay: 5000,
-            // debug: function (str) {
-            //     console.log(str);
-            // },
+            brokerURL: 'ws://localhost:8080/chat',
+            debug: function (str) {
+                console.log(str);
+            },
         });
 
         /** On connect */
@@ -119,10 +111,13 @@ function Page() {
                 const message = JSON.parse(data.body);
                 // console.log(message.body)
                 setMessages((prevMessages) => [...prevMessages, message]);
+                /** Map runing tiwce so that's why we using visitedUser  */
+                const visitedUser = []
                 setChatUsers(previousChatUsers => previousChatUsers.map(chatUser => {
                     console.log(chatUser.slug + " : "+ message.sender+ " : "+ chatUser.username)
-                    if(chatUser.slug == message.sender && !message.seen){
+                    if(chatUser.slug == message.sender && !message.seen && !visitedUser.includes(chatUser.slug)){
                         chatUser.chatNotification = (chatUser.chatNotification + 1);
+                        visitedUser.push(chatUser.slug)
                     }
                     return chatUser;
                 }))
@@ -165,9 +160,9 @@ function Page() {
         axios.defaults.headers = {
             Authorization : auth.token
         }
-        axios.post(host + `/admin/auth/W/all`,{})
+        axios.get(host + `/contacts/all`)
         .then(res => {
-            let users = res.data?.content;
+            let users = res.data;
             setChatUsers(users)
         }).catch(err => {
             alert(err.message)
@@ -175,6 +170,8 @@ function Page() {
     },[])
 
 
+
+    // Updating user last-seen
     const updateUserLastSeen = async () => {
         return axios.get(host+`/wholesale/auth/last-seen`)
         .then(res => res.data )
@@ -183,6 +180,8 @@ function Page() {
         })
     }
 
+
+    // Sending messages
     const sendMessage = (message) => {
         if(!!client){
             client.activate();
@@ -195,6 +194,7 @@ function Page() {
     };
 
 
+    // Send message logic
     const handleSendMessage = () =>{
         if (!!chatMessage){
             let messageBody = { 
@@ -212,6 +212,28 @@ function Page() {
         }
     }
 
+
+    // Update seen messsages 
+    useEffect(()=>{
+        if(receiver == undefined) return;
+        axios.defaults.headers = {
+            Authorization : auth.token
+        }
+        axios.post(host + `/chat/seen`,{
+            sender : receiver?.slug
+        })
+        .then(res => {
+            let data = res.data;
+            setChatUsers(previousChatUsers => previousChatUsers.map(chatUser => {
+                if(chatUser.slug == receiver.slug){
+                    chatUser.chatNotification = 0
+                } 
+                return chatUser
+            }))
+        }).catch(err => {
+            console.log(err)
+        })
+    },[receiver])
 
 
 
@@ -241,6 +263,8 @@ function Page() {
     }, []);
 
 
+
+    // On enter logic
     useEffect(() => {
         const listener = event => {
             if ((event.code === "Enter" || event.code === "NumpadEnter") && !event.shiftKey) {
@@ -286,14 +310,33 @@ function Page() {
                     color : 'white',
                     height : '100vh'
                 }}>
+                    
                     <Stack spacing={1.5} sx={{
                         py : 1,
                         px : 1.5
                     }}>
-                        <Typography variant='h6'>
-                            Chats
-                        </Typography>
 
+
+                        <Box sx={{
+                            display : 'flex',
+                            mx : 2,
+                        }}>
+                            <Button variant='outlined' color='inherit' sx={{
+                                border : activeTab=='chats' ? 1 : 0,
+                                flex : 1,
+                                }}>
+                                Chats
+                            </Button>
+
+                            <Button variant='outlined' color='inherit' sx={{
+                                border : activeTab=='contacts' ? 1 : 0,
+                                flex : 1
+                                }}>
+                                Contacts
+                            </Button>
+                        </Box>
+
+                
                         <Paper
                             component="form"
                             sx={{ p: '2px 4px', display: 'flex', alignItems: 'center',backgroundColor : 'neutral.700' }}
@@ -348,16 +391,33 @@ function Page() {
                                 </Box>
                             </Box>
                             
-                            {chatUser.chatNotification > 0 &&
+                            {chatUser.chatNotification > 0 && receiver?.slug != chatUser.slug &&
                             <Badge sx ={{
                                 justifySelf : 'flex-end',
                                 alignSelf : 'center',
                                 mx : 2
                             }}
-                             color="error" badgeContent={chatUser.chatNotification / 2} />
+                             color="error" badgeContent={chatUser.chatNotification} />
                         }
                         </Box>)
                 } )}
+
+                <Button
+                    color='inherit'
+                    size='large'
+                    sx={{
+                        m : 2
+                    }}
+                    startIcon = {
+                        <SvgIcon>
+                            <AddIcon/>
+                        </SvgIcon>
+                    }
+                    >
+                    Add new contact
+                </Button>
+
+
                 </Grid>
 
                 {/* Receiver top bar */}
@@ -499,8 +559,8 @@ function Page() {
                             cursor : 'pointer'
                         }}
                         onClick={scrollDown}>
-                    <KeyboardArrowDownIcon />
-                </Box>
+                            <KeyboardArrowDownIcon />
+                        </Box>
 
 
                     </Box>
