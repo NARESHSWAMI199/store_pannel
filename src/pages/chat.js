@@ -237,7 +237,7 @@ function Page() {
         }).catch(err => {
             console.log(err)
         })
-    },[receiver])
+    },[receiver,messages,chatMessage])
 
 
 
