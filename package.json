@@ -38,6 +38,7 @@
     "dayjs": "^1.11.10",
     "file-saver": "^2.0.5",
     "formik": "2.2.9",
+    "howler": "^2.2.4",
     "javascript-time-ago": "^2.5.11",
     "moment": "^2.30.1",
     "next": "^13.1.6",

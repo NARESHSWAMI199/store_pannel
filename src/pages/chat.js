@@ -22,7 +22,7 @@ import en from 'javascript-time-ago/locale/en';
 import ru from 'javascript-time-ago/locale/ru';
 import ReactTimeAgo from 'react-time-ago';
 import AddIcon from '@mui/icons-material/Add';
-
+import { Howl } from 'howler';
 
 TimeAgo.addDefaultLocale(en)
 TimeAgo.addLocale(ru)
@@ -37,6 +37,9 @@ function Page() {
     const [chatUsers,setChatUsers] = useState([])
     const [chatMessage,setChatMessage] = useState()
     const [activeTab ,setActiveTab] = useState("contacts")
+
+    const audioRef = useRef(null);
+    const [isPlaying, setIsPlaying] = useState(false);
 
 // Get all chats
     useEffect(()=>{
@@ -118,6 +121,7 @@ function Page() {
                     if(chatUser.slug == message.sender && !message.seen && !visitedUser.includes(chatUser.slug)){
                         chatUser.chatNotification = (chatUser.chatNotification + 1);
                         visitedUser.push(chatUser.slug)
+                        setIsPlaying(true)
                     }
                     return chatUser;
                 }))
@@ -296,6 +300,30 @@ function Page() {
         }
     },[messages])
 
+
+
+
+    // Notification sound
+    useEffect(() => {
+      const sound = new Howl({
+        src: ['/assets/notification.mp3'],
+        html5: true,
+        sound : 1
+      });
+      audioRef.current = sound;
+  
+      return () => {
+        sound.stop();
+        sound.unload();
+      };
+    }, []);
+  
+    useEffect(()=>{
+        if(isPlaying){
+            audioRef.current.play();
+        }
+        setIsPlaying(false);
+    },[isPlaying])
 
     return (
         <Box sx={{
