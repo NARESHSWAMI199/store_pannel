@@ -23,6 +23,8 @@ import ru from 'javascript-time-ago/locale/ru';
 import ReactTimeAgo from 'react-time-ago';
 import AddIcon from '@mui/icons-material/Add';
 import { Howl } from 'howler';
+import EmojiPicker from 'emoji-picker-react';
+import EmojiEmotionsRoundedIcon from '@mui/icons-material/EmojiEmotionsRounded';
 
 TimeAgo.addDefaultLocale(en)
 TimeAgo.addLocale(ru)
@@ -40,6 +42,7 @@ function Page() {
 
     const audioRef = useRef(null);
     const [isPlaying, setIsPlaying] = useState(false);
+    const [openEmojis, setOpenEmojis] = useState(false)
 
 // Get all chats
     useEffect(()=>{
@@ -60,6 +63,11 @@ function Page() {
         
     },[receiver])
 
+
+    // close emoji if open
+    useEffect(()=>{
+        setOpenEmojis(false)
+    },[receiver])
 
 
        // Calling in each 10 second
@@ -486,12 +494,14 @@ function Page() {
                             flexDirection :'column',
                             mt : 3,
                             mx : 5,
-                            pb : 50,
+                            pb : 20,
                             height : '85.1vh',
                             overflowY : 'scroll',
                             msOverflowStyle: 'none',
                             scrollbarWidth: 'none'
-                        }}>
+                        }}
+                            onClick = {()=>setOpenEmojis(false)}
+                        >
                             {messages.map((message, index) => {
                             let time = format(!!message.time ? message.time : 0, "hh:mm"  )
                             let justifyMessage = 'flex-end';
@@ -510,8 +520,8 @@ function Page() {
                                     boxShadow : 2,
                                     background : '#f0f0f5',
                                     borderRadius : 2,
-                                    maxWidth : 500,
-                                    mx : 1,
+                                    maxWidth : '45%',
+                                    mx : 1, 
                                     my : 0.5,
                                     alignSelf  : justifyMessage
                                 }}>
@@ -543,12 +553,20 @@ function Page() {
                             bottom : 2,
                             minWidth : `calc(100% - ${menuDivWidth}px)`,
                             display : 'flex',
-                            justifyContent : 'center',
+                            // justifyContent : 'center',
+                            flexDirection : 'column',
                             alignItems : 'center'
                         }}>
+
+                            <EmojiPicker 
+                                open={openEmojis} 
+                                width={'100%'} 
+                                onEmojiClick={(emojiObj) => setChatMessage(previous =>  `${!!previous ? previous : ''} ${emojiObj.emoji}`)}
+                            />
+
                             <TextField  sx={{
                                 backgroundColor : 'white',
-                                justifyContent : 'flex-end'
+                                justifyContent : 'flex-end',
                             }} 
                                 fullWidth 
                                 multiline
@@ -566,7 +584,22 @@ function Page() {
                                             }}
                                             onClick={handleSendMessage}
                                             /> 
-                                    </InputAdornment>
+                                    </InputAdornment>,
+
+                                    startAdornment :
+                                    <InputAdornment >
+                                        <EmojiEmotionsRoundedIcon 
+                                            sx={{
+                                                cursor : 'pointer'
+                                            }}
+                                            onClick={()=>setOpenEmojis(previous=> previous? false : true)}
+                                            /> 
+                                    </InputAdornment>,
+
+
+                                    sx : {
+                                        borderRadius : 0
+                                    }
                                     }}
                             />
                         
