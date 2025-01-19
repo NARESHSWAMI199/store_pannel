@@ -35,7 +35,6 @@ function Page() {
     const auth = useAuth();
     const user = auth.user
     const [receiver,setReceiver] = useState()
-    const soundRef = useRef(null)
     const [chatUsers,setChatUsers] = useState([])
     const [chatMessage,setChatMessage] = useState()
     const [activeTab ,setActiveTab] = useState("chats")
@@ -44,6 +43,7 @@ function Page() {
     const audioRef = useRef(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [openEmojis, setOpenEmojis] = useState(false)
+    const [pastMessages, setPastMessages] = useState({});
 
 // Get all chats
     useEffect(()=>{
@@ -55,7 +55,8 @@ function Page() {
                     receiver : receiver.slug
                 })
                 .then(res => {
-                    setMessages(res.data)
+                    setPastMessages(res.data)
+                    console.log(res.data)
                 })
                 .catch(err=>{
                     console.log(err.message)
@@ -515,6 +516,10 @@ function Page() {
 
                         </Box>
 
+                        
+
+                        {/* SHOW PAST MESSAGES */}
+
                         <Box ref={chatDivRef} sx={{
                             display : 'flex',
                             flexDirection :'column',
@@ -528,13 +533,71 @@ function Page() {
                         }}
                             onClick = {()=>setOpenEmojis(false)}
                         >
-                            {messages.map((message, index) => {
+
+                        {Object.keys(pastMessages).map(date => (
+                            <>
+                            <Typography sx={{
+                                alignSelf : 'center',
+                                fontSize : 14
+                            }}>
+                                {date}
+                            </Typography>
+                            {pastMessages[date].map((message, index) => {
                             let time = format(!!message.time ? message.time : 0, "hh:mm"  )
                             let justifyMessage = 'flex-end';
                             if(message.sender != user?.slug) {
                                 justifyMessage = 'flex-start';
                             }
          
+                        return (
+                            (
+                                (message.sender == user?.slug && message.receiver == receiver?.slug) || 
+                                (message.sender == receiver?.slug && message.receiver == user?.slug)
+                            ) &&
+                            <Box key={index} sx={{
+                                    px : 1.5,
+                                    py : 1,
+                                    boxShadow : 2,
+                                    background : '#f0f0f5',
+                                    borderRadius : 2,
+                                    maxWidth : '45%',
+                                    mx : 1, 
+                                    my : 0.5,
+                                    alignSelf  : justifyMessage
+                                }}>
+                                <Box sx={{
+                                    display : 'flex',
+                                    // flexDirection : 'column'
+                                }}>
+                                    <Typography sx={{mx : 1}}>
+                                        {message.message}
+                                    </Typography>
+                                    <Typography variant='small' sx={{
+                                        fontSize : 10,
+                                        alignSelf : 'flex-end',
+                                        mr : 1
+                                    }}>
+                                        {time}
+                                    </Typography>
+                                </Box>
+                            </Box>
+                            
+                        )
+                        
+                        }
+                            )}
+                            </>
+                        ))}
+                 
+
+                            {/* Recent chats */}
+                            {messages.map((message, index) => {
+                            let time = format(!!message.time ? message.time : 0, "hh:mm"  )
+                            let justifyMessage = 'flex-end';
+                            if(message.sender != user?.slug) {
+                                justifyMessage = 'flex-start';
+                            }
+            
                         return (
                             (
                                 (message.sender == user?.slug && message.receiver == receiver?.slug) || 
