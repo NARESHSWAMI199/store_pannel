@@ -24,8 +24,7 @@ import ReactTimeAgo from 'react-time-ago';
 import AddIcon from '@mui/icons-material/Add';
 import { Howl } from 'howler';
 import EmojiPicker from 'emoji-picker-react';
-import EmojiEmotionsRoundedIcon from '@mui/icons-material/EmojiEmotionsRounded';
-
+import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined';
 TimeAgo.addDefaultLocale(en)
 TimeAgo.addLocale(ru)
 
@@ -677,7 +676,7 @@ function Page() {
 
                                     startAdornment :
                                     <InputAdornment >
-                                        <EmojiEmotionsRoundedIcon 
+                                        <EmojiEmotionsOutlinedIcon 
                                             sx={{
                                                 cursor : 'pointer'
                                             }}
