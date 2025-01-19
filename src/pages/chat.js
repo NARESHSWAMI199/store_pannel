@@ -38,7 +38,8 @@ function Page() {
     const soundRef = useRef(null)
     const [chatUsers,setChatUsers] = useState([])
     const [chatMessage,setChatMessage] = useState()
-    const [activeTab ,setActiveTab] = useState("contacts")
+    const [activeTab ,setActiveTab] = useState("chats")
+    const [contactUsers,setContactUsers] = useState([])
 
     const audioRef = useRef(null);
     const [isPlaying, setIsPlaying] = useState(false);
@@ -167,7 +168,7 @@ function Page() {
 
 
 
-    // Get all users
+    // Get all contacts users
     useEffect(()=>{
         axios.defaults.headers = {
             Authorization : auth.token
@@ -175,12 +176,27 @@ function Page() {
         axios.get(host + `/contacts/all`)
         .then(res => {
             let users = res.data;
-            setChatUsers(users)
+            setContactUsers(users)
         }).catch(err => {
             alert(err.message)
         })
     },[])
 
+
+
+    // Get all chat users
+    useEffect(()=>{
+        axios.defaults.headers = {
+            Authorization : auth.token
+        }
+        axios.get(host + `/chat-users/all`)
+        .then(res => {
+            let users = res.data;
+            setChatUsers(users)
+        }).catch(err => {
+            alert(err.message)
+        })
+    },[])
 
 
     // Updating user last-seen
@@ -357,17 +373,26 @@ function Page() {
                             display : 'flex',
                             mx : 2,
                         }}>
-                            <Button variant='outlined' color='inherit' sx={{
-                                border : activeTab=='chats' ? 1 : 0,
-                                flex : 1,
+                            <Button 
+                                variant='outlined' 
+                                color='inherit' 
+                                onClick={()=>setActiveTab("chats")}
+                                sx={{
+                                    border : activeTab=='chats' ? 1 : 0,
+                                    flex : 1,
                                 }}>
                                 Chats
                             </Button>
 
-                            <Button variant='outlined' color='inherit' sx={{
-                                border : activeTab=='contacts' ? 1 : 0,
-                                flex : 1
-                                }}>
+                            <Button 
+                                variant='outlined' 
+                                color='inherit' 
+                                onClick={()=>setActiveTab("contacts")}
+                                sx={{
+                                    border : activeTab=='contacts' ? 1 : 0,
+                                    flex : 1
+                                }}
+                                >
                                 Contacts
                             </Button>
                         </Box>
@@ -390,7 +415,7 @@ function Page() {
                 
 
                 {/* Chat users */}
-                {chatUsers.filter((chatUser)=>(chatUser.slug !== user.slug)).map((chatUser , index) => {
+                {(activeTab == 'chats' ? chatUsers.filter((chatUser)=>(chatUser.slug !== user.slug)) : contactUsers).map((chatUser , index) => {
                     return(
                         <Box sx={{
                             display : 'flex',
@@ -427,7 +452,7 @@ function Page() {
                                 </Box>
                             </Box>
                             
-                            {chatUser.chatNotification > 0 && receiver?.slug != chatUser.slug &&
+                            {activeTab =='chats' && chatUser.chatNotification > 0 && receiver?.slug != chatUser.slug &&
                             <Badge sx ={{
                                 justifySelf : 'flex-end',
                                 alignSelf : 'center',
@@ -437,7 +462,7 @@ function Page() {
                         }
                         </Box>)
                 } )}
-
+                {activeTab == 'contacts' && 
                 <Button
                     color='inherit'
                     size='large'
@@ -452,6 +477,7 @@ function Page() {
                     >
                     Add new contact
                 </Button>
+                }
 
 
                 </Grid>
