@@ -1,6 +1,5 @@
 import SendIcon from '@mui/icons-material/Send';
-import { Avatar, Badge, Box, ƒ
-    , Grid, InputAdornment, Stack, TextField, Typography, 
+import { Avatar, Badge, Box,Grid, InputAdornment, Stack, TextField, Typography, 
     Button,
     SvgIcon} from '@mui/material';
 import { Client } from '@stomp/stompjs';
@@ -26,6 +25,7 @@ import { Howl } from 'howler';
 import EmojiPicker from 'emoji-picker-react';
 import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined';
 import DoneAllTwoToneIcon from '@mui/icons-material/DoneAllTwoTone';
+import { set } from 'nprogress';
 
 TimeAgo.addDefaultLocale(en)
 TimeAgo.addLocale(ru)
@@ -45,6 +45,7 @@ function Page() {
     const [isPlaying, setIsPlaying] = useState(false);
     const [openEmojis, setOpenEmojis] = useState(false)
     const [pastMessages, setPastMessages] = useState({});
+    const [isNewMessage,setIsNewMessage] = useState(false)
 
 
     // Websocket client
@@ -68,6 +69,7 @@ function Page() {
             wsClient.subscribe(`/user/${user?.slug}/queue/private`, (data) => {
                 const message = JSON.parse(data.body);
                 // console.log(message.body)
+                setIsNewMessage(true)
                 setMessages((prevMessages) => [...prevMessages, message]);
                 /** Map runing tiwce so that's why we using visitedUser  */
                 const visitedUser = []
@@ -334,6 +336,7 @@ function Page() {
 
 
     const scrollDown = useCallback(()=>{
+        setIsNewMessage(false)
         if (chatDivRef.current) {
             chatDivRef.current.scrollTo(0, chatDivRef.current.scrollHeight);
         }
@@ -343,7 +346,7 @@ function Page() {
         if (chatDivRef.current) {
             chatDivRef.current.scrollTo(0, chatDivRef.current.scrollHeight);
         }
-    },[messages])
+    },[chatMessage])
 
 
 
@@ -731,22 +734,26 @@ function Page() {
                         
                         </Box>
 
-
+          
                         <Box sx={{
                             position : 'absolute',
                             right : 20,
                             bottom : 100,
-                            borderRadius : 50,
                             height : 50,
-                            width : 50,
-                            display : 'flex',
-                            justifyContent : 'center',
-                            alignItems : 'center',
-                            boxShadow : 6,
-                            cursor : 'pointer'
+                            width : 50
                         }}
                         onClick={scrollDown}>
-                            <KeyboardArrowDownIcon />
+                            <Badge color='success' variant="dot" invisible={!isNewMessage} >     
+                                <KeyboardArrowDownIcon 
+                                    sx={{
+                                        borderRadius : 50,
+                                        justifySelf : 'center',
+                                        alignSelf : 'center',
+                                        boxShadow : 6,
+                                        cursor : 'pointer'
+                                    }}
+                                />
+                            </Badge>
                         </Box>
 
 
