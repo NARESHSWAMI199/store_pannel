@@ -1,11 +1,15 @@
 import SendIcon from '@mui/icons-material/Send';
-import { Avatar, Badge, Box,Grid, InputAdornment, Stack, TextField, Typography, 
+import {
+    Avatar, Badge, Box,
     Button,
-    SvgIcon} from '@mui/material';
+    Grid, InputAdornment, Stack,
+    SvgIcon,
+    TextField, Typography
+} from '@mui/material';
 import { Client } from '@stomp/stompjs';
 import axios from 'axios';
 import { format } from 'date-fns';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth } from 'src/hooks/use-auth';
 import { defaultChatImage, host, userImage } from 'src/utils/util';
 
@@ -16,21 +20,21 @@ import IconButton from '@mui/material/IconButton';
 import InputBase from '@mui/material/InputBase';
 import Paper from '@mui/material/Paper';
 
+import AddIcon from '@mui/icons-material/Add';
+import DoneAllTwoToneIcon from '@mui/icons-material/DoneAllTwoTone';
+import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined';
+import EmojiPicker from 'emoji-picker-react';
+import { Howl } from 'howler';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import ru from 'javascript-time-ago/locale/ru';
 import ReactTimeAgo from 'react-time-ago';
-import AddIcon from '@mui/icons-material/Add';
-import { Howl } from 'howler';
-import EmojiPicker from 'emoji-picker-react';
-import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined';
-import DoneAllTwoToneIcon from '@mui/icons-material/DoneAllTwoTone';
-import { set } from 'nprogress';
 
 TimeAgo.addDefaultLocale(en)
 TimeAgo.addLocale(ru)
 
 function Page() {
+    const [newMessage, setNewMessage] = useState();
     const [messages, setMessages] = useState([]);
     const [client, setClient] = useState(null);
     const auth = useAuth();
@@ -45,7 +49,6 @@ function Page() {
     const [isPlaying, setIsPlaying] = useState(false);
     const [openEmojis, setOpenEmojis] = useState(false)
     const [pastMessages, setPastMessages] = useState({});
-    const [isNewMessage,setIsNewMessage] = useState(false)
 
 
     // Websocket client
@@ -68,8 +71,7 @@ function Page() {
             /** reciving the message */
             wsClient.subscribe(`/user/${user?.slug}/queue/private`, (data) => {
                 const message = JSON.parse(data.body);
-                // console.log(message.body)
-                setIsNewMessage(true)
+                setNewMessage(message)
                 setMessages((prevMessages) => [...prevMessages, message]);
                 /** Map runing tiwce so that's why we using visitedUser  */
                 const visitedUser = []
@@ -336,7 +338,7 @@ function Page() {
 
 
     const scrollDown = useCallback(()=>{
-        setIsNewMessage(false)
+        setNewMessage(undefined)
         if (chatDivRef.current) {
             chatDivRef.current.scrollTo(0, chatDivRef.current.scrollHeight);
         }
@@ -743,7 +745,7 @@ function Page() {
                             width : 50
                         }}
                         onClick={scrollDown}>
-                            <Badge color='success' variant="dot" invisible={!isNewMessage} >     
+                            <Badge color='success' variant="dot" invisible={!(newMessage?.sender == receiver.slug)} >     
                                 <KeyboardArrowDownIcon 
                                     sx={{
                                         borderRadius : 50,
