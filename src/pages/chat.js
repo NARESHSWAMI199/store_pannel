@@ -45,7 +45,6 @@ function Page() {
     const [isPlaying, setIsPlaying] = useState(false);
     const [openEmojis, setOpenEmojis] = useState(false)
     const [pastMessages, setPastMessages] = useState({});
-    const [isSeen,setIsSeen] = useState(false)
 
 
     // Websocket client
@@ -124,9 +123,12 @@ function Page() {
         /** Messages seen or not */
         client.subscribe(`/user/${user?.slug}/queue/private/chat/seen`, (data) => {
             const seen = JSON.parse(data.body);
-            setIsSeen(seen)
+            setMessages(previousMessages => previousMessages.map(message=>{
+                message.seen = seen;
+                return message;
+            }))
         })
-    },[receiver])
+    },[receiver,messages])
 
 // Get all chats
     useEffect(()=>{
@@ -602,7 +604,7 @@ function Page() {
                                     <DoneAllTwoToneIcon sx={{
                                           fontSize : 14,
                                           alignSelf : 'flex-end',
-                                          color : isSeen || message.seen ? '#0e6f87' : 'black'
+                                          color : message.seen ? '#0e6f87' : 'black'
                                     }} />
                                 }
 
@@ -660,7 +662,7 @@ function Page() {
                                     <DoneAllTwoToneIcon sx={{
                                           fontSize : 14,
                                           alignSelf : 'flex-end',
-                                          color : isSeen || message.seen ? '#0e6f87' : 'black'
+                                          color : message.seen ? '#0e6f87' : 'black'
                                     }} />
                                 }
                                 </Box>
