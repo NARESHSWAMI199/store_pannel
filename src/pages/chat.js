@@ -25,6 +25,8 @@ import AddIcon from '@mui/icons-material/Add';
 import { Howl } from 'howler';
 import EmojiPicker from 'emoji-picker-react';
 import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined';
+import DoneAllTwoToneIcon from '@mui/icons-material/DoneAllTwoTone';
+
 TimeAgo.addDefaultLocale(en)
 TimeAgo.addLocale(ru)
 
@@ -43,62 +45,7 @@ function Page() {
     const [isPlaying, setIsPlaying] = useState(false);
     const [openEmojis, setOpenEmojis] = useState(false)
     const [pastMessages, setPastMessages] = useState({});
-
-// Get all chats
-    useEffect(()=>{
-        axios.defaults.headers = {
-            Authorization : auth.token
-        }
-            if(!!receiver){
-                axios.post(host+`/chats/all`,{
-                    receiver : receiver.slug
-                })
-                .then(res => {
-                    setPastMessages(res.data)
-                    console.log(res.data)
-                })
-                .catch(err=>{
-                    console.log(err.message)
-                })
-            }
-        
-    },[receiver])
-
-
-    // close emoji if open
-    useEffect(()=>{
-        setOpenEmojis(false)
-    },[receiver])
-
-
-       // Calling in each 10 second
-       useEffect(() => {
-        axios.defaults.headers = {
-            Authorization : auth.token
-        }
-        const intervalId = setInterval(() => {
-            setChatUsers(previousUsers => previousUsers.map((chatUser)=>{
-                axios.get(`${host}/chat/status/${chatUser.slug}`)
-                .then(res => {
-                    let user = res.data;
-                    if(user.slug == chatUser.slug){
-                        chatUser.isOnline = user.isOnline;
-                    }else{
-                        chatUser.isOnline = false;
-                    }
-                })
-                .catch(err => {
-                    console.log(err.message)
-                })
-                return chatUser;
-            }
-        ))
-        }, 10000)
-
-        return () => clearInterval(intervalId);
-
-    }, []);
-
+    const [isSeen,setIsSeen] = useState(false)
 
 
     // Websocket client
@@ -165,6 +112,78 @@ function Page() {
             wsClient.deactivate();
         }
     }, []);
+
+
+
+    useEffect(()=>{
+        if( client && !client.connected || receiver == undefined) return;
+            client.publish({
+                destination : `/app/chats/was-seen/${receiver.slug}`
+            });
+        
+        /** Messages seen or not */
+        client.subscribe(`/user/${user?.slug}/queue/private/chat/seen`, (data) => {
+            const seen = JSON.parse(data.body);
+            setIsSeen(seen)
+        })
+    },[receiver])
+
+// Get all chats
+    useEffect(()=>{
+        axios.defaults.headers = {
+            Authorization : auth.token
+        }
+            if(!!receiver){
+                axios.post(host+`/chats/all`,{
+                    receiver : receiver.slug
+                })
+                .then(res => {
+                    setPastMessages(res.data)
+                    console.log(res.data)
+                })
+                .catch(err=>{
+                    console.log(err.message)
+                })
+            }
+        
+    },[receiver])
+
+
+    // close emoji if open
+    useEffect(()=>{
+        setOpenEmojis(false)
+    },[receiver])
+
+
+       // Calling in each 10 second
+       useEffect(() => {
+        axios.defaults.headers = {
+            Authorization : auth.token
+        }
+        const intervalId = setInterval(() => {
+            setChatUsers(previousUsers => previousUsers.map((chatUser)=>{
+                axios.get(`${host}/chat/status/${chatUser.slug}`)
+                .then(res => {
+                    let user = res.data;
+                    if(user.slug == chatUser.slug){
+                        chatUser.isOnline = user.isOnline;
+                    }else{
+                        chatUser.isOnline = false;
+                    }
+                })
+                .catch(err => {
+                    console.log(err.message)
+                })
+                return chatUser;
+            }
+        ))
+        }, 10000)
+
+        return () => clearInterval(intervalId);
+
+    }, []);
+
+
 
 
 
@@ -533,7 +552,7 @@ function Page() {
                             onClick = {()=>setOpenEmojis(false)}
                         >
 
-                        {Object.keys(pastMessages).map(date => (
+                        {Object.keys(pastMessages).map((date) => (
                             <>
                             <Typography sx={{
                                 alignSelf : 'center',
@@ -578,6 +597,15 @@ function Page() {
                                     }}>
                                         {time}
                                     </Typography>
+
+                                {message.sender == user?.slug &&
+                                    <DoneAllTwoToneIcon sx={{
+                                          fontSize : 14,
+                                          alignSelf : 'flex-end',
+                                          color : isSeen || message.seen ? '#0e6f87' : 'black'
+                                    }} />
+                                }
+
                                 </Box>
                             </Box>
                             
@@ -627,6 +655,14 @@ function Page() {
                                     }}>
                                         {time}
                                     </Typography>
+
+                                {message.sender == user?.slug &&
+                                    <DoneAllTwoToneIcon sx={{
+                                          fontSize : 14,
+                                          alignSelf : 'flex-end',
+                                          color : isSeen || message.seen ? '#0e6f87' : 'black'
+                                    }} />
+                                }
                                 </Box>
                             </Box>
                             
