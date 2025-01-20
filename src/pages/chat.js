@@ -76,7 +76,7 @@ function Page() {
             client.publish({ destination: `/app/chats/was-seen/${receiver.slug}` });
             subscribeToSeenMessages(client, user, setMessages);
         }
-    }, [receiver, messages]);
+    }, [receiver, newMessage]);
 
     useEffect(() => {
         if (receiver) {
@@ -108,7 +108,7 @@ function Page() {
         if (receiver) {
             updateSeenMessages(receiver, setChatUsers, auth.token);
         }
-    }, [receiver, messages, chatMessage]);
+    }, [receiver,newMessage]);
 
     useEffect(() => {
         const listener = event => {
@@ -165,10 +165,10 @@ function Page() {
         setIsPlaying(false);
     }, [isPlaying]);
 
-    const handleSendMessage = () => {
+    const handleSendMessage = (token) => {
         if (chatMessage || selectedImages.length > 0) {
             const messageBody = createMessageBody(chatMessage, user, receiver, selectedImages);
-            sendMessage(client, messageBody);
+            sendMessage(client, token,messageBody);
             setMessages(prev => [...prev, messageBody]);
             setChatMessage('');
             setSelectedImages([]);
@@ -326,7 +326,7 @@ function Page() {
                                     </Box>
                                     <TextField sx={{ backgroundColor: 'white', justifyContent: 'flex-end' }} fullWidth multiline id='message' label='Type your message.' name='message' value={chatMessage} onChange={handleChange} InputProps={{
                                         endAdornment: <InputAdornment position='end'>
-                                            <SendIcon sx={{ cursor: 'pointer' }} onClick={handleSendMessage} />
+                                            <SendIcon sx={{ cursor: 'pointer' }} onClick={()=>handleSendMessage(auth.token)} />
                                             <input
                                                 accept="image/*"
                                                 style={{ display: 'none' }}
@@ -513,7 +513,7 @@ const createMessageBody = (chatMessage, user, receiver, images) => {
     return messageBody;
 };
 
-const sendMessage = (client, messageBody) => {
+const sendMessage = (client, token,messageBody) => {
     if (client) { 
         client.activate();
         if (client.connected) {
