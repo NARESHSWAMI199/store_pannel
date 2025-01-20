@@ -29,6 +29,8 @@ import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import ru from 'javascript-time-ago/locale/ru';
 import ReactTimeAgo from 'react-time-ago';
+import PhotoCamera from '@mui/icons-material/PhotoCamera';
+import CloseIcon from '@mui/icons-material/Close';
 
 TimeAgo.addDefaultLocale(en)
 TimeAgo.addLocale(ru)
@@ -51,6 +53,9 @@ function Page() {
     const menuDivRef = useRef(null);
     const chatDivRef = useRef(null);
     const [menuDivWidth, setMenuDivWidth] = useState(0);
+    const [selectedImages, setSelectedImages] = useState([]);
+    const [imagePreviews, setImagePreviews] = useState([]);
+    const fileInputRef = useRef(null);
 
     useEffect(() => {
         document.cookie = `X-Username=${user?.slug}; path=/`;
@@ -161,11 +166,13 @@ function Page() {
     }, [isPlaying]);
 
     const handleSendMessage = () => {
-        if (chatMessage) {
-            const messageBody = createMessageBody(chatMessage, user, receiver);
+        if (chatMessage || selectedImages.length > 0) {
+            const messageBody = createMessageBody(chatMessage, user, receiver, selectedImages);
             sendMessage(client, messageBody);
             setMessages(prev => [...prev, messageBody]);
             setChatMessage('');
+            setSelectedImages([]);
+            setImagePreviews([]);
         } else {
             console.log("Message: " + chatMessage);
         }
@@ -173,6 +180,29 @@ function Page() {
 
     const handleChange = (event) => {
         setChatMessage(event.target.value);
+    };
+
+    const handleImageChange = (event) => {
+        if (event.target.files) {
+            const filesArray = Array.from(event.target.files);
+            setSelectedImages(prevImages => [...prevImages, ...filesArray]);
+            const previewsArray = filesArray.map(file => URL.createObjectURL(file));
+            setImagePreviews(prevPreviews => [...prevPreviews, ...previewsArray]);
+            if (fileInputRef.current) {
+                fileInputRef.current.value = null; // Reset the input value to allow selecting the same file again
+            }
+        }
+    };
+
+    const handleRemoveImage = (index) => {
+        setSelectedImages(prevImages => prevImages.filter((_, i) => i !== index));
+        setImagePreviews(prevPreviews => prevPreviews.filter((_, i) => i !== index));
+    };
+
+    const handleFileInputClick = () => {
+        if (fileInputRef.current) {
+            fileInputRef.current.value = null; // Reset the input value to allow selecting the same file again
+        }
     };
 
     const scrollDown = useCallback(() => {
@@ -283,11 +313,40 @@ function Page() {
                             </Box>
                             <Box sx={{ position: 'absolute', bottom: 2, minWidth: `calc(100% - ${menuDivWidth}px)`, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                                 <EmojiPicker open={openEmojis} width={'100%'} onEmojiClick={(emojiObj) => setChatMessage(prev => `${prev || ''} ${emojiObj.emoji}`)} />
-                                <TextField sx={{ backgroundColor: 'white', justifyContent: 'flex-end' }} fullWidth multiline id='message' label='Type your message.' name='message' value={chatMessage} onChange={handleChange} InputProps={{
-                                    endAdornment: <InputAdornment position='end'><SendIcon sx={{ cursor: 'pointer' }} onClick={handleSendMessage} /></InputAdornment>,
-                                    startAdornment: <InputAdornment><EmojiEmotionsOutlinedIcon sx={{ cursor: 'pointer' }} onClick={() => setOpenEmojis(prev => !prev)} /></InputAdornment>,
-                                    sx: { borderRadius: 0 }
-                                }} />
+                                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', mb: 1 }}>
+                                        {imagePreviews.map((preview, index) => (
+                                            <Box key={index} sx={{ position: 'relative', m: 1 }}>
+                                                <img src={preview} alt={`preview-${index}`} style={{ width: 100, height: 100, objectFit: 'cover' }} />
+                                                <IconButton sx={{ position: 'absolute', top: 0, right: 0 }} onClick={() => handleRemoveImage(index)}>
+                                                    <CloseIcon />
+                                                </IconButton>
+                                            </Box>
+                                        ))}
+                                    </Box>
+                                    <TextField sx={{ backgroundColor: 'white', justifyContent: 'flex-end' }} fullWidth multiline id='message' label='Type your message.' name='message' value={chatMessage} onChange={handleChange} InputProps={{
+                                        endAdornment: <InputAdornment position='end'>
+                                            <SendIcon sx={{ cursor: 'pointer' }} onClick={handleSendMessage} />
+                                            <input
+                                                accept="image/*"
+                                                style={{ display: 'none' }}
+                                                id="icon-button-file"
+                                                type="file"
+                                                multiple
+                                                onChange={handleImageChange}
+                                                onClick={handleFileInputClick}
+                                                ref={fileInputRef}
+                                            />
+                                            <label htmlFor="icon-button-file">
+                                                <IconButton color="primary" aria-label="upload picture" component="span">
+                                                    <PhotoCamera />
+                                                </IconButton>
+                                            </label>
+                                        </InputAdornment>,
+                                        startAdornment: <InputAdornment><EmojiEmotionsOutlinedIcon sx={{ cursor: 'pointer' }} onClick={() => setOpenEmojis(prev => !prev)} /></InputAdornment>,
+                                        sx: { borderRadius: 0 }
+                                    }} />
+                                </Box>
                             </Box>
                             <Box sx={{ position: 'absolute', right: 20, bottom: 100, height: 50, width: 50 }} onClick={scrollDown}>
                                 <Badge color='success' variant="dot" invisible={!(newMessage?.sender === receiver.slug)}>
@@ -431,19 +490,46 @@ const updateSeenMessages = (receiver, setChatUsers, token) => {
         });
 };
 
-const createMessageBody = (chatMessage, user, receiver) => ({
-    type: 'chat',
-    message: chatMessage,
-    sender: user?.slug,
-    receiver: receiver?.slug,
-    time: new Date().getTime()
-});
+const createMessageBody = (chatMessage, user, receiver, images) => {
+    const messageBody = {
+        type: 'chat',
+        message: chatMessage,
+        sender: user?.slug,
+        receiver: receiver?.slug,
+        time: new Date().getTime(),
+        images : images
+    };
+    // if (images.length > 0) {
+    //     const formData = new FormData();
+    //     let newImages= []
+    //     images.forEach((image, index) => {
+    //         formData.append(`file${index}`, image);
+    //         newImages.push(image)
+    //     });
+    //     formData.append("images",newImages)
+    //     formData.append('message',JSON.stringify(messageBody));
+    //     return formData;
+    // }
+    return messageBody;
+};
 
 const sendMessage = (client, messageBody) => {
-    if (client) {
+    if (client) { 
         client.activate();
         if (client.connected) {
-            client.publish({ destination: `/app/chat/private/${messageBody.receiver}`, body: JSON.stringify(messageBody) });
+            if (messageBody?.images?.length > 0) {
+                axios.defaults.headers = {
+                    Authorization : token,
+                    "Content-Type" : "multipart/form-data"
+                }
+                axios.post(`${host}/chat/upload`,messageBody).then(response => {
+                    console.log('Images sent successfully');
+                }).catch(error => {
+                    console.error('Error sending images:', error);
+                });
+            } else {
+                client.publish({ destination: `/app/chat/private/${messageBody.receiver}`, body: JSON.stringify(messageBody) });
+            }
         } else {
             console.warn('Client not connected, unable to send message.');
         }
