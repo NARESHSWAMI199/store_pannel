@@ -3,7 +3,7 @@ import SendIcon from '@mui/icons-material/Send';
 import {
     Avatar, Badge, Box,
     Button,
-    Grid, InputAdornment, Stack,
+    Grid, InputAdornment, Menu, MenuItem, MenuList, Stack,
     SvgIcon,
     TextField, Typography
 } from '@mui/material';
@@ -33,6 +33,13 @@ import ReactTimeAgo from 'react-time-ago';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import CloseIcon from '@mui/icons-material/Close';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import Divider from '@mui/material/Divider';
+import ContentCopy from '@mui/icons-material/ContentCopy';
+import ReplyIcon from '@mui/icons-material/Reply';
+import DeleteIcon from '@mui/icons-material/Delete';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 TimeAgo.addLocale(en);
 TimeAgo.addLocale(ru);
@@ -59,6 +66,8 @@ function Page() {
     const [imagePreviews, setImagePreviews] = useState([]);
     const fileInputRef = useRef(null);
     const [isAtBottom, setIsAtBottom] = useState(true);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [selectedMessage, setSelectedMessage] = useState(null);
 
 
 
@@ -263,6 +272,31 @@ function Page() {
         window.open(url)
     };
 
+    const handleMenuOpen = (event, message) => {
+        setAnchorEl(event.currentTarget);
+        setSelectedMessage(message);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+        setSelectedMessage(null);
+    };
+
+    const handleReply = () => {
+        setChatMessage(`@${selectedMessage.sender}: ${selectedMessage.message}`);
+        handleMenuClose();
+    };
+
+    const handleCopy = () => {
+        navigator.clipboard.writeText(selectedMessage.message);
+        handleMenuClose();
+    };
+
+    const handleDelete = () => {
+        handleDeleteMessage(selectedMessage.id);
+        handleMenuClose();
+    };
+
 
     return (
         <Box sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }}>
@@ -344,6 +378,12 @@ function Page() {
                                                         {message.sender === user?.slug &&
                                                             <DoneAllTwoToneIcon sx={{ fontSize: 14, alignSelf: 'flex-end', color: message.seen ? '#0e6f87' : 'black' }} />
                                                         }
+                                                        <IconButton sx={{ ml: 1 }} onClick={(e) => handleMenuOpen(e, message)}>
+                                                            <MoreVertIcon sx={{ 
+                                                                fontSize : 18,
+                                                                color: 'black'
+                                                                 }} />
+                                                        </IconButton>
                                                     </Box>
                                                 </Box>
                                             );
@@ -372,6 +412,12 @@ function Page() {
                                                 {message.sender === user?.slug &&
                                                     <DoneAllTwoToneIcon sx={{ fontSize: 14, alignSelf: 'flex-end', color: message.seen ? '#0e6f87' : 'black' }} />
                                                 }
+                                                <IconButton sx={{ ml: 1 }} onClick={(e) => handleMenuOpen(e, message)}>
+                                                    <MoreVertIcon sx={{ 
+                                                        fontSize : 18,
+                                                        color: 'black'
+                                                         }} />
+                                                </IconButton>
                                             </Box>
                                         </Box>
                                     );
@@ -430,6 +476,39 @@ function Page() {
                     }
                 </Grid>
             </Grid>
+            <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleMenuClose}
+                PaperProps={{
+                    style: {
+                        maxHeight: 48 * 4.5,
+                        width: '20ch',
+                    },
+                }}
+            >
+                <MenuList>
+                    <MenuItem onClick={handleReply}>
+                        <ListItemIcon>
+                            <ReplyIcon fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText>Reply</ListItemText>
+                    </MenuItem>
+                    <MenuItem onClick={handleCopy}>
+                        <ListItemIcon>
+                            <ContentCopy fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText>Copy</ListItemText>
+                    </MenuItem>
+                    <Divider />
+                    <MenuItem onClick={handleDelete}>
+                        <ListItemIcon>
+                            <DeleteIcon fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText>Delete</ListItemText>
+                    </MenuItem>
+                </MenuList>
+            </Menu>
         </Box>
     );
 }
