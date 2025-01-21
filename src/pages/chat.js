@@ -58,11 +58,11 @@ function Page() {
     const [selectedImages, setSelectedImages] = useState([]);
     const [imagePreviews, setImagePreviews] = useState([]);
     const fileInputRef = useRef(null);
-    const [showNewMessages,setShowNewMessages] = useState(false)
+    const [isAtBottom, setIsAtBottom] = useState(true);
 
     useEffect(() => {
         document.cookie = `X-Username=${user?.slug}; path=/`;
-        const wsClient = createWebSocketClient(user, setNewMessage, setMessages, setChatUsers, setIsPlaying,showNotification,showNewMessages,setShowNewMessages,auth);
+        const wsClient = createWebSocketClient(user, setNewMessage, setMessages, setChatUsers, setIsPlaying,showNotification,auth);
         setClient(wsClient);
         wsClient.activate();
 
@@ -245,6 +245,23 @@ function Page() {
         window.open(url)
     };
 
+    const handleScroll = () => {
+        if (chatDivRef.current) {
+            const { scrollTop, scrollHeight, clientHeight } = chatDivRef.current;
+            setIsAtBottom(scrollTop + clientHeight >= scrollHeight - 10);
+        }
+    };
+
+    useEffect(() => {
+        if (chatDivRef.current) {
+            chatDivRef.current.addEventListener('scroll', handleScroll);
+        }
+        return () => {
+            if (chatDivRef.current) {
+                chatDivRef.current.removeEventListener('scroll', handleScroll);
+            }
+        };
+    }, []);
 
 
     return (
@@ -297,10 +314,14 @@ function Page() {
                                     <small>{receiver?.isOnline ? "Online" : <div>Last seen at <ReactTimeAgo date={receiver?.lastSeen || receiver?.createdAt} locale="en-US" /></div>}</small>
                                 </Typography>
                             </Box>
-                            <Box ref={chatDivRef} sx={{ display: 'flex', flexDirection: 'column', mt: 3, mx: 5, pb: 20, height: '85.1vh', overflowY: 'scroll', msOverflowStyle: 'none', scrollbarWidth: 'none' }} onClick={() => setOpenEmojis(false)}>
+                            <Box ref={chatDivRef} sx={{ display: 'flex', flexDirection: 'column', mt: 3, mx: 20, pb: 20, height: '85.1vh', overflowY: 'scroll', msOverflowStyle: 'none', scrollbarWidth: 'none' }} onClick={() => setOpenEmojis(false)}>
                                 {Object.keys(pastMessages).map(date => (
                                     <React.Fragment key={date}>
-                                        <Typography sx={{ alignSelf: 'center', fontSize: 14 }}>{date}</Typography>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', my: 2 }}>
+                                            <Box sx={{ flex: 1, height: '1px', backgroundColor: '#ccc' }} />
+                                            <Typography sx={{ mx: 2, fontSize: 14 }}>{date}</Typography>
+                                            <Box sx={{ flex: 1, height: '1px', backgroundColor: '#ccc' }} />
+                                        </Box>
                                         {pastMessages[date].map((message, index) => {
                                             let time = format(message.time || 0, "hh:mm");
                                             let justifyMessage = message.sender === user?.slug ? 'flex-end' : 'flex-start';
@@ -393,11 +414,13 @@ function Page() {
                                     }} />
                                 </Box>
                             </Box>
-                            <Box sx={{ position: 'absolute', right: 20, bottom: 100, height: 50, width: 50 }} onClick={scrollDown}>
-                                <Badge color='success' variant="dot" invisible={!(newMessage?.sender === receiver.slug)}>
-                                    <KeyboardArrowDownIcon sx={{ borderRadius: 50, justifySelf: 'center', alignSelf: 'center', boxShadow: 6, cursor: 'pointer' }} />
-                                </Badge>
-                            </Box>
+                            {!isAtBottom && (
+                                <Box sx={{ position: 'absolute', right: 20, bottom: 100, height: 50, width: 50 }} onClick={scrollDown}>
+                                    <Badge color='success' variant="dot" invisible={!(newMessage?.sender === receiver.slug)}>
+                                        <KeyboardArrowDownIcon sx={{ borderRadius: 50, justifySelf: 'center', alignSelf: 'center', boxShadow: 6, cursor: 'pointer' }} />
+                                    </Badge>
+                                </Box>
+                            )}
                         </Box>
                         :
                         <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
@@ -413,8 +436,11 @@ function Page() {
 
 export default Page;
 
+
+let showNewMessages = false;
+
 // Helper functions
-const createWebSocketClient = (user, setNewMessage, setMessages, setChatUsers, setIsPlaying, showNotification,showNewMessages,setShowNewMessages,auth) => {
+const createWebSocketClient = (user, setNewMessage, setMessages, setChatUsers, setIsPlaying, showNotification,auth) => {
     const wsClient = new Client({
         brokerURL: 'ws://localhost:8080/chat',
         debug: function (str) {
@@ -433,7 +459,7 @@ const createWebSocketClient = (user, setNewMessage, setMessages, setChatUsers, s
                 setMessages(prevMessages => [...prevMessages, message]);
             }
             else{
-                setShowNewMessages(true)
+                showNewMessages = true;
             }
             showNotification(message,auth.token);
             const visitedUser = [];
