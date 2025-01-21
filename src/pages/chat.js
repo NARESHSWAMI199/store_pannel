@@ -60,6 +60,24 @@ function Page() {
     const fileInputRef = useRef(null);
     const [isAtBottom, setIsAtBottom] = useState(true);
 
+
+
+    const handleScroll = () => {
+        if (chatDivRef.current) {
+            const { scrollTop, scrollHeight, clientHeight } = chatDivRef.current;
+            setIsAtBottom(scrollTop + clientHeight >= scrollHeight - 10);
+        }
+    };
+
+    useEffect(() => {
+        return () => {
+            if (chatDivRef.current) {
+                chatDivRef.current.removeEventListener('scroll', handleScroll);
+            }
+        };
+    }, [ chatDivRef.current?.addEventListener('scroll',handleScroll)]);
+
+
     useEffect(() => {
         document.cookie = `X-Username=${user?.slug}; path=/`;
         const wsClient = createWebSocketClient(user, setNewMessage, setMessages, setChatUsers, setIsPlaying,showNotification,auth);
@@ -244,24 +262,6 @@ function Page() {
     const handleDownloadImage = (url) => {
         window.open(url)
     };
-
-    const handleScroll = () => {
-        if (chatDivRef.current) {
-            const { scrollTop, scrollHeight, clientHeight } = chatDivRef.current;
-            setIsAtBottom(scrollTop + clientHeight >= scrollHeight - 10);
-        }
-    };
-
-    useEffect(() => {
-        if (chatDivRef.current) {
-            chatDivRef.current.addEventListener('scroll', handleScroll);
-        }
-        return () => {
-            if (chatDivRef.current) {
-                chatDivRef.current.removeEventListener('scroll', handleScroll);
-            }
-        };
-    }, []);
 
 
     return (
