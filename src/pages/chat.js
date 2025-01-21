@@ -58,10 +58,11 @@ function Page() {
     const [selectedImages, setSelectedImages] = useState([]);
     const [imagePreviews, setImagePreviews] = useState([]);
     const fileInputRef = useRef(null);
+    const [showNewMessages,setShowNewMessages] = useState(false)
 
     useEffect(() => {
         document.cookie = `X-Username=${user?.slug}; path=/`;
-        const wsClient = createWebSocketClient(user, setNewMessage, setMessages, setChatUsers, setIsPlaying);
+        const wsClient = createWebSocketClient(user, setNewMessage, setMessages, setChatUsers, setIsPlaying,showNotification,showNewMessages,setShowNewMessages,auth);
         setClient(wsClient);
         wsClient.activate();
 
@@ -82,7 +83,7 @@ function Page() {
 
     useEffect(() => {
         if (receiver) {
-            fetchPastMessages(receiver, setPastMessages, auth.token);
+            fetchPastMessages(receiver, setPastMessages,auth.token);
         }
     }, [receiver]);
 
@@ -167,6 +168,12 @@ function Page() {
         setIsPlaying(false);
     }, [isPlaying]);
 
+    useEffect(() => {
+        if (Notification.permission !== "granted") {
+            Notification.requestPermission();
+        }
+    }, []);
+
     const handleSendMessage = (token) => {
         if (chatMessage || selectedImages.length > 0) {
             const messageBody = createMessageBody(chatMessage, user, receiver, selectedImages);
@@ -237,6 +244,8 @@ function Page() {
     const handleDownloadImage = (url) => {
         window.open(url)
     };
+
+
 
     return (
         <Box sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }}>
@@ -405,7 +414,7 @@ function Page() {
 export default Page;
 
 // Helper functions
-const createWebSocketClient = (user, setNewMessage, setMessages, setChatUsers, setIsPlaying) => {
+const createWebSocketClient = (user, setNewMessage, setMessages, setChatUsers, setIsPlaying, showNotification,showNewMessages,setShowNewMessages,auth) => {
     const wsClient = new Client({
         brokerURL: 'ws://localhost:8080/chat',
         debug: function (str) {
@@ -420,7 +429,13 @@ const createWebSocketClient = (user, setNewMessage, setMessages, setChatUsers, s
         wsClient.subscribe(`/user/${user?.slug}/queue/private`, (data) => {
             const message = JSON.parse(data.body);
             setNewMessage(message);
-            setMessages(prevMessages => [...prevMessages, message]);
+            if(showNewMessages){
+                setMessages(prevMessages => [...prevMessages, message]);
+            }
+            else{
+                setShowNewMessages(true)
+            }
+            showNotification(message,auth.token);
             const visitedUser = [];
             setChatUsers(prevChatUsers => prevChatUsers.map(chatUser => {
                 if (chatUser.slug === message.sender && !message.seen && !visitedUser.includes(chatUser.slug)) {
@@ -462,7 +477,7 @@ const subscribeToSeenMessages = (client, user, setMessages) => {
     });
 };
 
-const fetchPastMessages = (receiver, setPastMessages, token) => {
+const fetchPastMessages = (receiver, setPastMessages,token) => {
     axios.defaults.headers = { Authorization: token };
     axios.post(`${host}/chats/all`, { receiver: receiver.slug })
         .then(res => {
@@ -568,4 +583,22 @@ const updateUserLastSeen = async () => {
         .catch(err => {
             console.log(err.message);
         });
+};
+
+const showNotification = async (message,token) => {
+    try {
+        const response = await axios.get(`${host}/wholesale/auth/detail`, {
+            params: { slug: message.sender },
+            headers: { Authorization: token }
+        });
+        const username = response.data.user?.username;
+        if (Notification.permission === "granted") {
+            new Notification("New Message", {
+                body: `${username}: ${message.message}`,
+                icon: `${userImage}${message.sender}/${message.avatar}`
+            });
+        }
+    } catch (error) {
+        console.error('Error fetching username:', error);
+    }
 };
