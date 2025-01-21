@@ -305,7 +305,15 @@ function Page() {
                                                 (message.sender === receiver?.slug && message.receiver === user?.slug)
                                             ) && (
                                                 <Box key={index} sx={{ px: 1.5, py: 1, boxShadow: 2, background: '#f0f0f5', borderRadius: 2, maxWidth: '45%', mx: 1, my: 0.5, alignSelf: justifyMessage }}>
-                                                    <Box sx={{ display: 'flex' }}>
+                                                    <Box sx={{ display: 'flex', flexDirection: message.imagesUrls?.length > 0 ? 'column' : 'row' }}>
+                                                        {message.imagesUrls && message.imagesUrls.map((url, imgIndex) => (
+                                                            <Box key={imgIndex} sx={{ position: 'relative', marginBottom: '8px' }}>
+                                                                <img src={url} alt={`message-img-${imgIndex}`} style={{ width: '100%' }} />
+                                                                <IconButton sx={{ position: 'absolute', top: 0, right: 0 }} onClick={() => handleDownloadImage(url)}>
+                                                                    <DownloadIcon />
+                                                                </IconButton>
+                                                            </Box>
+                                                        ))}
                                                         <Typography sx={{ mx: 1 }}>{message.message}</Typography>
                                                         <Typography variant='small' sx={{ fontSize: 10, alignSelf: 'flex-end', mr: 1 }}>{time}</Typography>
                                                         {message.sender === user?.slug &&
