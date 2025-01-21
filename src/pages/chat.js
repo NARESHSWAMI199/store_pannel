@@ -1,3 +1,4 @@
+import React from 'react'
 import SendIcon from '@mui/icons-material/Send';
 import {
     Avatar, Badge, Box,
@@ -32,8 +33,8 @@ import ReactTimeAgo from 'react-time-ago';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import CloseIcon from '@mui/icons-material/Close';
 
-TimeAgo.addDefaultLocale(en)
-TimeAgo.addLocale(ru)
+TimeAgo.addLocale(en);
+TimeAgo.addLocale(ru);
 
 function Page() {
     const [newMessage, setNewMessage] = useState();
@@ -113,7 +114,7 @@ function Page() {
     useEffect(() => {
         const listener = event => {
             if ((event.code === "Enter" || event.code === "NumpadEnter") && !event.shiftKey) {
-                handleSendMessage();
+                handleSendMessage(auth.token);
                 event.preventDefault();
             }
         };
@@ -121,7 +122,7 @@ function Page() {
         return () => {
             document.removeEventListener("keydown", listener);
         };
-    }, [chatMessage]);
+    }, [chatMessage, auth.token]);
 
     useEffect(() => {
         const getAppBarHeight = () => {
@@ -168,8 +169,8 @@ function Page() {
     const handleSendMessage = (token) => {
         if (chatMessage || selectedImages.length > 0) {
             const messageBody = createMessageBody(chatMessage, user, receiver, selectedImages);
-            sendMessage(client, token,messageBody);
-            setMessages(prev => [...prev, messageBody]);
+            sendMessage(client, token, messageBody);
+            setMessages(prev => [...prev, { ...messageBody, imagesUrls: selectedImages.map(file => URL.createObjectURL(file)) }]);
             setChatMessage('');
             setSelectedImages([]);
             setImagePreviews([]);
@@ -270,7 +271,7 @@ function Page() {
                             </Box>
                             <Box ref={chatDivRef} sx={{ display: 'flex', flexDirection: 'column', mt: 3, mx: 5, pb: 20, height: '85.1vh', overflowY: 'scroll', msOverflowStyle: 'none', scrollbarWidth: 'none' }} onClick={() => setOpenEmojis(false)}>
                                 {Object.keys(pastMessages).map(date => (
-                                    <>
+                                    <React.Fragment key={date}>
                                         <Typography sx={{ alignSelf: 'center', fontSize: 14 }}>{date}</Typography>
                                         {pastMessages[date].map((message, index) => {
                                             let time = format(message.time || 0, "hh:mm");
@@ -290,7 +291,7 @@ function Page() {
                                                 </Box>
                                             );
                                         })}
-                                    </>
+                                    </React.Fragment>
                                 ))}
                                 {messages.map((message, index) => {
                                     let time = format(message.time || 0, "hh:mm");
@@ -300,7 +301,10 @@ function Page() {
                                         (message.sender === receiver?.slug && message.receiver === user?.slug)
                                     ) && (
                                         <Box key={index} sx={{ px: 1.5, py: 1, boxShadow: 2, background: '#f0f0f5', borderRadius: 2, maxWidth: '45%', mx: 1, my: 0.5, alignSelf: justifyMessage }}>
-                                            <Box sx={{ display: 'flex' }}>
+                                            <Box sx={{ display: 'flex', flexDirection: message.imagesUrls?.length > 0 ? 'column' : 'row' }}>
+                                                {message.imagesUrls && message.imagesUrls.map((url, imgIndex) => (
+                                                    <img key={imgIndex} src={url} alt={`message-img-${imgIndex}`} style={{ width: '100%', marginBottom: '8px' }} />
+                                                ))}
                                                 <Typography sx={{ mx: 1 }}>{message.message}</Typography>
                                                 <Typography variant='small' sx={{ fontSize: 10, alignSelf: 'flex-end', mr: 1 }}>{time}</Typography>
                                                 {message.sender === user?.slug &&
@@ -326,7 +330,7 @@ function Page() {
                                     </Box>
                                     <TextField sx={{ backgroundColor: 'white', justifyContent: 'flex-end' }} fullWidth multiline id='message' label='Type your message.' name='message' value={chatMessage} onChange={handleChange} InputProps={{
                                         endAdornment: <InputAdornment position='end'>
-                                            <SendIcon sx={{ cursor: 'pointer' }} onClick={()=>handleSendMessage(auth.token)} />
+                                            <SendIcon sx={{ cursor: 'pointer' }} onClick={() => handleSendMessage(auth.token)} />
                                             <input
                                                 accept="image/*"
                                                 style={{ display: 'none' }}
@@ -343,7 +347,7 @@ function Page() {
                                                 </IconButton>
                                             </label>
                                         </InputAdornment>,
-                                        startAdornment: <InputAdornment><EmojiEmotionsOutlinedIcon sx={{ cursor: 'pointer' }} onClick={() => setOpenEmojis(prev => !prev)} /></InputAdornment>,
+                                        startAdornment: <InputAdornment position='start'><EmojiEmotionsOutlinedIcon sx={{ cursor: 'pointer' }} onClick={() => setOpenEmojis(prev => !prev)} /></InputAdornment>,
                                         sx: { borderRadius: 0 }
                                     }} />
                                 </Box>
@@ -513,11 +517,12 @@ const createMessageBody = (chatMessage, user, receiver, images) => {
     return messageBody;
 };
 
-const sendMessage = (client, token,messageBody) => {
+const sendMessage = (client,token,messageBody) => {
     if (client) { 
         client.activate();
         if (client.connected) {
             if (messageBody?.images?.length > 0) {
+                console.log(token ," :  token ")
                 axios.defaults.headers = {
                     Authorization : token,
                     "Content-Type" : "multipart/form-data"
