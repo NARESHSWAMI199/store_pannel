@@ -32,7 +32,7 @@ import ru from 'javascript-time-ago/locale/ru';
 import ReactTimeAgo from 'react-time-ago';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import CloseIcon from '@mui/icons-material/Close';
-import DownloadIcon from '@mui/icons-material/Download';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
 TimeAgo.addLocale(en);
 TimeAgo.addLocale(ru);
@@ -305,7 +305,7 @@ function Page() {
                                                             <Box key={imgIndex} sx={{ position: 'relative', marginBottom: '8px' }}>
                                                                 <img src={url} alt={`message-img-${imgIndex}`} style={{ width: '100%' }} />
                                                                 <IconButton sx={{ position: 'absolute', top: 0, right: 0 }} onClick={() => handleDownloadImage(url)}>
-                                                                    <DownloadIcon />
+                                                                    <OpenInNewIcon />
                                                                 </IconButton>
                                                             </Box>
                                                         ))}
@@ -333,7 +333,7 @@ function Page() {
                                                     <Box key={imgIndex} sx={{ position: 'relative', marginBottom: '8px' }}>
                                                         <img src={url} alt={`message-img-${imgIndex}`} style={{ width: '100%' }} />
                                                         <IconButton sx={{ position: 'absolute', top: 0, right: 0 }} onClick={() => handleDownloadImage(url)}>
-                                                            <DownloadIcon />
+                                                            <OpenInNewIcon />
                                                         </IconButton>
                                                     </Box>
                                                 ))}
