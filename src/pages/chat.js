@@ -32,6 +32,7 @@ import ru from 'javascript-time-ago/locale/ru';
 import ReactTimeAgo from 'react-time-ago';
 import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import CloseIcon from '@mui/icons-material/Close';
+import DownloadIcon from '@mui/icons-material/Download';
 
 TimeAgo.addLocale(en);
 TimeAgo.addLocale(ru);
@@ -179,6 +180,20 @@ function Page() {
         }
     };
 
+    const handleKeyDown = (event) => {
+        if ((event.code === "Enter" || event.code === "NumpadEnter") && !event.shiftKey) {
+            handleSendMessage(auth.token);
+            event.preventDefault();
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener("keydown", handleKeyDown);
+        return () => {
+            document.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [chatMessage, selectedImages, auth.token]);
+
     const handleChange = (event) => {
         setChatMessage(event.target.value);
     };
@@ -218,6 +233,15 @@ function Page() {
             chatDivRef.current.scrollTo(0, chatDivRef.current.scrollHeight);
         }
     }, [chatMessage]);
+
+    const handleDownloadImage = (url) => {
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = url.split('/').pop();
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
 
     return (
         <Box sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }}>
@@ -303,7 +327,12 @@ function Page() {
                                         <Box key={index} sx={{ px: 1.5, py: 1, boxShadow: 2, background: '#f0f0f5', borderRadius: 2, maxWidth: '45%', mx: 1, my: 0.5, alignSelf: justifyMessage }}>
                                             <Box sx={{ display: 'flex', flexDirection: message.imagesUrls?.length > 0 ? 'column' : 'row' }}>
                                                 {message.imagesUrls && message.imagesUrls.map((url, imgIndex) => (
-                                                    <img key={imgIndex} src={url} alt={`message-img-${imgIndex}`} style={{ width: '100%', marginBottom: '8px' }} />
+                                                    <Box key={imgIndex} sx={{ position: 'relative', marginBottom: '8px' }}>
+                                                        <img src={url} alt={`message-img-${imgIndex}`} style={{ width: '100%' }} />
+                                                        <IconButton sx={{ position: 'absolute', top: 0, right: 0 }} onClick={() => handleDownloadImage(url)}>
+                                                            <DownloadIcon />
+                                                        </IconButton>
+                                                    </Box>
                                                 ))}
                                                 <Typography sx={{ mx: 1 }}>{message.message}</Typography>
                                                 <Typography variant='small' sx={{ fontSize: 10, alignSelf: 'flex-end', mr: 1 }}>{time}</Typography>
@@ -503,17 +532,6 @@ const createMessageBody = (chatMessage, user, receiver, images) => {
         time: new Date().getTime(),
         images : images
     };
-    // if (images.length > 0) {
-    //     const formData = new FormData();
-    //     let newImages= []
-    //     images.forEach((image, index) => {
-    //         formData.append(`file${index}`, image);
-    //         newImages.push(image)
-    //     });
-    //     formData.append("images",newImages)
-    //     formData.append('message',JSON.stringify(messageBody));
-    //     return formData;
-    // }
     return messageBody;
 };
 
