@@ -348,7 +348,7 @@ function Page() {
                                     <small>{receiver?.isOnline ? "Online" : <div>Last seen at <ReactTimeAgo date={receiver?.lastSeen || receiver?.createdAt} locale="en-US" /></div>}</small>
                                 </Typography>
                             </Box>
-                            <Box ref={chatDivRef} sx={{ display: 'flex', flexDirection: 'column', mt: 3, mx: { xs: 2, lg: 20 }, pb: 20, height: '85.1vh', overflowY: 'scroll', msOverflowStyle: 'none', scrollbarWidth: 'none' }} onClick={() => setOpenEmojis(false)}>
+                            <Box ref={chatDivRef} sx={{ display: 'flex', flexDirection: 'column', mt: 3, mx: { xs: 2, lg: 15 }, pb: 20, height: '85.1vh', overflowY: 'scroll', msOverflowStyle: 'none', scrollbarWidth: 'none' }} onClick={() => setOpenEmojis(false)}>
                                 {Object.keys(pastMessages).map(date => (
                                     <React.Fragment key={date}>
                                         <Box sx={{ display: 'flex', alignItems: 'center', my: 2 }}>
@@ -363,7 +363,8 @@ function Page() {
                                                 (message.sender === user?.slug && message.receiver === receiver?.slug) ||
                                                 (message.sender === receiver?.slug && message.receiver === user?.slug)
                                             ) && (
-                                                <Box key={index} sx={{ px: 1.5, py: 1, boxShadow: 2, background: '#f0f0f5', borderRadius: 2, maxWidth: '45%', mx: 1, my: 0.5, alignSelf: justifyMessage }}>
+                                                <Box  key={index} sx={{ display : 'flex', alignSelf: justifyMessage,width : '100%' }}>
+                                                <Box sx={{ px: 1.5, py: 1, boxShadow: 2, background: '#f0f0f5', borderRadius: 2, mx: 1, my: 0.5,maxWidth : '50%'}}>
                                                     <Box sx={{ display: 'flex', flexDirection: message.imagesUrls?.length > 0 ? 'column' : 'row' }}>
                                                         {message.imagesUrls && message.imagesUrls.map((url, imgIndex) => (
                                                             <Box key={imgIndex} sx={{ position: 'relative', marginBottom: '8px' }}>
@@ -378,13 +379,16 @@ function Page() {
                                                         {message.sender === user?.slug &&
                                                             <DoneAllTwoToneIcon sx={{ fontSize: 14, alignSelf: 'flex-end', color: message.seen ? '#0e6f87' : 'black' }} />
                                                         }
-                                                        <IconButton sx={{ ml: 1 }} onClick={(e) => handleMenuOpen(e, message)}>
-                                                            <MoreVertIcon sx={{ 
-                                                                fontSize : 18,
-                                                                color: 'black'
-                                                                 }} />
-                                                        </IconButton>
                                                     </Box>
+                                                </Box>
+                                                <IconButton sx={{
+                                                   ml : 'auto'
+                                                }} onClick={(e) => handleMenuOpen(e, message)}>
+                                                    <MoreVertIcon sx={{ 
+                                                        fontSize : 18,
+                                                        color: 'black'
+                                                        }} />
+                                                </IconButton>
                                                 </Box>
                                             );
                                         })}
@@ -397,7 +401,8 @@ function Page() {
                                         (message.sender === user?.slug && message.receiver === receiver?.slug) ||
                                         (message.sender === receiver?.slug && message.receiver === user?.slug)
                                     ) && (
-                                        <Box key={index} sx={{ px: 1.5, py: 1, boxShadow: 2, background: '#f0f0f5', borderRadius: 2, maxWidth: '45%', mx: 1, my: 0.5, alignSelf: justifyMessage }}>
+                                        <Box  key={index} sx={{ display : 'flex', alignSelf: justifyMessage,maxWidth: '45%' }}>
+                                            <Box sx={{ px: 1.5, py: 1, boxShadow: 2, background: '#f0f0f5', borderRadius: 2, mx: 1, my: 0.5}}>
                                             <Box sx={{ display: 'flex', flexDirection: message.imagesUrls?.length > 0 ? 'column' : 'row' }}>
                                                 {message.imagesUrls && message.imagesUrls.map((url, imgIndex) => (
                                                     <Box key={imgIndex} sx={{ position: 'relative', marginBottom: '8px' }}>
@@ -412,13 +417,14 @@ function Page() {
                                                 {message.sender === user?.slug &&
                                                     <DoneAllTwoToneIcon sx={{ fontSize: 14, alignSelf: 'flex-end', color: message.seen ? '#0e6f87' : 'black' }} />
                                                 }
-                                                <IconButton sx={{ ml: 1 }} onClick={(e) => handleMenuOpen(e, message)}>
+                                            </Box>
+                                        </Box>
+                                            <IconButton onClick={(e) => handleMenuOpen(e, message)}>
                                                     <MoreVertIcon sx={{ 
                                                         fontSize : 18,
                                                         color: 'black'
                                                          }} />
                                                 </IconButton>
-                                            </Box>
                                         </Box>
                                     );
                                 })}
