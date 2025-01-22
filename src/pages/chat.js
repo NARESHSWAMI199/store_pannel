@@ -344,7 +344,7 @@ function Page() {
     };
 
     const showMessage = (message, index) => {
-        let time = format(message.time || 0, "hh:mm");
+        let time = format(message.createdAt || 0, "hh:mm");
         let justifyMessage = message.sender === user?.slug ? 'flex-end' : 'flex-start';
         let displayMessage = message.message;
 
@@ -631,6 +631,16 @@ const createWebSocketClient = (user, setNewMessage, setMessages, setChatUsers, s
                 return chatUser;
             }));
         });
+
+        wsClient.subscribe(`/user/${user?.slug}/queue/private/deleted`, (data) => {
+            const deletedMessage = JSON.parse(data.body);
+            setMessages(prevMessages => prevMessages.map(message => {
+                if (message.message === deletedMessage.message && message.createdAt === deletedMessage.createdAt) {
+                    return { ...message, isDeleted: 'Y', message: 'You deleted this message.' };
+                }
+                return message;
+            }));
+        });
     };
 
     wsClient.onDisconnect = (frame) => {
@@ -733,7 +743,7 @@ const createMessageBody = (chatMessage, user, receiver, images) => {
         message: chatMessage,
         sender: user?.slug,
         receiver: receiver?.slug,
-        time: new Date().getTime(),
+        createdAt: new Date().getTime(),
         images : images
     };
     return messageBody;
