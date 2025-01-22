@@ -5,7 +5,7 @@ import {
     Button,
     Grid, InputAdornment, Menu, MenuItem, MenuList, Stack,
     SvgIcon,
-    TextField, Typography
+    TextField, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Snackbar
 } from '@mui/material';
 import { Client } from '@stomp/stompjs';
 import axios from 'axios';
@@ -40,6 +40,7 @@ import ContentCopy from '@mui/icons-material/ContentCopy';
 import ReplyIcon from '@mui/icons-material/Reply';
 import DeleteIcon from '@mui/icons-material/Delete';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import MuiAlert from '@mui/material/Alert';
 
 TimeAgo.addLocale(en);
 TimeAgo.addLocale(ru);
@@ -69,6 +70,10 @@ function Page() {
     const [anchorEl, setAnchorEl] = useState(null);
     const [selectedMessage, setSelectedMessage] = useState(null);
     const [isHovered, setIsHovered] = useState(false);
+    const [openDialog, setOpenDialog] = useState(false);
+    const [deleteType, setDeleteType] = useState('');
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
 
 
 
@@ -111,7 +116,7 @@ function Page() {
 
     useEffect(() => {
         if (receiver) {
-            fetchPastMessages(receiver, setPastMessages,auth.token);
+            fetchPastMessages(receiver, setPastMessages,auth.token,setMessages);
         }
     }, [receiver]);
 
@@ -293,11 +298,34 @@ function Page() {
         handleMenuClose();
     };
 
-    const handleDelete = () => {
-        handleDeleteMessage(selectedMessage.id);
-        handleMenuClose();
+    const handleDelete = (type) => {
+        setDeleteType(type);
+        setOpenDialog(true);
     };
 
+    const confirmDelete = async () => {
+        try {
+            const isDeleted = deleteType === 'both' ? 'Y' : (selectedMessage.sender === user?.slug ? 'S' : 'R');
+            await axios.post(`${host}/chat/delete`, { ...selectedMessage, isDeleted }, {
+                headers: { Authorization: auth.token }
+            });
+            setMessages(prevMessages => prevMessages.map(message =>{
+                alert(message.id, " : ", selectedMessage.id)
+                return message.id === selectedMessage.id ? { ...message, isDeleted, message: 'You deleted this message.' } : message
+            } 
+
+                
+            ));
+            setOpenDialog(false);
+            handleMenuClose();
+            setSnackbarMessage('Message was deleted');
+            setSnackbarOpen(true);
+        } catch (error) {
+            setSnackbarMessage('Error deleting message');
+            setSnackbarOpen(true);
+            setOpenDialog(false);
+        }
+    };
 
     const handleMouseEnter = () => {
         setIsHovered(true);
@@ -307,52 +335,65 @@ function Page() {
         setIsHovered(false);
     };
 
+    const handleSnackbarClose = () => {
+        setSnackbarOpen(false);
+    };
 
-    const showMessage = (message,index) => {
+    const showMessage = (message, index) => {
         let time = format(message.time || 0, "hh:mm");
         let justifyMessage = message.sender === user?.slug ? 'flex-end' : 'flex-start';
+        let displayMessage = message.message;
+
+        if (message.isDeleted === 'Y') {
+            displayMessage = "This message was deleted.";
+        } else if (message.isDeleted === 'S' && message.sender === user?.slug) {
+            displayMessage = "You deleted this message.";
+        } else if (message.isDeleted === 'R' && message.receiver === user?.slug) {
+            displayMessage = "You deleted this message.";
+        }
+
         return (
             (message.sender === user?.slug && message.receiver === receiver?.slug) ||
             (message.sender === receiver?.slug && message.receiver === user?.slug)
         ) && (
-            <Box key={index} sx={{display : 'flex'}}>
-            <Box sx={{display : 'flex',justifyContent: justifyMessage, width : '100%'}}>
-                <Box sx={{display : 'flex',maxWidth : '40%'}}
-                    onMouseEnter={handleMouseEnter} 
-                    onMouseLeave={handleMouseLeave}
-                >
-                    {/* Message block */}
-                    <Box sx={{ px: 1.5, py: 1, boxShadow: 2, background: '#f0f0f5', borderRadius: 2, mx: 1, my: 0.5}}>
-                        <Box sx={{ display: 'flex', flexDirection: message.imagesUrls?.length > 0 ? 'column' : 'row' }}>
-                            {message.imagesUrls && message.imagesUrls.map((url, imgIndex) => (
-                                <Box key={imgIndex} sx={{ position: 'relative', marginBottom: '8px' }}>
-                                    <img src={url} alt={`message-img-${imgIndex}`} style={{ width: '100%' }} />
-                                    <IconButton sx={{ position: 'absolute', top: 0, right: 0 }} onClick={() => handleDownloadImage(url)}>
-                                        <OpenInNewIcon />
-                                    </IconButton>
-                                </Box>
-                            ))}
-                            <Typography sx={{ mx: 1 }}>{message.message}</Typography>
-                            <Typography variant='small' sx={{ fontSize: 10, alignSelf: 'flex-end', mr: 1 }}>{time}</Typography>
-                            {message.sender === user?.slug &&
-                                <DoneAllTwoToneIcon sx={{ fontSize: 14, alignSelf: 'flex-end', color: message.seen ? '#0e6f87' : 'black' }} />
-                            }
+            <Box key={index} sx={{ display: 'flex' }}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+            >
+                <Box sx={{ display: 'flex', justifyContent: justifyMessage, width: '100%' }}>
+                    <Box sx={{ display: 'flex', maxWidth: '40%' }}>
+                        {/* Message block */}
+                        <Box sx={{ px: 1.5, py: 1, boxShadow: 2, background: '#f0f0f5', borderRadius: 2, mx: 1, my: 0.5 }}>
+                            <Box sx={{ display: 'flex', flexDirection: message.imagesUrls?.length > 0 ? 'column' : 'row' }}>
+                                {message.imagesUrls && message.imagesUrls.map((url, imgIndex) => (
+                                    <Box key={imgIndex} sx={{ position: 'relative', marginBottom: '8px' }}>
+                                        <img src={url} alt={`message-img-${imgIndex}`} style={{ width: '100%' }} />
+                                        <IconButton sx={{ position: 'absolute', top: 0, right: 0 }} onClick={() => handleDownloadImage(url)}>
+                                            <OpenInNewIcon />
+                                        </IconButton>
+                                    </Box>
+                                ))}
+                                <Typography sx={{ mx: 1 }}>{displayMessage}</Typography>
+                                <Typography variant='small' sx={{ fontSize: 10, alignSelf: 'flex-end', mr: 1 }}>{time}</Typography>
+                                {message.sender === user?.slug &&
+                                    <DoneAllTwoToneIcon sx={{ fontSize: 14, alignSelf: 'flex-end', color: message.seen ? '#0e6f87' : 'black' }} />
+                                }
+                            </Box>
                         </Box>
                     </Box>
                 </Box>
-            </Box> 
-            {/* Three dots menu */}
-            <IconButton sx={{
-                justifyContent : 'flex-end'
-            }} 
-                onClick={(e) => handleMenuOpen(e, message)}>
-                <MoreVertIcon sx={{ 
-                    opacity: isHovered ? 1 : 0, 
-                    transition: 'opacity 0.3s ease-in-out' ,
-                    fontSize : 18,
-                    color: 'black'
+                {/* Three dots menu */}
+                <IconButton sx={{
+                    justifyContent: 'flex-end'
+                }}
+                    onClick={(e) => handleMenuOpen(e, message)}>
+                    <MoreVertIcon sx={{
+                        opacity: isHovered ? 1 : 0,
+                        transition: 'opacity 0.3s ease-in-out',
+                        fontSize: 18,
+                        color: 'black'
                     }} />
-            </IconButton>
+                </IconButton>
             </Box>
         )
     }
@@ -503,22 +544,60 @@ function Page() {
                         <ListItemText>Copy</ListItemText>
                     </MenuItem>
                     <Divider />
-                    <MenuItem onClick={handleDelete}>
+                    {selectedMessage?.sender === user?.slug && (
+                        <MenuItem onClick={() => handleDelete('both')}>
+                            <ListItemIcon>
+                                <DeleteIcon fontSize="small" />
+                            </ListItemIcon>
+                            <ListItemText>Delete for both</ListItemText>
+                        </MenuItem>
+                    )}
+                    <MenuItem onClick={() => handleDelete('self')}>
                         <ListItemIcon>
                             <DeleteIcon fontSize="small" />
                         </ListItemIcon>
-                        <ListItemText>Delete</ListItemText>
+                        <ListItemText>Delete for self</ListItemText>
                     </MenuItem>
                 </MenuList>
             </Menu>
+            <Dialog
+                open={openDialog}
+                onClose={() => setOpenDialog(false)}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">{"Confirm Deletion"}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        Are you sure you want to delete this message?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpenDialog(false)} color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={confirmDelete} color="primary" autoFocus>
+                        Confirm
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={6000}
+                onClose={handleSnackbarClose}
+                message={snackbarMessage}
+                action={
+                    <Button color="inherit" size="small" onClick={handleSnackbarClose}>
+                        Close
+                    </Button>
+                }
+            />
         </Box>
     );
 }
 
 export default Page;
 
-
-let showNewMessages = false;
 
 // Helper functions
 const createWebSocketClient = (user, setNewMessage, setMessages, setChatUsers, setIsPlaying, showNotification,auth) => {
@@ -536,12 +615,7 @@ const createWebSocketClient = (user, setNewMessage, setMessages, setChatUsers, s
         wsClient.subscribe(`/user/${user?.slug}/queue/private`, (data) => {
             const message = JSON.parse(data.body);
             setNewMessage(message);
-            if(showNewMessages){
-                setMessages(prevMessages => [...prevMessages, message]);
-            }
-            else{
-                showNewMessages = true;
-            }
+            setMessages(prevMessages => [...prevMessages, message]);
             showNotification(message,auth.token);
             const visitedUser = [];
             setChatUsers(prevChatUsers => prevChatUsers.map(chatUser => {
@@ -584,11 +658,12 @@ const subscribeToSeenMessages = (client, user, setMessages) => {
     });
 };
 
-const fetchPastMessages = (receiver, setPastMessages,token) => {
+const fetchPastMessages = (receiver, setPastMessages,token,setMessages) => {
     axios.defaults.headers = { Authorization: token };
     axios.post(`${host}/chats/all`, { receiver: receiver.slug })
         .then(res => {
             setPastMessages(res.data);
+            setMessages([])
         })
         .catch(err => {
             console.log(err.message);
