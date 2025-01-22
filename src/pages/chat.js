@@ -304,7 +304,14 @@ function Page() {
     };
 
     const confirmDelete = async () => {
-        const isDeleted = deleteType === 'both' ? 'Y' : (selectedMessage?.sender === user?.slug ? 'S' : 'R');
+        let isDeleted;
+        if (selectedMessage?.isDeleted === 'S' || selectedMessage?.isDeleted === 'R' || selectedMessage?.isDeleted === 'B') {
+            isDeleted = 'Y';
+        }else if (deleteType === 'both') {
+            isDeleted = 'B';
+        } else {
+            isDeleted = selectedMessage?.sender === user?.slug ? 'S' : 'R';
+        }
         await axios.post(`${host}/chat/delete`, { ...selectedMessage, isDeleted }, {
             headers: { Authorization: auth.token }
         }).then(res => {
