@@ -41,11 +41,16 @@ import ReplyIcon from '@mui/icons-material/Reply';
 import DeleteIcon from '@mui/icons-material/Delete';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import MuiAlert from '@mui/material/Alert';
+import { useRouter } from 'next/router';
+import ShowMessages from 'src/sections/chats-messages'
+import Contacts from 'src/components/Contacts';
+import Chats from 'src/components/Chats';
 
 TimeAgo.addLocale(en);
 TimeAgo.addLocale(ru);
 
 function Page() {
+    const router = useRouter();
     const [newMessage, setNewMessage] = useState();
     const [messages, setMessages] = useState([]);
     const [client, setClient] = useState(null);
@@ -95,7 +100,7 @@ function Page() {
 
     useEffect(() => {
         document.cookie = `X-Username=${user?.slug}; path=/`;
-        const wsClient = createWebSocketClient(user, setNewMessage, setMessages, setChatUsers, setIsPlaying,showNotification,auth);
+        const wsClient = createWebSocketClient(user, setNewMessage, setMessages,setPastMessages, setChatUsers, setIsPlaying,showNotification,auth);
         setClient(wsClient);
         wsClient.activate();
 
@@ -207,6 +212,12 @@ function Page() {
         }
     }, []);
 
+    useEffect(() => {
+        if (!auth.token) {
+            router.push('/auth/login');
+        }
+    }, [auth.token]);
+
     const handleSendMessage = (token) => {
         if (chatMessage || selectedImages.length > 0) {
             const messageBody = createMessageBody(chatMessage, user, receiver, selectedImages);
@@ -305,24 +316,38 @@ function Page() {
 
     const confirmDelete = async () => {
         let isDeleted;
-        if (selectedMessage?.isDeleted === 'S' || selectedMessage?.isDeleted === 'R' || selectedMessage?.isDeleted === 'B') {
-            isDeleted = 'Y';
-        }else if (deleteType === 'both') {
-            isDeleted = 'B';
+        if (selectedMessage?.isSenderDeleted === 'H') {
+            isDeleted = 'SY'; // if sender delete temporary delete message
+        } else if (selectedMessage?.isReceiverDeleted === 'H') {
+            isDeleted = 'RY'; // if receiver delete temporary delete message
+        } else if (deleteType === 'both') {
+            isDeleted = 'B'; // temporary delete from both sides
         } else {
             isDeleted = selectedMessage?.sender === user?.slug ? 'S' : 'R';
         }
-        await axios.post(`${host}/chat/delete`, { ...selectedMessage, isDeleted }, {
+
+        const deleteParams = { ...selectedMessage, isDeleted };
+        if (deleteParams.imagesUrls) {
+            delete deleteParams.images;
+        }
+
+        await axios.post(`${host}/chat/delete`, deleteParams, {
             headers: { Authorization: auth.token }
         }).then(res => {
             setMessages(prevMessages => prevMessages.map(message => {
-                return message.id === selectedMessage.id ? { ...message, isDeleted, message: 'You deleted this message.' } : message;
+                if (message.id === selectedMessage.id) {
+                    return { ...message, isDeleted, message: 'You deleted this message.', imagesUrls: [] }; // Hide images after delete action
+                }
+                return message;
             }));
             setPastMessages(prevPastMessages => {
                 const updatedPastMessages = { ...prevPastMessages };
                 Object.keys(updatedPastMessages).forEach(date => {
                     updatedPastMessages[date] = updatedPastMessages[date].map(message => {
-                        return message.id === selectedMessage.id ? { ...message, isDeleted, message: 'You deleted this message.' } : message;
+                        if (message.id === selectedMessage.id) {
+                            return { ...message, isDeleted, message: 'You deleted this message.', imagesUrls: [] }; // Hide images after delete action
+                        }
+                        return message;
                     });
                 });
                 return updatedPastMessages;
@@ -351,63 +376,20 @@ function Page() {
     };
 
     const showMessage = (message, index) => {
-        let time = format(message.createdAt || 0, "hh:mm");
-        let justifyMessage = message.sender === user?.slug ? 'flex-end' : 'flex-start';
-        let displayMessage = message.message;
-
-        if (message.isDeleted === 'Y') {
-            displayMessage = "This message was deleted.";
-        } else if (message.isDeleted === 'S' && message.sender === user?.slug) {
-            displayMessage = "You deleted this message.";
-        } else if (message.isDeleted === 'R' && message.receiver === user?.slug) {
-            displayMessage = "You deleted this message.";
-        }
-
         return (
-            (message.sender === user?.slug && message.receiver === receiver?.slug) ||
-            (message.sender === receiver?.slug && message.receiver === user?.slug)
-        ) && (
-            <Box key={index} sx={{ display: 'flex' }}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-            >
-                <Box sx={{ display: 'flex', justifyContent: justifyMessage, width: '100%' }}>
-                    <Box sx={{ display: 'flex', maxWidth: '40%' }}>
-                        {/* Message block */}
-                        <Box sx={{ px: 1.5, py: 1, boxShadow: 2, background: '#f0f0f5', borderRadius: 2, mx: 1, my: 0.5 }}>
-                            <Box sx={{ display: 'flex', flexDirection: message.imagesUrls?.length > 0 ? 'column' : 'row' }}>
-                                {message.imagesUrls && message.imagesUrls.map((url, imgIndex) => (
-                                    <Box key={imgIndex} sx={{ position: 'relative', marginBottom: '8px' }}>
-                                        <img src={url} alt={`message-img-${imgIndex}`} style={{ width: '100%' }} />
-                                        <IconButton sx={{ position: 'absolute', top: 0, right: 0 }} onClick={() => handleDownloadImage(url)}>
-                                            <OpenInNewIcon />
-                                        </IconButton>
-                                    </Box>
-                                ))}
-                                <Typography sx={{ mx: 1 }}>{displayMessage}</Typography>
-                                <Typography variant='small' sx={{ fontSize: 10, alignSelf: 'flex-end', mr: 1 }}>{time}</Typography>
-                                {message.sender === user?.slug &&
-                                    <DoneAllTwoToneIcon sx={{ fontSize: 14, alignSelf: 'flex-end', color: message.seen ? '#0e6f87' : 'black' }} />
-                                }
-                            </Box>
-                        </Box>
-                    </Box>
-                </Box>
-                {/* Three dots menu */}
-                <IconButton sx={{
-                    justifyContent: 'flex-end'
-                }}
-                    onClick={(e) => handleMenuOpen(e, message)}>
-                    <MoreVertIcon sx={{
-                        opacity: isHovered ? 1 : 0,
-                        transition: 'opacity 0.3s ease-in-out',
-                        fontSize: 18,
-                        color: 'black'
-                    }} />
-                </IconButton>
-            </Box>
-        )
-    }
+            <ShowMessages
+                key={index}
+                message={message}
+                user={user}
+                receiver={receiver}
+                handleMouseEnter={handleMouseEnter}
+                handleMouseLeave={handleMouseLeave}
+                handleMenuOpen={handleMenuOpen}
+                isHovered={isHovered}
+                handleDownloadImage={handleDownloadImage}
+            />
+        );
+    };
 
 
     return (
@@ -415,14 +397,6 @@ function Page() {
             <Grid container>
                 <Grid ref={menuDivRef} item xs={3} md={3} lg={2} sx={{ backgroundColor: 'neutral.800', color: 'white', height: '100vh' }}>
                     <Stack spacing={1.5} sx={{ py: 1, px: 1.5 }}>
-                        <Box sx={{ display: 'flex', mx: 2 }}>
-                            <Button variant='outlined' color='inherit' onClick={() => setActiveTab("chats")} sx={{ border: activeTab === 'chats' ? 1 : 0, flex: 1 }}>
-                                Chats
-                            </Button>
-                            <Button variant='outlined' color='inherit' onClick={() => setActiveTab("contacts")} sx={{ border: activeTab === 'contacts' ? 1 : 0, flex: 1 }}>
-                                Contacts
-                            </Button>
-                        </Box>
                         <Paper component="form" sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', backgroundColor: 'neutral.700' }}>
                             <InputBase sx={{ ml: 1, flex: 1, color: 'white', fontSize: 14 }} placeholder="Search Contacts" inputProps={{ 'aria-label': 'search google maps' }} />
                             <IconButton type="button" sx={{ p: '10px' }} aria-label="search">
@@ -430,53 +404,26 @@ function Page() {
                             </IconButton>
                         </Paper>
                     </Stack>
-                    {(activeTab === 'chats' ? chatUsers.filter(chatUser => chatUser.slug !== user.slug) : contactUsers).map((chatUser, index) => (
-                        <Box key={index} sx={{ display: 'flex', p: 2, borderWidth: 1, borderColor: '#f0f0f5', cursor: 'pointer', flex: '1' }} onClick={() => setReceiver(chatUser)}>
-                            <Avatar src={`${userImage}${chatUser.slug}/${chatUser?.avatar}`} />
-                            <Box sx={{ width: menuDivWidth + 'px' }}>
-                                <Typography sx={{ mx: 2, fontSize: 14 }}>{chatUser.username}</Typography>
-                                <Box fontSize={10} mx={2}>
-                                    {chatUser?.isOnline ? "Online" : <div>Last seen at <ReactTimeAgo date={chatUser?.lastSeen || chatUser?.createdAt} locale="en-US" /></div>}
-                                </Box>
-                            </Box>
-                            {activeTab === 'chats' && chatUser.chatNotification > 0 && receiver?.slug !== chatUser.slug &&
-                                <Badge sx={{ justifySelf: 'flex-end', alignSelf: 'center', mx: 2 }} color="error" badgeContent={chatUser.chatNotification} />
-                            }
-                        </Box>
-                    ))}
-                    {activeTab === 'contacts' &&
-                        <Button color='inherit' size='large' sx={{ m: 2 }} startIcon={<SvgIcon><AddIcon /></SvgIcon>}>
-                            Add new contact
-                        </Button>
-                    }
+                    <Contacts
+                        contacts={activeTab === 'chats' ? chatUsers : contactUsers}
+                        activeTab={activeTab}
+                        setActiveTab={setActiveTab}
+                        setReceiver={setReceiver}
+                        menuDivWidth={menuDivWidth}
+                        user={user}
+                    />
                 </Grid>
                 <Grid item xs={9} md={9} lg={10} sx={{ height: '100vh' }}>
                     {!!receiver ?
-                        <Box>
-                            <Box sx={{ display: 'flex', background: '#f0f0f5', minHeight: 65, alignItems: 'center' }}>
-                                <Avatar sx={{ mx: 1 }} src={`${userImage}${receiver?.slug}/${receiver?.avatar}`} />
-                                <Typography variant='subtitle2' sx={{ display: 'flex', flexDirection: 'column' }}>
-                                    {receiver?.username}
-                                    <small>{receiver?.isOnline ? "Online" : <div>Last seen at <ReactTimeAgo date={receiver?.lastSeen || receiver?.createdAt} locale="en-US" /></div>}</small>
-                                </Typography>
-                            </Box>
-                            <Box ref={chatDivRef} sx={{ display: 'flex', flexDirection: 'column', mt: 3, mx: { xs: 2, lg: 15 }, pb: 20, height: '85.1vh', overflowY: 'scroll', msOverflowStyle: 'none', scrollbarWidth: 'none' }} onClick={() => setOpenEmojis(false)}>
-                                {Object.keys(pastMessages).map(date => (
-                                    <React.Fragment key={date}>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', my: 2 }}>
-                                            <Box sx={{ flex: 1, height: '1px', backgroundColor: '#ccc' }} />
-                                            <Typography sx={{ mx: 2, fontSize: 14 }}>{date}</Typography>
-                                            <Box sx={{ flex: 1, height: '1px', backgroundColor: '#ccc' }} />
-                                        </Box>
-                                        {pastMessages[date].map((message, index) => (
-                                          showMessage(message,index) 
-                                        ))}
-                                    </React.Fragment>
-                                ))}
-                                {messages.map((message, index) => (
-                                    showMessage(message,index) 
-                                ))}
-                            </Box>
+                        <>
+                            <Chats
+                                receiver={receiver}
+                                pastMessages={pastMessages}
+                                messages={messages}
+                                showMessage={showMessage}
+                                chatDivRef={chatDivRef}
+                                setOpenEmojis={setOpenEmojis}
+                            />
                             <Box sx={{ position: 'absolute', bottom: 2, minWidth: `calc(100% - ${menuDivWidth}px)`, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                                 <EmojiPicker open={openEmojis} width={'100%'} onEmojiClick={(emojiObj) => setChatMessage(prev => `${prev || ''} ${emojiObj.emoji}`)} />
                                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
@@ -521,7 +468,7 @@ function Page() {
                                     </Badge>
                                 </Box>
                             )}
-                        </Box>
+                        </>
                         :
                         <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
                             <img src={defaultChatImage} style={{ minHeight: 200, minWidth: 200 }} alt="Live chat" />
@@ -611,7 +558,7 @@ export default Page;
 
 
 // Helper functions
-const createWebSocketClient = (user, setNewMessage, setMessages, setChatUsers, setIsPlaying, showNotification,auth) => {
+const createWebSocketClient = (user, setNewMessage, setMessages,setPastMessages, setChatUsers, setIsPlaying, showNotification,auth) => {
     const wsClient = new Client({
         brokerURL: 'ws://localhost:8080/chat',
         debug: function (str) {
@@ -647,6 +594,18 @@ const createWebSocketClient = (user, setNewMessage, setMessages, setChatUsers, s
                 }
                 return message;
             }));
+            setPastMessages(prevPastMessages => {
+                const updatedPastMessages = { ...prevPastMessages };
+                Object.keys(updatedPastMessages).forEach(date => {
+                    updatedPastMessages[date] = updatedPastMessages[date].map(message => {
+                        if (message.message === deletedMessage.message && message.createdAt === deletedMessage.createdAt) {
+                            return { ...message, isDeleted: 'Y', message: 'You deleted this message.' };
+                        }
+                        return message;
+                    });
+                });
+                return updatedPastMessages;
+            });
         });
     };
 
