@@ -68,6 +68,7 @@ function Page() {
     const [isAtBottom, setIsAtBottom] = useState(true);
     const [anchorEl, setAnchorEl] = useState(null);
     const [selectedMessage, setSelectedMessage] = useState(null);
+    const [isHovered, setIsHovered] = useState(false);
 
 
 
@@ -298,6 +299,58 @@ function Page() {
     };
 
 
+    const handleMouseEnter = () => {
+        setIsHovered(true);
+    };
+    
+    const handleMouseLeave = () => {
+        setIsHovered(false);
+    };
+
+
+    const showMessage = (message,justifyMessage,time) => (
+    <>
+        <Box sx={{display : 'flex',justifyContent: justifyMessage, width : '100%'}}>
+            <Box sx={{display : 'flex',maxWidth : '40%'}}
+                onMouseEnter={handleMouseEnter} 
+                onMouseLeave={handleMouseLeave}
+            >
+                {/* Message block */}
+                <Box sx={{ px: 1.5, py: 1, boxShadow: 2, background: '#f0f0f5', borderRadius: 2, mx: 1, my: 0.5}}>
+                    <Box sx={{ display: 'flex', flexDirection: message.imagesUrls?.length > 0 ? 'column' : 'row' }}>
+                        {message.imagesUrls && message.imagesUrls.map((url, imgIndex) => (
+                            <Box key={imgIndex} sx={{ position: 'relative', marginBottom: '8px' }}>
+                                <img src={url} alt={`message-img-${imgIndex}`} style={{ width: '100%' }} />
+                                <IconButton sx={{ position: 'absolute', top: 0, right: 0 }} onClick={() => handleDownloadImage(url)}>
+                                    <OpenInNewIcon />
+                                </IconButton>
+                            </Box>
+                        ))}
+                        <Typography sx={{ mx: 1 }}>{message.message}</Typography>
+                        <Typography variant='small' sx={{ fontSize: 10, alignSelf: 'flex-end', mr: 1 }}>{time}</Typography>
+                        {message.sender === user?.slug &&
+                            <DoneAllTwoToneIcon sx={{ fontSize: 14, alignSelf: 'flex-end', color: message.seen ? '#0e6f87' : 'black' }} />
+                        }
+                    </Box>
+                </Box>
+            </Box>
+        </Box> 
+        {/* Three dots menu */}
+        <IconButton sx={{
+            justifyContent : 'flex-end'
+        }} 
+            onClick={(e) => handleMenuOpen(e, message)}>
+            <MoreVertIcon sx={{ 
+                opacity: isHovered ? 1 : 0, 
+                transition: 'opacity 0.3s ease-in-out' ,
+                fontSize : 18,
+                color: 'black'
+                }} />
+        </IconButton>
+    </>
+    )
+
+
     return (
         <Box sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }}>
             <Grid container>
@@ -363,32 +416,8 @@ function Page() {
                                                 (message.sender === user?.slug && message.receiver === receiver?.slug) ||
                                                 (message.sender === receiver?.slug && message.receiver === user?.slug)
                                             ) && (
-                                                <Box  key={index} sx={{ display : 'flex', alignSelf: justifyMessage,width : '100%' }}>
-                                                <Box sx={{ px: 1.5, py: 1, boxShadow: 2, background: '#f0f0f5', borderRadius: 2, mx: 1, my: 0.5,maxWidth : '50%'}}>
-                                                    <Box sx={{ display: 'flex', flexDirection: message.imagesUrls?.length > 0 ? 'column' : 'row' }}>
-                                                        {message.imagesUrls && message.imagesUrls.map((url, imgIndex) => (
-                                                            <Box key={imgIndex} sx={{ position: 'relative', marginBottom: '8px' }}>
-                                                                <img src={url} alt={`message-img-${imgIndex}`} style={{ width: '100%' }} />
-                                                                <IconButton sx={{ position: 'absolute', top: 0, right: 0 }} onClick={() => handleDownloadImage(url)}>
-                                                                    <OpenInNewIcon />
-                                                                </IconButton>
-                                                            </Box>
-                                                        ))}
-                                                        <Typography sx={{ mx: 1 }}>{message.message}</Typography>
-                                                        <Typography variant='small' sx={{ fontSize: 10, alignSelf: 'flex-end', mr: 1 }}>{time}</Typography>
-                                                        {message.sender === user?.slug &&
-                                                            <DoneAllTwoToneIcon sx={{ fontSize: 14, alignSelf: 'flex-end', color: message.seen ? '#0e6f87' : 'black' }} />
-                                                        }
-                                                    </Box>
-                                                </Box>
-                                                <IconButton sx={{
-                                                   ml : 'auto'
-                                                }} onClick={(e) => handleMenuOpen(e, message)}>
-                                                    <MoreVertIcon sx={{ 
-                                                        fontSize : 18,
-                                                        color: 'black'
-                                                        }} />
-                                                </IconButton>
+                                                <Box key={index} sx={{display : 'flex'}}>
+                                                   {showMessage(message,justifyMessage,time)}
                                                 </Box>
                                             );
                                         })}
@@ -401,30 +430,8 @@ function Page() {
                                         (message.sender === user?.slug && message.receiver === receiver?.slug) ||
                                         (message.sender === receiver?.slug && message.receiver === user?.slug)
                                     ) && (
-                                        <Box  key={index} sx={{ display : 'flex', alignSelf: justifyMessage,maxWidth: '45%' }}>
-                                            <Box sx={{ px: 1.5, py: 1, boxShadow: 2, background: '#f0f0f5', borderRadius: 2, mx: 1, my: 0.5}}>
-                                            <Box sx={{ display: 'flex', flexDirection: message.imagesUrls?.length > 0 ? 'column' : 'row' }}>
-                                                {message.imagesUrls && message.imagesUrls.map((url, imgIndex) => (
-                                                    <Box key={imgIndex} sx={{ position: 'relative', marginBottom: '8px' }}>
-                                                        <img src={url} alt={`message-img-${imgIndex}`} style={{ width: '100%' }} />
-                                                        <IconButton sx={{ position: 'absolute', top: 0, right: 0 }} onClick={() => handleDownloadImage(url)}>
-                                                            <OpenInNewIcon />
-                                                        </IconButton>
-                                                    </Box>
-                                                ))}
-                                                <Typography sx={{ mx: 1 }}>{message.message}</Typography>
-                                                <Typography variant='small' sx={{ fontSize: 10, alignSelf: 'flex-end', mr: 1 }}>{time}</Typography>
-                                                {message.sender === user?.slug &&
-                                                    <DoneAllTwoToneIcon sx={{ fontSize: 14, alignSelf: 'flex-end', color: message.seen ? '#0e6f87' : 'black' }} />
-                                                }
-                                            </Box>
-                                        </Box>
-                                            <IconButton onClick={(e) => handleMenuOpen(e, message)}>
-                                                    <MoreVertIcon sx={{ 
-                                                        fontSize : 18,
-                                                        color: 'black'
-                                                         }} />
-                                                </IconButton>
+                                        <Box key={index} sx={{display : 'flex'}}>
+                                            {showMessage(message,justifyMessage,time)}
                                         </Box>
                                     );
                                 })}
