@@ -304,27 +304,31 @@ function Page() {
     };
 
     const confirmDelete = async () => {
-        try {
-            const isDeleted = deleteType === 'both' ? 'Y' : (selectedMessage.sender === user?.slug ? 'S' : 'R');
-            await axios.post(`${host}/chat/delete`, { ...selectedMessage, isDeleted }, {
-                headers: { Authorization: auth.token }
+        const isDeleted = deleteType === 'both' ? 'Y' : (selectedMessage?.sender === user?.slug ? 'S' : 'R');
+        await axios.post(`${host}/chat/delete`, { ...selectedMessage, isDeleted }, {
+            headers: { Authorization: auth.token }
+        }).then(res => {
+            setMessages(prevMessages => prevMessages.map(message => {
+                return message.id === selectedMessage.id ? { ...message, isDeleted, message: 'You deleted this message.' } : message;
+            }));
+            setPastMessages(prevPastMessages => {
+                const updatedPastMessages = { ...prevPastMessages };
+                Object.keys(updatedPastMessages).forEach(date => {
+                    updatedPastMessages[date] = updatedPastMessages[date].map(message => {
+                        return message.id === selectedMessage.id ? { ...message, isDeleted, message: 'You deleted this message.' } : message;
+                    });
+                });
+                return updatedPastMessages;
             });
-            setMessages(prevMessages => prevMessages.map(message =>{
-                alert(message.id, " : ", selectedMessage.id)
-                return message.id === selectedMessage.id ? { ...message, isDeleted, message: 'You deleted this message.' } : message
-            } 
-
-                
-            ));
             setOpenDialog(false);
             handleMenuClose();
             setSnackbarMessage('Message was deleted');
             setSnackbarOpen(true);
-        } catch (error) {
+        }).catch(err => {
             setSnackbarMessage('Error deleting message');
             setSnackbarOpen(true);
             setOpenDialog(false);
-        }
+        });
     };
 
     const handleMouseEnter = () => {
@@ -576,7 +580,7 @@ function Page() {
                     <Button onClick={() => setOpenDialog(false)} color="primary">
                         Cancel
                     </Button>
-                    <Button onClick={confirmDelete} color="primary" autoFocus>
+                    <Button onClick={()=>confirmDelete(setMessages)} color="primary" autoFocus>
                         Confirm
                     </Button>
                 </DialogActions>
