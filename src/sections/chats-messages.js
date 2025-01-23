@@ -10,11 +10,18 @@ const ShowMessages = ({ message, user, receiver, handleMouseEnter, handleMouseLe
     let justifyMessage = message.sender === user?.slug ? 'flex-end' : 'flex-start';
     let displayMessage = message.message;
 
+
+    if((message.isSenderDeleted === 'Y' && message.sender === user?.slug)){
+        return null;
+    }else if(message.isReceiverDeleted === 'Y' && message.receiver === user?.slug){
+        return null;
+    }
+
     if ((message.isSenderDeleted === 'H' && message.isReceiverDeleted === 'H')) {
         displayMessage = "This message was deleted.";
-    } else if ((message.isSenderDeleted === 'H' && message.isReceiverDeleted === 'N' && message.sender === user?.slug)) {
+    } else if ((message.isSenderDeleted === 'H' && (message.isReceiverDeleted === 'N' || message.isReceiverDeleted === 'Y' )  && message.sender === user?.slug)) {
         displayMessage = "You deleted this message.";
-    } else if ((message.isSenderDeleted === 'N' && message.isReceiverDeleted === 'H' && message.receiver === user?.slug)) {
+    } else if (((message.isSenderDeleted === 'N' || message.isSenderDeleted === 'Y' ) && message.isReceiverDeleted === 'H' && message.receiver === user?.slug)) {
         displayMessage = "You deleted this message.";
     }
 

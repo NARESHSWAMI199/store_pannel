@@ -49,6 +49,19 @@ import Chats from 'src/components/Chats';
 TimeAgo.addLocale(en);
 TimeAgo.addLocale(ru);
 
+const fetchUsername = async (slug, token) => {
+    try {
+        const response = await axios.get(`${host}/wholesale/auth/detail`, {
+            params: { slug },
+            headers: { Authorization: token }
+        });
+        return response.data.user?.username;
+    } catch (error) {
+        console.error('Error fetching username:', error);
+        return null;
+    }
+};
+
 function Page() {
     const router = useRouter();
     const [newMessage, setNewMessage] = useState();
@@ -299,8 +312,11 @@ function Page() {
         setSelectedMessage(null);
     };
 
-    const handleReply = () => {
-        setChatMessage(`@${selectedMessage.sender}: ${selectedMessage.message}`);
+    const handleReply = async () => {
+        const username = await fetchUsername(selectedMessage.sender, auth.token);
+        if (username) {
+            setChatMessage(`@${username}: ${selectedMessage.message}`);
+        }
         handleMenuClose();
     };
 
@@ -316,9 +332,9 @@ function Page() {
 
     const confirmDelete = async () => {
         let isDeleted;
-        if (selectedMessage?.isSenderDeleted === 'H') {
+        if (selectedMessage?.isSenderDeleted === 'H' && selectedMessage?.sender === user?.slug) {
             isDeleted = 'SY'; // if sender delete temporary delete message
-        } else if (selectedMessage?.isReceiverDeleted === 'H') {
+        } else if (selectedMessage?.isReceiverDeleted === 'H' && selectedMessage?.receiver === user?.slug) {
             isDeleted = 'RY'; // if receiver delete temporary delete message
         } else if (deleteType === 'both') {
             isDeleted = 'B'; // temporary delete from both sides
@@ -334,24 +350,35 @@ function Page() {
         await axios.post(`${host}/chat/delete`, deleteParams, {
             headers: { Authorization: auth.token }
         }).then(res => {
-            setMessages(prevMessages => prevMessages.map(message => {
-                if (message.id === selectedMessage.id) {
-                    return { ...message, isDeleted, message: 'You deleted this message.', imagesUrls: [] }; // Hide images after delete action
-                }
-                return message;
-            }));
-            setPastMessages(prevPastMessages => {
-                const updatedPastMessages = { ...prevPastMessages };
-                Object.keys(updatedPastMessages).forEach(date => {
-                    updatedPastMessages[date] = updatedPastMessages[date].map(message => {
-                        if (message.id === selectedMessage.id) {
-                            return { ...message, isDeleted, message: 'You deleted this message.', imagesUrls: [] }; // Hide images after delete action
-                        }
-                        return message;
+            if (selectedMessage?.isSenderDeleted === 'H' || selectedMessage?.isReceiverDeleted === 'H') {
+                setMessages(prevMessages => prevMessages.filter(message => message.id !== selectedMessage.id));
+                setPastMessages(prevPastMessages => {
+                    const updatedPastMessages = { ...prevPastMessages };
+                    Object.keys(updatedPastMessages).forEach(date => {
+                        updatedPastMessages[date] = updatedPastMessages[date].filter(message => message.id !== selectedMessage.id);
                     });
+                    return updatedPastMessages;
                 });
-                return updatedPastMessages;
-            });
+            }else{ 
+                setMessages(prevMessages => prevMessages.map(message => {
+                    if (message.id === selectedMessage.id) {
+                        return { ...message, isDeleted, message: 'You deleted this message.', imagesUrls: [] }; // Hide images after delete action
+                    }
+                    return message;
+                }));
+                setPastMessages(prevPastMessages => {
+                    const updatedPastMessages = { ...prevPastMessages };
+                    Object.keys(updatedPastMessages).forEach(date => {
+                        updatedPastMessages[date] = updatedPastMessages[date].map(message => {
+                            if (message.id === selectedMessage.id) {
+                                return { ...message, isDeleted, message: 'You deleted this message.', imagesUrls: [] }; // Hide images after delete action
+                            }
+                            return message;
+                        });
+                    });
+                    return updatedPastMessages;
+                });
+            }
             setOpenDialog(false);
             handleMenuClose();
             setSnackbarMessage('Message was deleted');
@@ -375,11 +402,22 @@ function Page() {
         setSnackbarOpen(false);
     };
 
+    const highlightText = (text) => {
+        const emailRegex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/gi;
+        const urlRegex = /(https?:\/\/[^\s]+)/gi;
+        const usernameRegex = /@([a-zA-Z0-9._-]+)/gi;
+
+        return text
+            .replace(emailRegex, '<span style="color: blue;">$1</span>')
+            .replace(urlRegex, '<span style="color: blue;">$1</span>')
+            .replace(usernameRegex, '<span style="color: blue;">$&</span>');
+    };
+
     const showMessage = (message, index) => {
         return (
             <ShowMessages
                 key={index}
-                message={message}
+                message={{ ...message, message: highlightText(message.message) }}
                 user={user}
                 receiver={receiver}
                 handleMouseEnter={handleMouseEnter}
@@ -391,19 +429,79 @@ function Page() {
         );
     };
 
+    const showPastMessages = (pastMessages) => {
+        return Object.keys(pastMessages).map((date, index) => (
+            <div key={index}>
+                <Typography variant="subtitle2" color="textSecondary" align="center">
+                    {format(new Date(date), 'MMMM dd, yyyy')}
+                </Typography>
+                {pastMessages[date].map((message, idx) => showMessage(message, idx))}
+            </div>
+        ));
+    };
 
     return (
-        <Box sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }}>
+        <Box 
+            sx={{ 
+                position: 'fixed', 
+                bottom: 0, 
+                left: 0, 
+                right: 0 
+            }}
+        >
             <Grid container>
-                <Grid ref={menuDivRef} item xs={3} md={3} lg={2} sx={{ backgroundColor: 'neutral.800', color: 'white', height: '100vh' }}>
-                    <Stack spacing={1.5} sx={{ py: 1, px: 1.5 }}>
-                        <Paper component="form" sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', backgroundColor: 'neutral.700' }}>
-                            <InputBase sx={{ ml: 1, flex: 1, color: 'white', fontSize: 14 }} placeholder="Search Contacts" inputProps={{ 'aria-label': 'search google maps' }} />
-                            <IconButton type="button" sx={{ p: '10px' }} aria-label="search">
+                <Grid 
+                    ref={menuDivRef} 
+                    item 
+                    xs={3} 
+                    md={3} 
+                    lg={2} 
+                    sx={{ 
+                        backgroundColor: 'neutral.800', 
+                        color: 'white', 
+                        height: '100vh' 
+                    }}
+                >
+                    <Stack 
+                        spacing={1.5} 
+                        sx={{ 
+                            py: 1, 
+                            px: 1.5 
+                        }}
+                    >
+                        <Paper 
+                            component="form" 
+                            sx={{ 
+                                p: '2px 4px', 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                backgroundColor: 'neutral.700' 
+                            }}
+                        >
+                            <InputBase 
+                                sx={{ 
+                                    ml: 1, 
+                                    flex: 1, 
+                                    color: 'white', 
+                                    fontSize: 14 
+                                }} 
+                                placeholder="Search Contacts" 
+                                inputProps={{ 
+                                    'aria-label': 'search google maps' 
+                                }} 
+                            />
+                            <IconButton 
+                                type="button" 
+                                sx={{ 
+                                    p: '10px' 
+                                }} 
+                                aria-label="search"
+                            >
                                 <SearchIcon />
                             </IconButton>
                         </Paper>
                     </Stack>
+                    {/* Contacts */}
                     <Contacts
                         contacts={activeTab === 'chats' ? chatUsers : contactUsers}
                         activeTab={activeTab}
@@ -413,9 +511,18 @@ function Page() {
                         user={user}
                     />
                 </Grid>
-                <Grid item xs={9} md={9} lg={10} sx={{ height: '100vh' }}>
+                <Grid 
+                    item 
+                    xs={9} 
+                    md={9} 
+                    lg={10} 
+                    sx={{ 
+                        height: '100vh' 
+                    }}
+                >
                     {!!receiver ?
                         <>
+                            {/* Chats */}
                             <Chats
                                 receiver={receiver}
                                 pastMessages={pastMessages}
@@ -424,55 +531,179 @@ function Page() {
                                 chatDivRef={chatDivRef}
                                 setOpenEmojis={setOpenEmojis}
                             />
-                            <Box sx={{ position: 'absolute', bottom: 2, minWidth: `calc(100% - ${menuDivWidth}px)`, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                                <EmojiPicker open={openEmojis} width={'100%'} onEmojiClick={(emojiObj) => setChatMessage(prev => `${prev || ''} ${emojiObj.emoji}`)} />
-                                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', mb: 1 }}>
+                            <Box 
+                                sx={{ 
+                                    position: 'absolute', 
+                                    bottom: 2, 
+                                    minWidth: `calc(100% - ${menuDivWidth}px)`, 
+                                    display: 'flex', 
+                                    flexDirection: 'column', 
+                                    alignItems: 'center' 
+                                }}
+                            >
+                                <EmojiPicker 
+                                    open={openEmojis} 
+                                    width={'100%'} 
+                                    onEmojiClick={(emojiObj) => setChatMessage(prev => `${prev || ''} ${emojiObj.emoji}`)} 
+                                />
+                                <Box 
+                                    sx={{ 
+                                        display: 'flex', 
+                                        flexDirection: 'column', 
+                                        alignItems: 'center', 
+                                        width: '100%' 
+                                    }}
+                                >
+                                    <Box 
+                                        sx={{ 
+                                            display: 'flex', 
+                                            flexWrap: 'wrap', 
+                                            mb: 1 
+                                        }}
+                                    >
                                         {imagePreviews.map((preview, index) => (
-                                            <Box key={index} sx={{ position: 'relative', m: 1 }}>
-                                                <img src={preview} alt={`preview-${index}`} style={{ width: 100, height: 100, objectFit: 'cover' }} />
-                                                <IconButton sx={{ position: 'absolute', top: 0, right: 0 }} onClick={() => handleRemoveImage(index)}>
+                                            <Box 
+                                                key={index} 
+                                                sx={{ 
+                                                    position: 'relative', 
+                                                    m: 1 
+                                                }}
+                                            >
+                                                <img 
+                                                    src={preview} 
+                                                    alt={`preview-${index}`} 
+                                                    style={{ 
+                                                        width: 100, 
+                                                        height: 100, 
+                                                        objectFit: 'cover' 
+                                                    }} 
+                                                />
+                                                <IconButton 
+                                                    sx={{ 
+                                                        position: 'absolute', 
+                                                        top: 0, 
+                                                        right: 0 
+                                                    }} 
+                                                    onClick={() => handleRemoveImage(index)}
+                                                >
                                                     <CloseIcon />
                                                 </IconButton>
                                             </Box>
                                         ))}
                                     </Box>
-                                    <TextField sx={{ backgroundColor: 'white', justifyContent: 'flex-end' }} fullWidth multiline id='message' label='Type your message.' name='message' value={chatMessage} onChange={handleChange} InputProps={{
-                                        endAdornment: <InputAdornment position='end'>
-                                            <SendIcon sx={{ cursor: 'pointer' }} onClick={() => handleSendMessage(auth.token)} />
-                                            <input
-                                                accept="image/*"
-                                                style={{ display: 'none' }}
-                                                id="icon-button-file"
-                                                type="file"
-                                                multiple
-                                                onChange={handleImageChange}
-                                                onClick={handleFileInputClick}
-                                                ref={fileInputRef}
-                                            />
-                                            <label htmlFor="icon-button-file">
-                                                <IconButton color="primary" aria-label="upload picture" component="span">
-                                                    <PhotoCamera />
-                                                </IconButton>
-                                            </label>
-                                        </InputAdornment>,
-                                        startAdornment: <InputAdornment position='start'><EmojiEmotionsOutlinedIcon sx={{ cursor: 'pointer' }} onClick={() => setOpenEmojis(prev => !prev)} /></InputAdornment>,
-                                        sx: { borderRadius: 0 }
-                                    }} />
+                                    <TextField 
+                                        sx={{ 
+                                            backgroundColor: 'white', 
+                                            justifyContent: 'flex-end' 
+                                        }} 
+                                        fullWidth 
+                                        multiline 
+                                        id='message' 
+                                        label='Type your message.' 
+                                        name='message' 
+                                        value={chatMessage} 
+                                        onChange={handleChange} 
+                                        InputProps={{
+                                            endAdornment: 
+                                                <InputAdornment position='end'>
+                                                    <SendIcon 
+                                                        sx={{ 
+                                                            cursor: 'pointer' 
+                                                        }} 
+                                                        onClick={() => handleSendMessage(auth.token)} 
+                                                    />
+                                                    <input
+                                                        accept="image/*"
+                                                        style={{ 
+                                                            display: 'none' 
+                                                        }}
+                                                        id="icon-button-file"
+                                                        type="file"
+                                                        multiple
+                                                        onChange={handleImageChange}
+                                                        onClick={handleFileInputClick}
+                                                        ref={fileInputRef}
+                                                    />
+                                                    <label htmlFor="icon-button-file">
+                                                        <IconButton 
+                                                            color="primary" 
+                                                            aria-label="upload picture" 
+                                                            component="span"
+                                                        >
+                                                            <PhotoCamera />
+                                                        </IconButton>
+                                                    </label>
+                                                </InputAdornment>,
+                                            startAdornment: 
+                                                <InputAdornment position='start'>
+                                                    <EmojiEmotionsOutlinedIcon 
+                                                        sx={{ 
+                                                            cursor: 'pointer' 
+                                                        }} 
+                                                        onClick={() => setOpenEmojis(prev => !prev)} 
+                                                    />
+                                                </InputAdornment>,
+                                            sx: { 
+                                                borderRadius: 0 
+                                            }
+                                        }} 
+                                    />
                                 </Box>
                             </Box>
                             {!isAtBottom && (
-                                <Box sx={{ position: 'absolute', right: 20, bottom: 100, height: 50, width: 50 }} onClick={scrollDown}>
-                                    <Badge color='success' variant="dot" invisible={!(newMessage?.sender === receiver.slug)}>
-                                        <KeyboardArrowDownIcon sx={{ borderRadius: 50, justifySelf: 'center', alignSelf: 'center', boxShadow: 6, cursor: 'pointer' }} />
+                                <Box 
+                                    sx={{ 
+                                        position: 'absolute', 
+                                        right: 20, 
+                                        bottom: 100, 
+                                        height: 50, 
+                                        width: 50 
+                                    }} 
+                                    onClick={scrollDown}
+                                >
+                                    <Badge 
+                                        color='success' 
+                                        variant="dot" 
+                                        invisible={!(newMessage?.sender === receiver.slug)}
+                                    >
+                                        <KeyboardArrowDownIcon 
+                                            sx={{ 
+                                                borderRadius: 50, 
+                                                justifySelf: 'center', 
+                                                alignSelf: 'center', 
+                                                boxShadow: 6, 
+                                                cursor: 'pointer' 
+                                            }} 
+                                        />
                                     </Badge>
                                 </Box>
                             )}
                         </>
                         :
-                        <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-                            <img src={defaultChatImage} style={{ minHeight: 200, minWidth: 200 }} alt="Live chat" />
-                            <Typography variant='h5' color={"#6c757d"} fontFamily={"sans-serif"}>Let's live chat with your contacts</Typography>
+                        <Box 
+                            sx={{ 
+                                display: 'flex', 
+                                flexDirection: 'column', 
+                                justifyContent: 'center', 
+                                alignItems: 'center', 
+                                height: '100vh' 
+                            }}
+                        >
+                            <img 
+                                src={defaultChatImage} 
+                                style={{ 
+                                    minHeight: 200, 
+                                    minWidth: 200 
+                                }} 
+                                alt="Live chat" 
+                            />
+                            <Typography 
+                                variant='h5' 
+                                color={"#6c757d"} 
+                                fontFamily={"sans-serif"}
+                            >
+                                Let's live chat with your contacts
+                            </Typography>
                         </Box>
                     }
                 </Grid>
@@ -502,7 +733,7 @@ function Page() {
                         <ListItemText>Copy</ListItemText>
                     </MenuItem>
                     <Divider />
-                    {selectedMessage?.sender === user?.slug && (
+                    {selectedMessage?.sender === user?.slug && selectedMessage?.isSenderDeleted !== 'H' && !selectedMessage?.isDeleted && (
                         <MenuItem onClick={() => handleDelete('both')}>
                             <ListItemIcon>
                                 <DeleteIcon fontSize="small" />
@@ -524,17 +755,26 @@ function Page() {
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
-                <DialogTitle id="alert-dialog-title">{"Confirm Deletion"}</DialogTitle>
+                <DialogTitle id="alert-dialog-title">
+                    {"Confirm Deletion"}
+                </DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
                         Are you sure you want to delete this message?
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={() => setOpenDialog(false)} color="primary">
+                    <Button 
+                        onClick={() => setOpenDialog(false)} 
+                        color="primary"
+                    >
                         Cancel
                     </Button>
-                    <Button onClick={()=>confirmDelete(setMessages)} color="primary" autoFocus>
+                    <Button 
+                        onClick={()=>confirmDelete(setMessages)} 
+                        color="primary" 
+                        autoFocus
+                    >
                         Confirm
                     </Button>
                 </DialogActions>
@@ -545,7 +785,11 @@ function Page() {
                 onClose={handleSnackbarClose}
                 message={snackbarMessage}
                 action={
-                    <Button color="inherit" size="small" onClick={handleSnackbarClose}>
+                    <Button 
+                        color="inherit" 
+                        size="small" 
+                        onClick={handleSnackbarClose}
+                    >
                         Close
                     </Button>
                 }
@@ -748,19 +992,11 @@ const updateUserLastSeen = async () => {
 };
 
 const showNotification = async (message,token) => {
-    try {
-        const response = await axios.get(`${host}/wholesale/auth/detail`, {
-            params: { slug: message.sender },
-            headers: { Authorization: token }
+    const username = await fetchUsername(message.sender, token);
+    if (username && Notification.permission === "granted") {
+        new Notification("New Message", {
+            body: `${username}: ${message.message}`,
+            icon: `${userImage}${message.sender}/${message.avatar}`
         });
-        const username = response.data.user?.username;
-        if (Notification.permission === "granted") {
-            new Notification("New Message", {
-                body: `${username}: ${message.message}`,
-                icon: `${userImage}${message.sender}/${message.avatar}`
-            });
-        }
-    } catch (error) {
-        console.error('Error fetching username:', error);
     }
 };

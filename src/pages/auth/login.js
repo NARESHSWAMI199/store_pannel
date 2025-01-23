@@ -11,7 +11,7 @@ import {
   TextField,
   Typography
 } from '@mui/material';
-import {Spin } from 'antd';
+import { Spin } from 'antd';
 import axios from 'axios';
 import { useFormik } from 'formik';
 import Head from 'next/head';
@@ -21,95 +21,80 @@ import { useAuth } from 'src/hooks/use-auth';
 import { Layout as AuthLayout } from 'src/layouts/auth/layout';
 import { host } from 'src/utils/util';
 import * as Yup from 'yup';
-import bg from 'public/assets/bg2.png'
+import bg from 'public/assets/bg2.png';
 import styled from '@emotion/styled';
 import HomeNavbar from 'src/sections/top-nav';
 import NextLink from 'next/link';
 
-
 const Page = (props) => {
-
-
-  /** snackbar varibatles */
-
-  const [open,setOpen] = useState()
-  const [message, setMessage] = useState("")
-  const [flag, setFlag] = useState("warning")
-
+  const [open, setOpen] = useState();
+  const [message, setMessage] = useState("");
+  const [flag, setFlag] = useState("warning");
 
   const router = useRouter();
   const [method, setMethod] = useState('email');
   const auth = useAuth();
-  const [values,setValues] = useState({})
-  const [showSpinner,setShowSpinner] = useState(false)
-  const [showOtpInput,setShowOtpInput] = useState(false)
+  const [values, setValues] = useState({});
+  const [showSpinner, setShowSpinner] = useState(false);
+  const [showOtpInput, setShowOtpInput] = useState(false);
 
-
-
-  useEffect(()=>{
-    if(!!auth.token){
-      router.push("/")
+  useEffect(() => {
+    if (!!auth.token) {
+      router.push("/");
     }
-  },[auth.token])
-
+  }, [auth.token]);
 
   const handleChange = (event) => {
-    if ([event.target.name] == 'email') setShowOtpInput(false)
-    setValues((previous)=>({
+    if ([event.target.name] == 'email') setShowOtpInput(false);
+    setValues((previous) => ({
       ...previous,
-      [event.target.name] : event.target.value
-    }))
-  }
+      [event.target.name]: event.target.value
+    }));
+  };
 
-
-  const sendOtp = () =>{
-      if(!!values.email ){
-      setShowSpinner(true)
-      axios.post(host+"/wholesale/auth/sendOtp",{email : values.email})
-      .then(res => {
-        setShowOtpInput(true)
-        setMessage(res.data.message)
-        setFlag("success")
-        setOpen(true)
-        setShowSpinner(false)
-      })
-      .catch(err => {
-        setMessage(!!err.response ? err.response.data.message : err.message )
-        setFlag("error")
-        setOpen(true)
-        setShowSpinner(false)
-      })
+  const sendOtp = () => {
+    if (!!values.email) {
+      setShowSpinner(true);
+      axios.post(host + "/wholesale/auth/sendOtp", { email: values.email })
+        .then(res => {
+          setShowOtpInput(true);
+          setMessage(res.data.message);
+          setFlag("success");
+          setOpen(true);
+          setShowSpinner(false);
+        })
+        .catch(err => {
+          setMessage(!!err.response ? err.response.data.message : err.message);
+          setFlag("error");
+          setOpen(true);
+          setShowSpinner(false);
+        });
+    } else {
+      setMessage("First enter your email.");
+      setFlag("error");
+      setOpen(true);
     }
-    else{
-      setMessage("First enter you email.")
-      setFlag("error")
-      setOpen(true)
-    }
-  }
+  };
 
-  const handleSubmit = async (e) =>{
-    debugger
-    e.preventDefault()
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     const form = e.target;
-    const formData = new FormData(form)
-      let email = formData.get("email");
-      let password = formData.get("otp");
+    const formData = new FormData(form);
+    let email = formData.get("email");
+    let password = formData.get("otp");
     try {
-      await auth.signIn(email,password,"OTP");
+      await auth.signIn(email, password, "OTP");
       router.push('/');
     } catch (err) {
-      setMessage(err.message)
-      setFlag("error")
-      setOpen(true)
+      setMessage(err.message);
+      setFlag("error");
+      setOpen(true);
     }
-  }
+  };
 
-
-    /** for snackbar close */
-    const handleClose = () => {
-      setOpen(false)
-    };
-
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const formik = useFormik({
     initialValues: {
@@ -147,62 +132,62 @@ const Page = (props) => {
     []
   );
 
+  const appBarRef = useRef(null);
+  const [appBarHeight, setAppBarHeight] = useState(0);
 
-
-  
-    const appBarRef = useRef(null);
-    const [appBarHeight, setAppBarHeight] = useState(0);
-  
-    useEffect(() => {
-      const getAppBarHeight = () => {
-        if (appBarRef.current) {
-          setAppBarHeight(appBarRef.current.clientHeight);
-        }
-      };
-  
-      getAppBarHeight(); 
-  
-      const resizeObserver = new ResizeObserver(getAppBarHeight);
+  useEffect(() => {
+    const getAppBarHeight = () => {
       if (appBarRef.current) {
-        resizeObserver.observe(appBarRef.current);
+        setAppBarHeight(appBarRef.current.clientHeight);
       }
-  
-      return () => {
-        if (appBarRef.current) {
-          resizeObserver.unobserve(appBarRef.current);
-        }
-      };
-    }, []);
-  
+    };
+
+    getAppBarHeight();
+
+    const resizeObserver = new ResizeObserver(getAppBarHeight);
+    if (appBarRef.current) {
+      resizeObserver.observe(appBarRef.current);
+    }
+
+    return () => {
+      if (appBarRef.current) {
+        resizeObserver.unobserve(appBarRef.current);
+      }
+    };
+  }, []);
 
   return (
     <>
-  <Grid container 
-      sx={{
-          justifyContent : 'center',
-          alignItems : 'center',
-          display : 'flex'
-      }}>
-        <Grid md={4.2} xs={12}
+      <Grid
+        container
         sx={{
-          background : 'white',
-          px : 5,
-          py : 10,
-          borderRadius : 2
-        }}>
-      <Head>
-        <title>
-          Login | Swami Sales
-        </title>
-      </Head>
-
+          justifyContent: 'center',
+          alignItems: 'center',
+          display: 'flex'
+        }}
+      >
+        <Grid
+          md={4.2}
+          xs={12}
+          sx={{
+            background: 'white',
+            px: 5,
+            py: 10,
+            borderRadius: 2
+          }}
+        >
+          <Head>
+            <title>
+              Login | Swami Sales
+            </title>
+          </Head>
           <div>
             <Stack
               spacing={1}
               sx={{ mb: 3 }}
             >
               <Typography variant="h4">
-                Already have an account ?
+                Already have an account?
               </Typography>
               <Typography
                 color="text.secondary"
@@ -249,7 +234,6 @@ const Page = (props) => {
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
                     type="email"
-                  
                   />
                   <TextField
                     error={!!(formik.touched.password && formik.errors.password)}
@@ -260,7 +244,6 @@ const Page = (props) => {
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
                     type="password"
-
                   />
                 </Stack>
                 {formik.errors.submit && (
@@ -281,12 +264,10 @@ const Page = (props) => {
                 >
                   Login
                 </Button>
-        
-            
               </form>
             )}
             {method === 'otp' && (
-                <form
+              <form
                 onSubmit={handleSubmit}
               >
                 <Stack spacing={3}>
@@ -301,57 +282,65 @@ const Page = (props) => {
                     onBlur={formik.handleBlur}
                     onChange={handleChange}
                     type="email"
-                  
                   />
-                  <Spin size='large' style={{display : showSpinner ? 'block' : 'none' ,marginTop : 20}} />
-                  {!showOtpInput ? 
+                  <Spin
+                    size='large'
+                    style={{
+                      display: showSpinner ? 'block' : 'none',
+                      marginTop: 20
+                    }}
+                  />
+                  {!showOtpInput ?
                     <Button
-                        fullWidth
-                        size="large"
-                        sx={{ mt: 3 }}
-                        type="button"
-                        variant="contained"
-                        onClick={sendOtp}> 
-                        Send Otp
+                      fullWidth
+                      size="large"
+                      sx={{ mt: 3 }}
+                      type="button"
+                      variant="contained"
+                      onClick={sendOtp}
+                    >
+                      Send Otp
                     </Button>
-                  : ""}
-                  {showOtpInput ? 
-                  <TextField
-                    fullWidth
-                    label="Otp"
-                    name="otp"
-                    value={values.otp}
-                    required
-                    onBlur={formik.handleBlur}
-                    onChange={handleChange}
-                    type="number"
-
-                  /> : ""}
+                    : ""}
+                  {showOtpInput ?
+                    <TextField
+                      fullWidth
+                      label="Otp"
+                      name="otp"
+                      value={values.otp}
+                      required
+                      onBlur={formik.handleBlur}
+                      onChange={handleChange}
+                      type="number"
+                    /> : ""}
                 </Stack>
-                {showOtpInput ? 
-                <Button
-                  fullWidth
-                  size="large"
-                  sx={{ mt: 3 }}
-                  type="submit"
-                  variant="contained"
-                >
-                  Continue
-                </Button> : ""
-                }
-            
+                {showOtpInput ?
+                  <Button
+                    fullWidth
+                    size="large"
+                    sx={{ mt: 3 }}
+                    type="submit"
+                    variant="contained"
+                  >
+                    Continue
+                  </Button> : ""}
               </form>
             )}
           </div>
         </Grid>
-        </Grid>
-      <Snackbar anchorOrigin={{ vertical : 'top', horizontal : 'right' }}
-          open={open}
+      </Grid>
+      <Snackbar
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        open={open}
+        onClose={handleClose}
+        key={'top' + 'right'}
+      >
+        <Alert
           onClose={handleClose}
-          key={'top' + 'right'}
+          severity={flag}
+          sx={{ width: '100%' }}
         >
-        <Alert onClose={handleClose} severity={flag} sx={{ width: '100%' }}>
-            {message}
+          {message}
         </Alert>
       </Snackbar>
     </>
@@ -359,11 +348,10 @@ const Page = (props) => {
 };
 
 Page.getLayout = (page) => (
-    <HomeNavbar bg={bg}>
-      {page}
-    </HomeNavbar>
+  <HomeNavbar bg={bg}>
+    {page}
+  </HomeNavbar>
 );
-
 
 export default Page;
 
