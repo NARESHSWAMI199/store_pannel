@@ -5,7 +5,7 @@ import {
     Button,
     Grid, InputAdornment, Menu, MenuItem, MenuList, Stack,
     SvgIcon,
-    TextField, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Snackbar
+    TextField, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Snackbar, IconButton
 } from '@mui/material';
 import { Client } from '@stomp/stompjs';
 import axios from 'axios';
@@ -14,10 +14,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth } from 'src/hooks/use-auth';
 import { defaultChatImage, host, userImage } from 'src/utils/util';
 
-
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import SearchIcon from '@mui/icons-material/Search';
-import IconButton from '@mui/material/IconButton';
 import InputBase from '@mui/material/InputBase';
 import Paper from '@mui/material/Paper';
 
@@ -41,6 +39,7 @@ import ReplyIcon from '@mui/icons-material/Reply';
 import DeleteIcon from '@mui/icons-material/Delete';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import MuiAlert from '@mui/material/Alert';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useRouter } from 'next/router';
 import ShowMessages from 'src/sections/chats-messages'
 import Contacts from 'src/components/Contacts';
@@ -92,8 +91,7 @@ function Page() {
     const [deleteType, setDeleteType] = useState('');
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
-
-
+    const [showChatList, setShowChatList] = useState(true);
 
     const handleScroll = () => {
         if (chatDivRef.current) {
@@ -109,7 +107,6 @@ function Page() {
             }
         };
     }, [ chatDivRef.current?.addEventListener('scroll',handleScroll)]);
-
 
     useEffect(() => {
         document.cookie = `X-Username=${user?.slug}; path=/`;
@@ -427,9 +424,6 @@ function Page() {
     };
 
     const showMessage = (message, index) => {
-        if (message.isSenderDeleted === 'Y' || message.isReceiverDeleted === 'Y') {
-            return null;
-        }
         return (
             <ShowMessages
                 key={index}
@@ -456,6 +450,17 @@ function Page() {
         ));
     };
 
+    const handleBackClick = () => {
+        setReceiver(null);
+        setShowChatList(true);
+    };
+
+    const getInitials = (name) => {
+        const names = name.split(' ');
+        const initials = names.map(n => n[0]).join('');
+        return initials.toUpperCase();
+    };
+
     return (
         <Box 
             sx={{ 
@@ -466,78 +471,134 @@ function Page() {
             }}
         >
             <Grid container>
-                <Grid 
-                    ref={menuDivRef} 
-                    item 
-                    xs={3} 
-                    md={3} 
-                    lg={2} 
-                    sx={{ 
-                        backgroundColor: 'neutral.800', 
-                        color: 'white', 
-                        height: '100vh' 
-                    }}
-                >
-                    <Stack 
-                        spacing={1.5} 
+                {showChatList && (
+                    <Grid 
+                        ref={menuDivRef} 
+                        item 
+                        xs={12} 
+                        md={3} 
+                        lg={2} 
                         sx={{ 
-                            py: 1, 
-                            px: 1.5 
+                            backgroundColor: 'neutral.800', 
+                            color: 'white', 
+                            height: '100vh', 
+                            display: { xs: receiver ? 'none' : 'block', md: 'block' } 
                         }}
                     >
-                        <Paper 
-                            component="form" 
+                        <Stack 
+                            spacing={1.5} 
                             sx={{ 
-                                p: '2px 4px', 
-                                display: 'flex', 
-                                alignItems: 'center', 
-                                backgroundColor: 'neutral.700' 
+                                py: 1, 
+                                px: 1.5 
                             }}
                         >
-                            <InputBase 
+                            <Paper 
+                                component="form" 
                                 sx={{ 
-                                    ml: 1, 
-                                    flex: 1, 
-                                    color: 'white', 
-                                    fontSize: 14 
-                                }} 
-                                placeholder="Search Contacts" 
-                                inputProps={{ 
-                                    'aria-label': 'search google maps' 
-                                }} 
-                            />
-                            <IconButton 
-                                type="button" 
-                                sx={{ 
-                                    p: '10px' 
-                                }} 
-                                aria-label="search"
+                                    p: '2px 4px', 
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    backgroundColor: 'neutral.700' 
+                                }}
                             >
-                                <SearchIcon />
-                            </IconButton>
-                        </Paper>
-                    </Stack>
-                    {/* Contacts */}
-                    <Contacts
-                        contacts={activeTab === 'chats' ? chatUsers : contactUsers}
-                        activeTab={activeTab}
-                        setActiveTab={setActiveTab}
-                        setReceiver={setReceiver}
-                        menuDivWidth={menuDivWidth}
-                        user={user}
-                    />
-                </Grid>
+                                <InputBase 
+                                    sx={{ 
+                                        ml: 1, 
+                                        flex: 1, 
+                                        color: 'white', 
+                                        fontSize: 14 
+                                    }} 
+                                    placeholder="Search Contacts" 
+                                    inputProps={{ 
+                                        'aria-label': 'search google maps' 
+                                    }} 
+                                />
+                                <IconButton 
+                                    type="button" 
+                                    sx={{ 
+                                        p: '10px' 
+                                    }} 
+                                    aria-label="search"
+                                >
+                                    <SearchIcon />
+                                </IconButton>
+                            </Paper>
+                        </Stack>
+                        {/* Contacts */}
+                        <Contacts
+                            contacts={activeTab === 'chats' ? chatUsers : contactUsers}
+                            activeTab={activeTab}
+                            setActiveTab={setActiveTab}
+                            setReceiver={setReceiver}
+                            menuDivWidth={menuDivWidth}
+                            user={user}
+                        />
+                    </Grid>
+                )}
                 <Grid 
                     item 
-                    xs={9} 
+                    xs={12} 
                     md={9} 
                     lg={10} 
                     sx={{ 
-                        height: '100vh' 
+                        height: '100vh', 
+                        display: { xs: receiver ? 'block' : 'none', md: 'block' } 
                     }}
                 >
-                    {!!receiver ?
+                    {!!receiver ? (
                         <>
+                            <Box 
+                                sx={{ 
+                                    display: { xs: 'flex', md: 'none' }, 
+                                    alignItems: 'center', 
+                                    p: 1, 
+                                    backgroundColor: 'neutral.800', 
+                                    color: 'white' 
+                                }}
+                            >
+                                <IconButton 
+                                    onClick={handleBackClick} 
+                                    sx={{ 
+                                        color: 'white' 
+                                    }}
+                                >
+                                    <ArrowBackIcon />
+                                </IconButton>
+                                {receiver.avatar ? (
+                                    <Avatar 
+                                        src={`${userImage}${receiver.slug}/${receiver.avatar}`} 
+                                        sx={{ 
+                                            ml: 2 
+                                        }} 
+                                    />
+                                ) : (
+                                    <Avatar 
+                                        sx={{ 
+                                            ml: 2 
+                                        }}
+                                    >
+                                        {getInitials(receiver.username)}
+                                    </Avatar>
+                                )}
+                                <Box 
+                                    sx={{ 
+                                        display: 'flex', 
+                                        flexDirection: 'column', 
+                                        ml: 2 
+                                    }}
+                                >
+                                    <Typography 
+                                        variant="h6"
+                                    >
+                                        {receiver.username}
+                                    </Typography>
+                                    <Typography 
+                                        variant="body2"
+                                    >
+                                        {receiver.isOnline ? "Online" : <div>Last seen at <ReactTimeAgo date={receiver.lastSeen || receiver.createdAt} locale="en-US" /></div>}
+                                    </Typography>
+                                </Box>
+                            </Box>
                             {/* Chats */}
                             <Chats
                                 receiver={receiver}
@@ -551,7 +612,7 @@ function Page() {
                                 sx={{ 
                                     position: 'absolute', 
                                     bottom: 2, 
-                                    minWidth: `calc(100% - ${menuDivWidth}px)`, 
+                                    width: { xs: '100%', md: `calc(100% - ${menuDivWidth}px)` }, 
                                     display: 'flex', 
                                     flexDirection: 'column', 
                                     alignItems: 'center' 
@@ -610,7 +671,8 @@ function Page() {
                                     <TextField 
                                         sx={{ 
                                             backgroundColor: 'white', 
-                                            justifyContent: 'flex-end' 
+                                            justifyContent: 'flex-end', 
+                                            width: '100%' // Ensure the TextField takes full width
                                         }} 
                                         fullWidth 
                                         multiline 
@@ -695,7 +757,7 @@ function Page() {
                                 </Box>
                             )}
                         </>
-                        :
+                    ) : (
                         <Box 
                             sx={{ 
                                 display: 'flex', 
@@ -721,7 +783,7 @@ function Page() {
                                 Let's live chat with your contacts
                             </Typography>
                         </Box>
-                    }
+                    )}
                 </Grid>
             </Grid>
             <Menu
