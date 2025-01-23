@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Avatar, Typography, Switch } from '@mui/material';
 import ReactTimeAgo from 'react-time-ago';
 import { userImage } from 'src/utils/util';
-import SettingsIcon from '@mui/icons-material/Settings';
+import DarkModeIcon from '@mui/icons-material/DarkMode'; // Import DarkMode icon
 
 const Chats = ({ receiver, pastMessages, messages, showMessage, chatDivRef, setOpenEmojis, darkMode, handleDarkModeToggle }) => {
     return (
@@ -48,7 +48,7 @@ const Chats = ({ receiver, pastMessages, messages, showMessage, chatDivRef, setO
                     </Box>
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <SettingsIcon sx={{ color: darkMode ? '#fff' : '#000' }} />
+                    <DarkModeIcon sx={{ color: darkMode ? '#fff' : '#000' }} /> {/* Use DarkMode icon */}
                     <Switch checked={darkMode} onChange={handleDarkModeToggle} />
                 </Box>
             </Box>

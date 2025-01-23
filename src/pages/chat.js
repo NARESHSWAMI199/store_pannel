@@ -700,7 +700,7 @@ function Page() {
                                     <TextField 
                                         sx={{ 
                                             backgroundColor: darkMode ? '#333' : '#fff', 
-                                            justifyContent: 'center'
+                                            justifyContent: 'center',
                                         }} 
                                         fullWidth 
                                         multiline 
@@ -732,7 +732,7 @@ function Page() {
                                                     />
                                                     <label htmlFor="icon-button-file">
                                                         <IconButton 
-                                                            color="primary" 
+                                                            color="inherit" // Change color to inherit
                                                             aria-label="upload picture" 
                                                             component="span"
                                                         >
@@ -760,7 +760,14 @@ function Page() {
                                                     '&.Mui-focused fieldset': {
                                                         borderColor: darkMode ? '#fff' : '#ccc', // Consistent border color
                                                     },
-                                                }
+                                                    '& input, & textarea': {
+                                                        color: darkMode ? '#fff' : '#000', // Text color
+                                                    },
+                                                    '& .MuiInputLabel-root': {
+                                                        color: darkMode ? '#fff' : '#000', // Label color
+                                                    }
+                                                },
+                                                color : darkMode ? 'white' : 'black'
                                             }
                                         }} 
                                     />

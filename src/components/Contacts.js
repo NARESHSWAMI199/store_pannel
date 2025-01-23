@@ -1,5 +1,6 @@
 import React from 'react';
-import { Box, Avatar, Typography, List, ListItem, ListItemAvatar, Button,ListItemText } from '@mui/material';
+import { Box, Avatar, Typography, List, ListItem, ListItemAvatar, Button, SvgIcon, ListItemText, Badge } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add'; // Correct import for AddIcon
 import { userImage } from 'src/utils/util';
 
 const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth, user }) => {
@@ -30,7 +31,13 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
                         }}
                     >
                         <ListItemAvatar>
-                            <Avatar src={`${userImage}${contact.slug}/${contact.avatar}`} />
+                            <Badge 
+                                color="secondary" 
+                                badgeContent={contact.chatNotification} 
+                                invisible={contact.chatNotification === 0}
+                            >
+                                <Avatar src={`${userImage}${contact.slug}/${contact.avatar}`} />
+                            </Badge>
                         </ListItemAvatar>
                         <ListItemText 
                             primary={contact.username} 
