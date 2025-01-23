@@ -5,7 +5,7 @@ import {
     Button,
     Grid, InputAdornment, Menu, MenuItem, MenuList, Stack,
     SvgIcon,
-    TextField, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Snackbar, IconButton
+    TextField, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Snackbar, IconButton, Switch, FormControlLabel
 } from '@mui/material';
 import { Client } from '@stomp/stompjs';
 import axios from 'axios';
@@ -40,6 +40,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import MuiAlert from '@mui/material/Alert';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import SettingsIcon from '@mui/icons-material/Settings';
 import { useRouter } from 'next/router';
 import ShowMessages from 'src/sections/chats-messages'
 import Contacts from 'src/components/Contacts';
@@ -58,6 +59,12 @@ const fetchUsername = async (slug, token) => {
     } catch (error) {
         console.error('Error fetching username:', error);
         return null;
+    }
+};
+
+const handleUnauthorizedResponse = (error, router) => {
+    if (error.response && error.response.status === 401) {
+        router.push('/auth/login');
     }
 };
 
@@ -92,6 +99,12 @@ function Page() {
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [showChatList, setShowChatList] = useState(true);
+    const [darkMode, setDarkMode] = useState(false);
+
+    useEffect(() => {
+        const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+        setDarkMode(savedDarkMode);
+    }, []);
 
     const handleScroll = () => {
         if (chatDivRef.current) {
@@ -157,7 +170,7 @@ function Page() {
 
     useEffect(() => {
         if (receiver) {
-            updateSeenMessages(receiver, setChatUsers, auth.token);
+            updateSeenMessages(receiver, setChatUsers, auth.token, router);
         }
     }, [receiver,newMessage]);
 
@@ -394,6 +407,7 @@ function Page() {
             setSnackbarMessage('Message was deleted');
             setSnackbarOpen(true);
         }).catch(err => {
+            handleUnauthorizedResponse(err, router);
             setSnackbarMessage('Error deleting message');
             setSnackbarOpen(true);
             setOpenDialog(false);
@@ -435,6 +449,7 @@ function Page() {
                 handleMenuOpen={handleMenuOpen}
                 isHovered={isHovered}
                 handleDownloadImage={handleDownloadImage}
+                darkMode={darkMode}
             />
         );
     };
@@ -461,13 +476,23 @@ function Page() {
         return initials.toUpperCase();
     };
 
+    const handleDarkModeToggle = () => {
+        setDarkMode(prevMode => {
+            const newMode = !prevMode;
+            localStorage.setItem('darkMode', newMode);
+            return newMode;
+        });
+    };
+
     return (
         <Box 
             sx={{ 
                 position: 'fixed', 
                 bottom: 0, 
                 left: 0, 
-                right: 0 
+                right: 0,
+                backgroundColor: darkMode ? '#333' : '#f5f5f5',
+                color: darkMode ? '#fff' : '#000'
             }}
         >
             <Grid container>
@@ -479,7 +504,7 @@ function Page() {
                         md={3} 
                         lg={2} 
                         sx={{ 
-                            backgroundColor: 'neutral.800', 
+                            backgroundColor: darkMode ? '#444' : 'neutral.800', 
                             color: 'white', 
                             height: '100vh', 
                             display: { xs: receiver ? 'none' : 'block', md: 'block' } 
@@ -498,7 +523,7 @@ function Page() {
                                     p: '2px 4px', 
                                     display: 'flex', 
                                     alignItems: 'center', 
-                                    backgroundColor: 'neutral.700' 
+                                    backgroundColor: darkMode ? '#555' : '#34495e' 
                                 }}
                             >
                                 <InputBase 
@@ -552,7 +577,7 @@ function Page() {
                                     display: { xs: 'flex', md: 'none' }, 
                                     alignItems: 'center', 
                                     p: 1, 
-                                    backgroundColor: 'neutral.800', 
+                                    backgroundColor: '#2c3e50', 
                                     color: 'white' 
                                 }}
                             >
@@ -593,9 +618,10 @@ function Page() {
                                         {receiver.username}
                                     </Typography>
                                     <Typography 
-                                        variant="body2"
+                                        variant="caption"
+                                        sx={{ fontSize: '0.8em' }}
                                     >
-                                        {receiver.isOnline ? "Online" : <div>Last seen at <ReactTimeAgo date={receiver.lastSeen || receiver.createdAt} locale="en-US" /></div>}
+                                        {receiver.isOnline ? "Online" : <div>Last seen at <ReactTimeAgo date={receiver.lastSeen || receiver.createdAt} locale="en-US" style={{ fontSize: '10px' }} /></div>}
                                     </Typography>
                                 </Box>
                             </Box>
@@ -607,6 +633,8 @@ function Page() {
                                 showMessage={showMessage}
                                 chatDivRef={chatDivRef}
                                 setOpenEmojis={setOpenEmojis}
+                                darkMode={darkMode}
+                                handleDarkModeToggle={handleDarkModeToggle}
                             />
                             <Box 
                                 sx={{ 
@@ -652,7 +680,8 @@ function Page() {
                                                     style={{ 
                                                         width: 100, 
                                                         height: 100, 
-                                                        objectFit: 'cover' 
+                                                        objectFit: 'cover', 
+                                                        borderRadius: '8px' 
                                                     }} 
                                                 />
                                                 <IconButton 
@@ -670,9 +699,8 @@ function Page() {
                                     </Box>
                                     <TextField 
                                         sx={{ 
-                                            backgroundColor: 'white', 
-                                            justifyContent: 'flex-end', 
-                                            width: '100%' // Ensure the TextField takes full width
+                                            backgroundColor: darkMode ? '#333' : '#fff', 
+                                            justifyContent: 'center'
                                         }} 
                                         fullWidth 
                                         multiline 
@@ -722,7 +750,17 @@ function Page() {
                                                     />
                                                 </InputAdornment>,
                                             sx: { 
-                                                borderRadius: 0 
+                                                '& .MuiOutlinedInput-root': {
+                                                    '& fieldset': {
+                                                        borderColor: darkMode ? '#fff' : '#ccc', // Consistent border color
+                                                    },
+                                                    '&:hover fieldset': {
+                                                        borderColor: darkMode ? '#fff' : '#ccc', // Consistent border color
+                                                    },
+                                                    '&.Mui-focused fieldset': {
+                                                        borderColor: darkMode ? '#fff' : '#ccc', // Consistent border color
+                                                    },
+                                                }
                                             }
                                         }} 
                                     />
@@ -969,6 +1007,7 @@ const fetchPastMessages = (receiver, setPastMessages,token,setMessages) => {
         })
         .catch(err => {
             console.log(err.message);
+            handleUnauthorizedResponse(err, router);
         });
 };
 
@@ -982,6 +1021,7 @@ const updateChatUsersStatus = (chatUsers, setChatUsers, token) => {
             })
             .catch(err => {
                 console.log(err.message);
+                handleUnauthorizedResponse(err, router);
             });
         return chatUser;
     }));
@@ -995,6 +1035,7 @@ const fetchContactUsers = (setContactUsers, token) => {
         })
         .catch(err => {
             alert(err.message);
+            handleUnauthorizedResponse(err, router);
         });
 };
 
@@ -1006,10 +1047,11 @@ const fetchChatUsers = (setChatUsers, token) => {
         })
         .catch(err => {
             alert(err.message);
+            handleUnauthorizedResponse(err, router);
         });
 };
 
-const updateSeenMessages = (receiver, setChatUsers, token) => {
+const updateSeenMessages = (receiver, setChatUsers, token, router) => {
     axios.defaults.headers = { Authorization: token };
     axios.post(`${host}/chat/seen`, { sender: receiver?.slug })
         .then(res => {
@@ -1022,6 +1064,7 @@ const updateSeenMessages = (receiver, setChatUsers, token) => {
         })
         .catch(err => {
             console.log(err);
+            handleUnauthorizedResponse(err, router);
         });
 };
 

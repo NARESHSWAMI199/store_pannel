@@ -5,8 +5,8 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { format } from 'date-fns';
 
-const ShowMessages = ({ message, user, receiver, handleMouseEnter, handleMouseLeave, handleMenuOpen, isHovered, handleDownloadImage }) => {
-    let time = format(message.createdAt || 0, "hh:mm");
+const ShowMessages = ({ message, user, receiver, handleMouseEnter, handleMouseLeave, handleMenuOpen, isHovered, handleDownloadImage, darkMode }) => {
+    let time = format(message.createdAt || 0, "hh:mm a");
     let justifyMessage = message.sender === user?.slug ? 'flex-end' : 'flex-start';
     let displayMessage = message.message;
 
@@ -37,25 +37,25 @@ const ShowMessages = ({ message, user, receiver, handleMouseEnter, handleMouseLe
         (message.sender === user?.slug && message.receiver === receiver?.slug) ||
         (message.sender === receiver?.slug && message.receiver === user?.slug)
     ) && (
-        <Box key={message.id} sx={{ display: 'flex' }}
+        <Box key={message.id} sx={{ display: 'flex', padding: '8px 16px' }}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
         >
             <Box sx={{ display: 'flex', justifyContent: justifyMessage, width: '100%' }}>
-                <Box sx={{ display: 'flex', maxWidth: '40%' }}>
+                <Box sx={{ display: 'flex', maxWidth: '60%' }}>
                     {/* Message block */}
-                    <Box sx={{ px: 1.5, py: 1, boxShadow: 2, background: '#f0f0f5', borderRadius: 2, mx: 1, my: 0.5, wordBreak: 'break-word' }}>
+                    <Box sx={{ px: 2, py: 1.5, boxShadow: 3, background: darkMode ? '#666' : '#e0e0e0', borderRadius: 3, mx: 1, my: 0.5, wordBreak: 'break-word' }}>
                         <Box sx={{ display: 'flex', flexDirection: message.imagesUrls?.length > 0 ? 'column' : 'row' }}>
                             {!shouldHideImages && message.imagesUrls && message.imagesUrls.map((url, imgIndex) => (
                                 <Box key={imgIndex} sx={{ position: 'relative', marginBottom: '8px' }}>
-                                    <img src={url} alt={`message-img-${imgIndex}`} style={{ width: '100%' }} />
+                                    <img src={url} alt={`message-img-${imgIndex}`} style={{ width: '100%', borderRadius: '8px' }} />
                                     <IconButton sx={{ position: 'absolute', top: 0, right: 0 }} onClick={() => handleDownloadImage(url)}>
                                         <OpenInNewIcon />
                                     </IconButton>
                                 </Box>
                             ))}
                             <Typography sx={{ mx: 1 }} dangerouslySetInnerHTML={{ __html: highlightText(displayMessage) }}></Typography>
-                            <Typography variant='small' sx={{ fontSize: 10, alignSelf: 'flex-end', mr: 1 }}>{time}</Typography>
+                            <Typography variant='caption' sx={{ fontSize: 10, alignSelf: 'flex-end', mr: 1 }}>{time}</Typography>
                             {message.sender === user?.slug &&
                                 <DoneAllTwoToneIcon sx={{ fontSize: 14, alignSelf: 'flex-end', color: message.seen ? '#0e6f87' : 'black' }} />
                             }
@@ -72,7 +72,7 @@ const ShowMessages = ({ message, user, receiver, handleMouseEnter, handleMouseLe
                     opacity: isHovered ? 1 : 0,
                     transition: 'opacity 0.3s ease-in-out',
                     fontSize: 18,
-                    color: 'black'
+                    color: darkMode ? '#fff' : 'black'
                 }} />
             </IconButton>
         </Box>

@@ -1,41 +1,55 @@
 import React from 'react';
-import { Box, Avatar, Typography } from '@mui/material';
+import { Box, Avatar, Typography, Switch } from '@mui/material';
 import ReactTimeAgo from 'react-time-ago';
 import { userImage } from 'src/utils/util';
+import SettingsIcon from '@mui/icons-material/Settings';
 
-const Chats = ({ receiver, pastMessages, messages, showMessage, chatDivRef, setOpenEmojis }) => {
+const Chats = ({ receiver, pastMessages, messages, showMessage, chatDivRef, setOpenEmojis, darkMode, handleDarkModeToggle }) => {
     return (
         <Box>
             <Box 
                 sx={{ 
                     display: { xs: 'none', md: 'flex' }, 
-                    background: '#f0f0f5', 
-                    minHeight: 65, 
-                    alignItems: 'center' 
+                    background: darkMode ? '#333' : '#f0f0f5', 
+                    height: 65, 
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    px: 2,
+                    borderRadius: '8px',
+                    margin: '8px 0',
+                    padding: '8px',
                 }}
             >
-                <Avatar 
-                    sx={{ 
-                        mx: 1 
-                    }} 
-                    src={`${userImage}${receiver?.slug}/${receiver?.avatar}`} 
-                />
-                <Box 
-                    sx={{ 
-                        display: 'flex', 
-                        flexDirection: 'column' 
-                    }}
-                >
-                    <Typography 
-                        variant='subtitle2'
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Avatar 
+                        sx={{ 
+                            mx: 1 
+                        }} 
+                        src={`${userImage}${receiver?.slug}/${receiver?.avatar}`} 
+                    />
+                    <Box 
+                        sx={{ 
+                            display: 'flex', 
+                            flexDirection: 'column' 
+                        }}
                     >
-                        {receiver?.username}
-                    </Typography>
-                    <Typography 
-                        variant='body2'
-                    >
-                        {receiver?.isOnline ? "Online" : <div>Last seen at <ReactTimeAgo date={receiver?.lastSeen || receiver?.createdAt} locale="en-US" /></div>}
-                    </Typography>
+                        <Typography 
+                            variant='subtitle2'
+                            sx={{ color: darkMode ? '#fff' : '#000' }}
+                        >
+                            {receiver?.username}
+                        </Typography>
+                        <Typography 
+                            variant='body2'
+                            sx={{ fontSize: '0.8em', color: darkMode ? '#ccc' : '#000' }}
+                        >
+                            {receiver?.isOnline ? "Online" : <div>Last seen at <ReactTimeAgo date={receiver?.lastSeen || receiver?.createdAt} locale="en-US" style={{ fontSize: '10px' }} /></div>}
+                        </Typography>
+                    </Box>
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <SettingsIcon sx={{ color: darkMode ? '#fff' : '#000' }} />
+                    <Switch checked={darkMode} onChange={handleDarkModeToggle} />
                 </Box>
             </Box>
             <Box 
@@ -49,7 +63,11 @@ const Chats = ({ receiver, pastMessages, messages, showMessage, chatDivRef, setO
                     height: '85.1vh', 
                     overflowY: 'scroll', 
                     msOverflowStyle: 'none', 
-                    scrollbarWidth: 'none' 
+                    scrollbarWidth: 'none',
+                    backgroundColor: darkMode ? '#444' : '#f0f0f5',
+                    color: darkMode ? '#fff' : '#000',
+                    borderRadius: '8px',
+                    padding: '8px',
                 }} 
                 onClick={() => setOpenEmojis(false)}
             >
@@ -66,13 +84,14 @@ const Chats = ({ receiver, pastMessages, messages, showMessage, chatDivRef, setO
                                 sx={{ 
                                     flex: 1, 
                                     height: '1px', 
-                                    backgroundColor: '#ccc' 
+                                    backgroundColor: darkMode ? '#666' : '#ccc' 
                                 }} 
                             />
                             <Typography 
                                 sx={{ 
                                     mx: 2, 
-                                    fontSize: 14 
+                                    fontSize: 14,
+                                    color: darkMode ? '#ccc' : '#000'
                                 }}
                             >
                                 {date}
@@ -81,7 +100,7 @@ const Chats = ({ receiver, pastMessages, messages, showMessage, chatDivRef, setO
                                 sx={{ 
                                     flex: 1, 
                                     height: '1px', 
-                                    backgroundColor: '#ccc' 
+                                    backgroundColor: darkMode ? '#666' : '#ccc' 
                                 }} 
                             />
                         </Box>
