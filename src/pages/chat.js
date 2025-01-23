@@ -356,13 +356,13 @@ function Page() {
                     });
                     return updatedPastMessages;
                 });
-            }else{ 
+            } else { 
                 setMessages(prevMessages => prevMessages.map(message => {
                     if (message.id === selectedMessage.id) {
                         return { 
                             ...message, 
                             isDeleted, 
-                            message: 'You deleted this message.', 
+                            message: 'Message was deleted', 
                             imagesUrls: [], 
                             isSenderDeleted: user?.slug === selectedMessage?.sender ? 'H' : message.isSenderDeleted, 
                             isReceiverDeleted: user?.slug !== selectedMessage?.sender ? 'H' : message.isReceiverDeleted 
@@ -377,7 +377,7 @@ function Page() {
                             if (message.id === selectedMessage.id) {
                                 return { 
                                     ...message, isDeleted, 
-                                    message: 'You deleted this message.', 
+                                    message: 'Message was deleted', 
                                     imagesUrls: [],
                                     isSenderDeleted: user?.slug === selectedMessage?.sender ? 'H' : message.isSenderDeleted, 
                                     isReceiverDeleted: user?.slug !== selectedMessage?.sender ? 'H' : message.isReceiverDeleted 
@@ -912,7 +912,7 @@ const createWebSocketClient = (user, setNewMessage, setMessages,setPastMessages,
             const deletedMessage = JSON.parse(data.body);
             setMessages(prevMessages => prevMessages.map(message => {
                 if (message.message === deletedMessage.message && message.createdAt === deletedMessage.createdAt) {
-                    return { ...message, isDeleted: 'Y', message: 'You deleted this message.' };
+                    return { ...message, isDeleted: 'Y', message: 'Message was deleted' };
                 }
                 return message;
             }));
@@ -921,7 +921,7 @@ const createWebSocketClient = (user, setNewMessage, setMessages,setPastMessages,
                 Object.keys(updatedPastMessages).forEach(date => {
                     updatedPastMessages[date] = updatedPastMessages[date].map(message => {
                         if (message.message === deletedMessage.message && message.createdAt === deletedMessage.createdAt) {
-                            return { ...message, isDeleted: 'Y', message: 'You deleted this message.' };
+                            return { ...message, isDeleted: 'Y', message: 'Message was deleted' };
                         }
                         return message;
                     });

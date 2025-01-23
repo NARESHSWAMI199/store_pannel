@@ -20,9 +20,9 @@ const ShowMessages = ({ message, user, receiver, handleMouseEnter, handleMouseLe
     if ((message.isSenderDeleted === 'H' && message.isReceiverDeleted === 'H')) {
         displayMessage = "This message was deleted.";
     } else if ((message.isSenderDeleted === 'H' && (message.isReceiverDeleted === 'N' || message.isReceiverDeleted === 'Y' )  && message.sender === user?.slug)) {
-        displayMessage = "You deleted this message.";
+        displayMessage = "Message was deleted";
     } else if (((message.isSenderDeleted === 'N' || message.isSenderDeleted === 'Y' ) && message.isReceiverDeleted === 'H' && message.receiver === user?.slug)) {
-        displayMessage = "You deleted this message.";
+        displayMessage = "Message was deleted";
     }
 
     const shouldHideImages = (message.isSenderDeleted === 'H' && message.sender === user?.slug) || 
