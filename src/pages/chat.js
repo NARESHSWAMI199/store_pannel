@@ -422,11 +422,14 @@ function Page() {
 
         return text
             .replace(emailRegex, '<span style="color: blue;">$1</span>')
-            .replace(urlRegex, '<span style="color: blue;">$1</span>')
+            .replace(urlRegex, (url) => `${url}`)
             .replace(usernameRegex, '<span style="color: blue;">$&</span>');
     };
 
     const showMessage = (message, index) => {
+        if (message.isSenderDeleted === 'Y' || message.isReceiverDeleted === 'Y') {
+            return null;
+        }
         return (
             <ShowMessages
                 key={index}

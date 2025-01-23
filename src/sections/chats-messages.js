@@ -28,6 +28,11 @@ const ShowMessages = ({ message, user, receiver, handleMouseEnter, handleMouseLe
     const shouldHideImages = (message.isSenderDeleted === 'H' && message.sender === user?.slug) || 
                              (message.isReceiverDeleted === 'H' && message.receiver === user?.slug);
 
+    const highlightText = (text) => {
+        const urlRegex = /(https?:\/\/[^\s]+)/gi;
+        return text.replace(urlRegex, (url) => `<a href="${url}" style="color: blue;" target="_blank">${url}</a>`);
+    };
+
     return (
         (message.sender === user?.slug && message.receiver === receiver?.slug) ||
         (message.sender === receiver?.slug && message.receiver === user?.slug)
@@ -39,7 +44,7 @@ const ShowMessages = ({ message, user, receiver, handleMouseEnter, handleMouseLe
             <Box sx={{ display: 'flex', justifyContent: justifyMessage, width: '100%' }}>
                 <Box sx={{ display: 'flex', maxWidth: '40%' }}>
                     {/* Message block */}
-                    <Box sx={{ px: 1.5, py: 1, boxShadow: 2, background: '#f0f0f5', borderRadius: 2, mx: 1, my: 0.5 }}>
+                    <Box sx={{ px: 1.5, py: 1, boxShadow: 2, background: '#f0f0f5', borderRadius: 2, mx: 1, my: 0.5, wordBreak: 'break-word' }}>
                         <Box sx={{ display: 'flex', flexDirection: message.imagesUrls?.length > 0 ? 'column' : 'row' }}>
                             {!shouldHideImages && message.imagesUrls && message.imagesUrls.map((url, imgIndex) => (
                                 <Box key={imgIndex} sx={{ position: 'relative', marginBottom: '8px' }}>
@@ -49,7 +54,7 @@ const ShowMessages = ({ message, user, receiver, handleMouseEnter, handleMouseLe
                                     </IconButton>
                                 </Box>
                             ))}
-                            <Typography sx={{ mx: 1 }}>{displayMessage}</Typography>
+                            <Typography sx={{ mx: 1 }} dangerouslySetInnerHTML={{ __html: highlightText(displayMessage) }}></Typography>
                             <Typography variant='small' sx={{ fontSize: 10, alignSelf: 'flex-end', mr: 1 }}>{time}</Typography>
                             {message.sender === user?.slug &&
                                 <DoneAllTwoToneIcon sx={{ fontSize: 14, alignSelf: 'flex-end', color: message.seen ? '#0e6f87' : 'black' }} />
