@@ -362,7 +362,14 @@ function Page() {
             }else{ 
                 setMessages(prevMessages => prevMessages.map(message => {
                     if (message.id === selectedMessage.id) {
-                        return { ...message, isDeleted, message: 'You deleted this message.', imagesUrls: [] }; // Hide images after delete action
+                        return { 
+                            ...message, 
+                            isDeleted, 
+                            message: 'You deleted this message.', 
+                            imagesUrls: [], 
+                            isSenderDeleted: user?.slug === selectedMessage?.sender ? 'H' : message.isSenderDeleted, 
+                            isReceiverDeleted: user?.slug !== selectedMessage?.sender ? 'H' : message.isReceiverDeleted 
+                        };
                     }
                     return message;
                 }));
@@ -371,7 +378,13 @@ function Page() {
                     Object.keys(updatedPastMessages).forEach(date => {
                         updatedPastMessages[date] = updatedPastMessages[date].map(message => {
                             if (message.id === selectedMessage.id) {
-                                return { ...message, isDeleted, message: 'You deleted this message.', imagesUrls: [] }; // Hide images after delete action
+                                return { 
+                                    ...message, isDeleted, 
+                                    message: 'You deleted this message.', 
+                                    imagesUrls: [],
+                                    isSenderDeleted: user?.slug === selectedMessage?.sender ? 'H' : message.isSenderDeleted, 
+                                    isReceiverDeleted: user?.slug !== selectedMessage?.sender ? 'H' : message.isReceiverDeleted 
+                                };
                             }
                             return message;
                         });
