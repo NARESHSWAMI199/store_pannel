@@ -100,6 +100,7 @@ function Page() {
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [showChatList, setShowChatList] = useState(true);
     const [darkMode, setDarkMode] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
         const savedDarkMode = localStorage.getItem('darkMode') === 'true';
@@ -484,6 +485,18 @@ function Page() {
         });
     };
 
+    const handleSearchChange = (event) => {
+        setSearchQuery(event.target.value);
+    };
+
+    const filteredContacts = contactUsers.filter(contact => 
+        contact.username.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    const filteredChats = chatUsers.filter(chat => 
+        chat.username.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     return (
         <Box 
             sx={{ 
@@ -535,8 +548,10 @@ function Page() {
                                     }} 
                                     placeholder="Search Contacts" 
                                     inputProps={{ 
-                                        'aria-label': 'search google maps' 
+                                        'aria-label': 'search contacts' 
                                     }} 
+                                    value={searchQuery}
+                                    onChange={handleSearchChange}
                                 />
                                 <IconButton 
                                     type="button" 
@@ -551,7 +566,7 @@ function Page() {
                         </Stack>
                         {/* Contacts */}
                         <Contacts
-                            contacts={activeTab === 'chats' ? chatUsers : contactUsers}
+                            contacts={activeTab === 'chats' ? filteredChats : filteredContacts}
                             activeTab={activeTab}
                             setActiveTab={setActiveTab}
                             setReceiver={setReceiver}
