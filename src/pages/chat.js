@@ -514,8 +514,8 @@ function Page() {
                         ref={menuDivRef} 
                         item 
                         xs={12} 
-                        md={3} 
-                        lg={2} 
+                        md={4} 
+                        lg={2.5} 
                         sx={{ 
                             backgroundColor: darkMode ? '#444' : 'neutral.800', 
                             color: 'white', 
@@ -578,8 +578,8 @@ function Page() {
                 <Grid 
                     item 
                     xs={12} 
-                    md={9} 
-                    lg={10} 
+                    md={8} 
+                    lg={9.5} 
                     sx={{ 
                         height: '100vh', 
                         display: { xs: receiver ? 'block' : 'none', md: 'block' } 
