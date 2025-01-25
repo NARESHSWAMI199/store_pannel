@@ -572,6 +572,7 @@ function Page() {
                             setReceiver={setReceiver}
                             menuDivWidth={menuDivWidth}
                             user={user}
+                            darkMode={darkMode}
                         />
                     </Grid>
                 )}
@@ -892,27 +893,26 @@ function Page() {
                 onClose={() => setOpenDialog(false)}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
+                PaperProps={{
+                    sx: {
+                        backgroundColor: darkMode ? '#333' : '#fff',
+                        color: darkMode ? '#fff' : '#000',
+                    }
+                }}
             >
-                <DialogTitle id="alert-dialog-title">
+                <DialogTitle id="alert-dialog-title" sx={{ backgroundColor: darkMode ? '#333' : '#fff', color: darkMode ? '#fff' : '#000' }}>
                     {"Confirm Deletion"}
                 </DialogTitle>
-                <DialogContent>
+                <DialogContent sx={{ backgroundColor: darkMode ? '#333' : '#fff', color: darkMode ? '#fff' : '#000' }}>
                     <DialogContentText id="alert-dialog-description">
                         Are you sure you want to delete this message?
                     </DialogContentText>
                 </DialogContent>
-                <DialogActions>
-                    <Button 
-                        onClick={() => setOpenDialog(false)} 
-                        color="primary"
-                    >
+                <DialogActions sx={{ backgroundColor: darkMode ? '#333' : '#fff', color: darkMode ? '#fff' : '#000' }}>
+                    <Button onClick={() => setOpenDialog(false)} sx={{ color: darkMode ? '#fff' : '#000' }}>
                         Cancel
                     </Button>
-                    <Button 
-                        onClick={()=>confirmDelete(setMessages)} 
-                        color="primary" 
-                        autoFocus
-                    >
+                    <Button onClick={()=>confirmDelete(setMessages)} sx={{ color: darkMode ? '#fff' : '#000' }} autoFocus>
                         Confirm
                     </Button>
                 </DialogActions>

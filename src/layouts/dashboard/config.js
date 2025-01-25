@@ -10,6 +10,8 @@ import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import StoreIcon from '@mui/icons-material/Store';
 import { SvgIcon } from '@mui/material';
 import WallpaperIcon from '@mui/icons-material/Wallpaper';
+import ChatIcon from '@mui/icons-material/Chat';
+
 export const items = (user) =>{
 
   return [
@@ -117,6 +119,17 @@ export const items = (user) =>{
       icon: (
         <SvgIcon fontSize="small">
           <BlockIcon />
+        </SvgIcon>
+      )
+    },
+  
+    {
+      title: 'Chats',
+      path: '/chat',
+      show: true,
+      icon: (
+        <SvgIcon fontSize="small">
+          <ChatIcon />
         </SvgIcon>
       )
     },
