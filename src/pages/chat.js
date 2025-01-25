@@ -145,7 +145,7 @@ function Page() {
 
     useEffect(() => {
         if (receiver) {
-            fetchPastMessages(receiver, setPastMessages,auth.token,setMessages);
+            fetchPastMessages(receiver, setPastMessages,auth.token,setMessages,router);
         }
     }, [receiver]);
 
@@ -1020,7 +1020,7 @@ const subscribeToSeenMessages = (client, user, setMessages) => {
     });
 };
 
-const fetchPastMessages = (receiver, setPastMessages,token,setMessages) => {
+const fetchPastMessages = (receiver, setPastMessages,token,setMessages,router) => {
     axios.defaults.headers = { Authorization: token };
     axios.post(`${host}/chats/all`, { receiver: receiver.slug })
         .then(res => {
