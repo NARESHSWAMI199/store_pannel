@@ -223,11 +223,16 @@ export const ItemsTable = (props) => {
                         spacing={2}
                       >      
                  
-                    {!!item.avtar ? <Image src={itemImage+item.slug+"/"+item.avtars?.split(',')[0]} style={{borderRadius : "50%" , width:"50px", height : "50px" }}/>  : 
-                        <Avatar src={itemImage+item.slug+"/"+item.avtars?.split(',')[0]} >
-                          {getInitials(item.name)}
-                        </Avatar>
-                        }
+                    {!!item.avtar ? 
+                      <Image 
+                        src={itemImage+item.slug+"/"+item.avtars?.split(',')[0]} 
+                        style={{borderRadius : "50%" , width:"50px", height : "50px" }}
+                      />  
+                      : 
+                      <Avatar src={itemImage+item.slug+"/"+item.avtars?.split(',')[0]} >
+                        {getInitials(item.name)}
+                      </Avatar>
+                    }
                    
                       <Typography variant="subtitle2">
                       {toTitleCase(item.name)}
@@ -239,16 +244,34 @@ export const ItemsTable = (props) => {
        
                     <TableCell sx={{color:'text.secondary'}}>
                      <span style={{color:'green'}}>{item.slug} </span> 
-                      {!!item.isCopied && item.isCopied && isCopied ? <Badge color="primary"  badgeContent="copied" style={{marginBottom:'35px'}} /> : <></>}
+                      {!!item.isCopied && item.isCopied && isCopied ? 
+                        <Badge 
+                          color="primary"  
+                          badgeContent="copied" 
+                          style={{marginBottom:'35px'}} 
+                        /> 
+                        : <></>}
                       <CopyOutlined onClick={() => { handleCopyClick(item.slug) }} />
                     </TableCell>
 
                     <TableCell align='center'>
-                        {item.label === "O" && <Badge color="error" badgeContent={'Old'} />}
-                        {item.label === "N" && <Badge color="success" badgeContent={'New'} />}
+                        {item.label === "O" && 
+                          <Badge 
+                            color="error" 
+                            badgeContent={'Old'} 
+                          />}
+                        {item.label === "N" && 
+                          <Badge 
+                            color="success" 
+                            badgeContent={'New'} 
+                          />}
                     </TableCell>
                     <TableCell>
-                        <Rating name="read-only" value={item.rating} readOnly />
+                        <Rating 
+                          name="read-only" 
+                          value={item.rating} 
+                          readOnly 
+                        />
                     </TableCell>
 
                     <TableCell>
@@ -288,30 +311,30 @@ export const ItemsTable = (props) => {
 
                     
                     <TableCell>
-                     {item.inStock !== 'Y' ? <CancelIcon sx={ {
-                        marginX : '2px',
-                        color : 'Red'
-                        
-                        } }  titleAccess='In stock' onClick={(e)=> {
+                     {item.inStock !== 'Y' ? 
+                      <CancelIcon 
+                        sx={{ marginX : '2px', color : 'Red' }}  
+                        titleAccess='In stock' 
+                        onClick={(e)=> {
                           setMessage("We are going to add the item in stock.")
                           setSlug(item.slug)
                           setStatus('Y')
                           setAction('stock')
                           confirmBox()
-                        }} />
-
+                        }} 
+                      />
                       : 
-                      <CheckCircleIcon sx={ {
-                        marginX : '2px',
-                        color : 'Green'
-                        
-                        } } titleAccess='Out of stock' onClick={(e)=> {
+                      <CheckCircleIcon 
+                        sx={{ marginX : '2px', color : 'Green' }} 
+                        titleAccess='Out of stock' 
+                        onClick={(e)=> {
                           setMessage("We are going to remove item from the stock.")
                           setSlug(item.slug)
                           setStatus('N')
                           setAction('stock')
                           confirmBox()
-                        }} />
+                        }} 
+                      />
                       }
                     </TableCell>
 
@@ -323,45 +346,41 @@ export const ItemsTable = (props) => {
                                         
 
                     <Link
-                            href={{
-                              pathname: '/items/comments/[slug]',
-                              query: { slug: item.slug },
-                            }}
-                          >
-                              <VisibilityIcon sx = {{
-                                  marginX : '5px',
-                                  color : '#111927'
-                            }}
-                            titleAccess='Edit'
-                            />   
-                      </Link>
+                      href={{
+                        pathname: '/items/comments/[slug]',
+                        query: { slug: item.slug },
+                      }}
+                    >
+                      <VisibilityIcon 
+                        sx={{ marginX : '5px', color : '#111927' }}
+                        titleAccess='Edit'
+                      />   
+                    </Link>
 
 
 
                       <Link
-                            href={{
-                              pathname: '/items/update/[slug]',
-                              query: { slug: item.slug },
-                            }}
-                          >
-                              <EditIcon sx = {{
-                                  marginX : '5px',
-                                  color : '#111927'
-                            }}
-                            titleAccess='Edit'
-                            />   
+                        href={{
+                          pathname: '/items/update/[slug]',
+                          query: { slug: item.slug },
+                        }}
+                      >
+                        <EditIcon 
+                          sx={{ marginX : '5px', color : '#111927' }}
+                          titleAccess='Edit'
+                        />   
                       </Link>
-                      <DeleteIcon sx={ {
-                        marginX : '5px',
-                        color : 'Red'
-                        
-                        } }  titleAccess='delete' onClick={(e)=>{
+                      <DeleteIcon 
+                        sx={{ marginX : '5px', color : 'Red' }}  
+                        titleAccess='delete' 
+                        onClick={(e)=>{
                           setSlug(item.slug)
                           setRowIndex(index)
                           setMessage("We are going to delete this item if you agree press agree otherwise press disagree.")
                           setAction("delete")
                           confirmBox()
-                          }} />
+                        }} 
+                      />
                     </TableCell>
                   </TableRow>
 
@@ -397,10 +416,16 @@ export const ItemsTable = (props) => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button autoFocus onClick={handleClose}>
+          <Button 
+            autoFocus 
+            onClick={handleClose}
+          >
             Disagree
           </Button>
-          <Button onClick={()=>takeAction(action)} autoFocus>
+          <Button 
+            onClick={()=>takeAction(action)} 
+            autoFocus
+          >
             Agree
           </Button>
         </DialogActions>

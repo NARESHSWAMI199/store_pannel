@@ -41,10 +41,12 @@ export const AccountPopover = (props) => {
       PaperProps={{ sx: { width: 200 } }}
     >
       <Typography     
-      sx={{
+        sx={{
           py: 1.5,
           px: 2
-        }} variant="overline">
+        }} 
+        variant="overline"
+      >
         Account
       </Typography>
       <Box
@@ -62,13 +64,16 @@ export const AccountPopover = (props) => {
           }}
         >
           <AccountCircleOutlinedIcon />
-          <Link style={{
-            textDecoration:'none',
-            color:'black',
-            marginLeft : 5
-          }} href={{
-            pathname : "/account"
-          }}> 
+          <Link 
+            style={{
+              textDecoration: 'none',
+              color: 'black',
+              marginLeft: 5
+            }} 
+            href={{
+              pathname: "/account"
+            }}
+          > 
           {!!user.username ? (user.username).toUpperCase() : ""}
           </Link>
         </Typography>
@@ -89,14 +94,16 @@ export const AccountPopover = (props) => {
           }}
         >
           <AccountBalanceWalletOutlinedIcon/>
-          <Link style={{
-            textDecoration:'none',
-            color:'black',
-            marginLeft : 5
-          }} 
+          <Link 
+            style={{
+              textDecoration: 'none',
+              color: 'black',
+              marginLeft: 5
+            }} 
             href={{
-            pathname : "/plans"
-          }}> 
+              pathname: "/plans"
+            }}
+          > 
               My Plans
           </Link>
 

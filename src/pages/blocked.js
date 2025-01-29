@@ -53,9 +53,9 @@ const Page = () => {
         status : "D"
     })
 
-    useEffect(()=>{
-        setData((previous)=>({...data , storeId : wholesale?.id}))
-    },[])
+    useEffect(() => {
+        setData((previous) => ({ ...previous, storeId: wholesale?.id }));
+    }, [wholesale?.id]);
     
 
 
@@ -157,7 +157,11 @@ const Page = () => {
                 onClose={handleClose}
                 key={'top' + 'right'}
             >
-                <Alert onClose={handleClose} severity={flag} sx={{ width: '100%' }}>
+                <Alert 
+                    onClose={handleClose} 
+                    severity={flag} 
+                    sx={{ width: '100%' }}
+                >
                     {message}
                 </Alert>
             </Snackbar>
@@ -227,7 +231,10 @@ const Page = () => {
 
                         
                     
-                        <BasicSearch onSearch={onSearch} type="item" />
+                        <BasicSearch 
+                            onSearch={onSearch} 
+                            type="item" 
+                        />
                         <BlockedItems
                             count={totalElements}
                             items={items}

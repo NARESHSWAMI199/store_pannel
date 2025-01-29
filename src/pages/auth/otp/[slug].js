@@ -17,9 +17,9 @@ const router = useRouter();
 const { slug } = router.query;
 
 
-const handleClose = useCallback(()=>{
-  setOpen(false)
-},[])
+const handleClose = useCallback(() => {
+  setOpen(false);
+}, []);
 
 const validateOtp = async (e) => {
     e.preventDefault();
@@ -65,29 +65,41 @@ const sendOtp = ()=>{
         }}>
 
 
-        <Grid md={3.6} xs={12} sx={{
-            background : 'white',
-            borderRadius : 2,
-            px : 3,
-            py : 3,
-            boxShadow : 1,
-            justifyContent : 'center',
-            alignItems : 'center',
-        }}> 
+        <Grid
+          md={3.6}
+          xs={12}
+          sx={{
+            background: 'white',
+            borderRadius: 2,
+            px: 3,
+            py: 3,
+            boxShadow: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        > 
 
-              <Grid item xs={12} md={12}>
+              <Grid
+                item
+                xs={12}
+                md={12}
+              >
                 <Stack sx={{my : 1}}>
                 <Typography variant="h6" color="text.secondary">
                     Validate OTP
                 </Typography>
                 </Stack>
              </Grid>
-             <form onSubmit={(e) => validateOtp(e)} style={{ width : '100%',
-                 display : 'flex',
-                  justifyContent : 'center',
-                  alignItems : 'center',
-                  flexDirection : 'column'
-              }}>
+             <form
+               onSubmit={(e) => validateOtp(e)}
+               style={{
+                 width: '100%',
+                 display: 'flex',
+                 justifyContent: 'center',
+                 alignItems: 'center',
+                 flexDirection: 'column'
+               }}
+             >
               {/* <Grid item md={12} xs={12}  sx={{}}> */}
                   <TextField                    
                           fullWidth
@@ -111,18 +123,26 @@ const sendOtp = ()=>{
                 width : '100%',
                 alignItems : 'center'
               }}>
-                <Button variant='text' onClick={sendOtp}  color='primary' sx={{}}> 
-                    Resend otp ?
+                <Button
+                  variant='text'
+                  onClick={sendOtp}
+                  color='primary'
+                  sx={{}}
+                > 
+                  Resend otp ?
                 </Button>
                 </Box>
-                  <Button variant='contained' type='submit' color='primary' sx={{height : 55,width: '100%'}}> 
+                  <Button
+                    variant='contained'
+                    type='submit'
+                    color='primary'
+                    sx={{height: 55, width: '100%'}}
+                  > 
                               Validate OTP    
                   </Button>
               {/* </Grid> */}
             </form>
        
-       
-        
         </Grid>
         
 
@@ -131,7 +151,11 @@ const sendOtp = ()=>{
                     onClose={handleClose}
                     key={'bottom' + 'left'}
                 >
-                <Alert onClose={handleClose} severity={flag} sx={{ width: '100%' }}>
+                <Alert
+                  onClose={handleClose}
+                  severity={flag}
+                  sx={{ width: '100%' }}
+                >
                     {message}
                 </Alert>
             </Snackbar>

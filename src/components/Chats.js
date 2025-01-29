@@ -43,7 +43,16 @@ const Chats = ({ receiver, pastMessages, messages, showMessage, chatDivRef, setO
                             variant='body2'
                             sx={{ fontSize: '0.8em', color: darkMode ? '#ccc' : '#000' }}
                         >
-                            {receiver?.isOnline ? "Online" : <div>Last seen at <ReactTimeAgo date={receiver?.lastSeen || receiver?.createdAt} locale="en-US" style={{ fontSize: '10px' }} /></div>}
+                            {receiver?.isOnline ? "Online" : (
+                                <div>
+                                    Last seen at 
+                                    <ReactTimeAgo 
+                                        date={receiver?.lastSeen || receiver?.createdAt} 
+                                        locale="en-US" 
+                                        style={{ fontSize: '10px' }} 
+                                    />
+                                </div>
+                            )}
                         </Typography>
                     </Box>
                 </Box>

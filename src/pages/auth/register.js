@@ -90,7 +90,10 @@ const Register = () => {
           alignItems : 'center',
           display : 'flex'
       }}>
-        <Grid md={5} xs={12}  sx={{
+        <Grid
+          md={5}
+          xs={12}
+          sx={{
             background : 'white',
             borderRadius : 2,
             px : 3,
@@ -108,7 +111,7 @@ const Register = () => {
           sx={{ my: 2 }}
         >
           <Typography variant="h4">
-            Don't have any account ?
+            {"Don't have any account ?"}
           </Typography>
           <Typography
             color="text.secondary"

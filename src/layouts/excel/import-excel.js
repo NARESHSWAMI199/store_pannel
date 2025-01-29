@@ -60,7 +60,10 @@ export default function DialogFormForExcelImport({importExcelSheet}) {
         aria-labelledby="customized-dialog-title"
         open={open}
       >
-        <DialogTitle sx={{ m: 0, p: 2}} id="customized-dialog-title">
+        <DialogTitle
+          sx={{ m: 0, p: 2}}
+          id="customized-dialog-title"
+        >
             Import Items
         </DialogTitle>
         <IconButton
@@ -76,10 +79,20 @@ export default function DialogFormForExcelImport({importExcelSheet}) {
           <CloseIcon />
         </IconButton>
         <DialogContent dividers>
-        <form encType='multipart' onSubmit={ (e) => importExcelSheetSubmit(e)}>
+        <form
+          encType='multipart'
+          onSubmit={ (e) => importExcelSheetSubmit(e)}
+        >
           <label htmlFor="file" >Import Excel</label>
-          <input type='file' name="excelfile" id="file"></input>
-          <Button type="primary" htmltype="submit">
+          <input
+            type='file'
+            name="excelfile"
+            id="file"
+          ></input>
+          <Button
+            type="primary"
+            htmltype="submit"
+          >
             UPLOAD EXCEL
         </Button>
         </form>

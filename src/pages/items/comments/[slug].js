@@ -138,8 +138,9 @@ useEffect( ()=>{
                       height : 400,
                       background : '#303030'
                     }}>
-                      {!!item.avtars && item.avtars.split(',').map(avtar =>{
+                      {!!item.avtars && item.avtars.split(',').map((avtar,index) =>{
                        return (<Image
+                            key={index}
                             width ={376}
                             height={'auto'}
                             max-width='300px'

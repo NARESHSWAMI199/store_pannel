@@ -143,14 +143,16 @@ function Pricing() {
                                             <Box sx={{my:1}}>
                                                 <Typography variant='h6'>Advanced Features</Typography>                                    
                                                 <Box sx={{ml : 2}}>
-                                                    {[1,2,3,4,5,6].map(i =>{
+                                                    {[1,2,3,4,5,6].map((i,index) =>{
                                                         return (
                                                             <Box sx={{
                                                                     my : 1,
                                                                     display : 'flex',
                                                                     alignItems : 'center',
                                                                     textAlign : 'center'
-                                                                }}>
+                                                                }}
+                                                                key={index}
+                                                                >
                                                                 <CheckCircleOutline sx={{color : 'green',mr : 1}}/>
                                                                 <Typography variant='p'>
                                                                     Al Reply/Compose

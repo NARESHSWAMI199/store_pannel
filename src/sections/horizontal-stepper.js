@@ -105,13 +105,14 @@ export default function HorizontalLinearStepper(props) {
     getAppBarHeight(); 
 
     const resizeObserver = new ResizeObserver(getAppBarHeight);
-    if (appBarRef.current) {
-      resizeObserver.observe(appBarRef.current);
+    const appBarNode = appBarRef.current;
+    if (appBarNode) {
+      resizeObserver.observe(appBarNode);
     }
 
     return () => {
-      if (appBarRef.current) {
-        resizeObserver.unobserve(appBarRef.current);
+      if (appBarNode) {
+        resizeObserver.unobserve(appBarNode);
       }
     };
   }, []);
@@ -174,14 +175,17 @@ export default function HorizontalLinearStepper(props) {
             minHeight : 'calc(100% - '+(appBarHeight+10)+'px)'
         }}>
 
-        <Grid md={5} xs={12} 
-            sx={{
-                background : 'white',
-                marginTop : (appBarHeight+10)+'px',
-                borderRadius : 2,
-                px : 5,
-                py : 3
-            }}>
+        <Grid 
+          md={5} 
+          xs={12} 
+          sx={{
+            background : 'white',
+            marginTop : (appBarHeight+10)+'px',
+            borderRadius : 2,
+            px : 5,
+            py : 3
+          }}
+        >
             <Stepper activeStep={activeStep}>
                 {steps.map((label, index) => {
                 const stepProps = {};
@@ -195,8 +199,11 @@ export default function HorizontalLinearStepper(props) {
                     stepProps.completed = false;
                 }
                 return (
-                    <Step key={label} {...stepProps}>
-                    <StepLabel {...labelProps}>{label}</StepLabel>
+                    <Step 
+                      key={label} 
+                      {...stepProps}
+                    >
+                      <StepLabel {...labelProps}>{label}</StepLabel>
                     </Step>
                 );
                 })}
@@ -213,14 +220,24 @@ export default function HorizontalLinearStepper(props) {
                     >
                     Back
                     </Button>
-                    <Box sx={{ flex: '1 1 auto' }}  variant="contained" />
+                    <Box 
+                      sx={{ flex: '1 1 auto' }}  
+                      variant="contained" 
+                    />
                     {isStepOptional(activeStep) && (
-                    <Button color="inherit" onClick={handleSkip} sx={{ mr: 1 }}>
-                        Skip
+                    <Button 
+                      color="inherit" 
+                      onClick={handleSkip} 
+                      sx={{ mr: 1 }}
+                    >
+                      Skip
                     </Button>
                     )}
                     {activeStep !== steps.length &&
-                        <Button onClick={handleNext} variant='contained' >
+                        <Button 
+                          onClick={handleNext} 
+                          variant='contained'
+                        >
                         {activeStep === steps.length -1  ? 'Go for payment' : 'Save & Next'}
                         </Button>
                     }

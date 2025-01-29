@@ -83,20 +83,32 @@ export function OptionMenu(props) {
         open={open}
         onClose={handleClose}
       >
-        <MenuItem onClick={handleClose} disableRipple>
+        <MenuItem
+          onClick={handleClose}
+          disableRipple
+        >
           <EditIcon />
           Edit
         </MenuItem>
-        <MenuItem onClick={handleClose} disableRipple>
+        <MenuItem
+          onClick={handleClose}
+          disableRipple
+        >
           <FileCopyIcon />
           Duplicate
         </MenuItem>
         <Divider sx={{ my: 0.5 }} />
-        <MenuItem onClick={handleClose} disableRipple>
+        <MenuItem
+          onClick={handleClose}
+          disableRipple
+        >
           <ArchiveIcon />
           Archive
         </MenuItem>
-        <MenuItem onClick={handleClose} disableRipple>
+        <MenuItem
+          onClick={handleClose}
+          disableRipple
+        >
           <MoreHorizIcon />
           More
         </MenuItem>

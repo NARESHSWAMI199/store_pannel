@@ -77,7 +77,7 @@ const auth = useAuth()
                     fontFamily : 'serif'
                 }}
             > 
-                Hey ! It's time to switch online.
+                {"Hey ! It's time to switch online."}
             </Typography>
             <Link 
                 href={{

@@ -213,8 +213,12 @@ export const CustomersTable = (props) => {
                         spacing={2}
                       >      
               
-                      { !!customer.avatar ? <Image  style={{borderRadius : '50%', height : '50px', width : '50px'}} src={userImage+customer.slug+"/"+customer.avatar}/> :
-
+                      { !!customer.avatar ? 
+                        <Image  
+                          style={{borderRadius : '50%', height : '50px', width : '50px'}} 
+                          src={userImage+customer.slug+"/"+customer.avatar} 
+                        /> 
+                        :
                         <Avatar src={userImage+customer.avatar} >
                           {getInitials(customer.username)}
                         </Avatar>
@@ -227,7 +231,10 @@ export const CustomersTable = (props) => {
                           }}
                           style={{textDecoration : 'none'}}
                         >
-                        <Typography variant="subtitle2" sx={{color : "text.primary"}} >
+                        <Typography 
+                          variant="subtitle2" 
+                          sx={{color : "text.primary"}}
+                        >
                           {toTitleCase(customer.username)}
                         </Typography>
                         </Link>
@@ -242,20 +249,34 @@ export const CustomersTable = (props) => {
 
 
                     <TableCell align='center'>
-                        {customer.userType === "R" && <Badge color="error" badgeContent={'Retailer'} />}
-                        {customer.userType === "SA" && <Badge color='warning' badgeContent={'Admin'} />}
+                        {customer.userType === "R" && 
+                          <Badge 
+                            color="error" 
+                            badgeContent={'Retailer'} 
+                          />}
+                        {customer.userType === "SA" && 
+                          <Badge 
+                            color='warning' 
+                            badgeContent={'Admin'} 
+                          />}
                         {customer.userType === "W" && 
                           <Link
-                                href={{
-                                  pathname: '/store/[userSlug]',
-                                  query: { userSlug: customer.slug },
-                                }}
-                              >
-                        <Badge color="info" badgeContent={'Wholesaler'} />
-                        </Link>
+                            href={{
+                              pathname: '/store/[userSlug]',
+                              query: { userSlug: customer.slug },
+                            }}
+                          >
+                            <Badge 
+                              color="info" 
+                              badgeContent={'Wholesaler'} 
+                            />
+                          </Link>
                         }
-                        
-                        {customer.userType === "S" && <Badge color="primary" badgeContent={'Staff'} />}
+                        {customer.userType === "S" && 
+                          <Badge 
+                            color="primary" 
+                            badgeContent={'Staff'} 
+                          />}
                     </TableCell>
                     <TableCell>
                       {customer.email}
@@ -270,30 +291,30 @@ export const CustomersTable = (props) => {
 
                     <TableCell>
                       {/* {setStatus(customer.status)} */}
-                     {customer.status !== 'A' ? <CancelIcon sx={ {
-                        marginX : '2px',
-                        color : 'Red'
-                        
-                        } }  titleAccess='activate' onClick={(e)=> {
+                     {customer.status !== 'A' ? 
+                      <CancelIcon 
+                        sx={{ marginX : '2px', color : 'Red' }}  
+                        titleAccess='activate' 
+                        onClick={(e)=> {
                           setMessage("We are going to activate this user.")
                           setSlug(customer.slug)
                           setStatus('A')
                           setAction('status')
                           confirmBox()
-                        }} />
-
+                        }} 
+                      />
                       : 
-                      <CheckCircleIcon sx={ {
-                        marginX : '2px',
-                        color : 'Green'
-                        
-                        } } titleAccess='deactivate' onClick={(e)=> {
+                      <CheckCircleIcon 
+                        sx={{ marginX : '2px', color : 'Green' }} 
+                        titleAccess='deactivate' 
+                        onClick={(e)=> {
                           setMessage("We are going to deactivate this user.")
                           setSlug(customer.slug)
                           setStatus('D')
                           setAction('status')
                           confirmBox()
-                        }} />
+                        }} 
+                      />
                       }
                     </TableCell>
 
@@ -304,29 +325,27 @@ export const CustomersTable = (props) => {
                     <TableCell>
                                         
                       <Link
-                            href={{
-                              pathname: '/account/[slug]',
-                              query: { slug: customer.slug },
-                            }}
-                          >
-                              <EditIcon sx = {{
-                                  marginX : '5px',
-                                  color : '#111927'
-                            }}
-                            titleAccess='Edit'
-                            />   
+                        href={{
+                          pathname: '/account/[slug]',
+                          query: { slug: customer.slug },
+                        }}
+                      >
+                        <EditIcon 
+                          sx={{ marginX : '5px', color : '#111927' }}
+                          titleAccess='Edit'
+                        />   
                       </Link>
-                      <DeleteIcon sx={ {
-                        marginX : '5px',
-                        color : 'Red'
-                        
-                        } }  titleAccess='delete' onClick={(e)=>{
+                      <DeleteIcon 
+                        sx={{ marginX : '5px', color : 'Red' }}  
+                        titleAccess='delete' 
+                        onClick={(e)=>{
                           setSlug(customer.slug)
                           setRowIndex(index)
                           setMessage("We are going to delete this user if user type is wholesaler then user's store will also delete. if you agree press agree otherwise press disagree.")
                           setAction("delete")
                           confirmBox()
-                          }} />
+                        }} 
+                      />
                     </TableCell>
                   </TableRow>
 
@@ -363,10 +382,16 @@ export const CustomersTable = (props) => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button autoFocus onClick={handleClose}>
+          <Button 
+            autoFocus 
+            onClick={handleClose}
+          >
             Disagree
           </Button>
-          <Button onClick={()=>takeAction(action)} autoFocus>
+          <Button 
+            onClick={()=>takeAction(action)} 
+            autoFocus
+          >
             Agree
           </Button>
         </DialogActions>

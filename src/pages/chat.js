@@ -145,7 +145,7 @@ function Page() {
 
     useEffect(() => {
         if (receiver) {
-            fetchPastMessages(receiver, setPastMessages,auth.token,setMessages,router);
+            fetchPastMessages(receiver, setPastMessages, auth.token, setMessages, router);
         }
     }, [receiver]);
 
@@ -155,28 +155,28 @@ function Page() {
 
     useEffect(() => {
         const intervalId = setInterval(() => {
-            updateChatUsersStatus(chatUsers, setChatUsers, auth.token);
+            updateChatUsersStatus(chatUsers, setChatUsers, auth.token,router);
         }, 10000);
 
         return () => clearInterval(intervalId);
     }, [chatUsers]);
 
     useEffect(() => {
-        fetchContactUsers(setContactUsers, auth.token);
+        fetchContactUsers(setContactUsers, auth.token,router);
     }, []);
 
     useEffect(() => {
-        fetchChatUsers(setChatUsers, auth.token);
+        fetchChatUsers(setChatUsers, auth.token,router);
     }, []);
 
     useEffect(() => {
         if (receiver) {
             updateSeenMessages(receiver, setChatUsers, auth.token, router);
         }
-    }, [receiver,newMessage]);
+    }, [receiver, newMessage]);
 
     useEffect(() => {
-        const listener = event => {
+        const listener = (event) => {
             if ((event.code === "Enter" || event.code === "NumpadEnter") && !event.shiftKey) {
                 handleSendMessage(auth.token);
                 event.preventDefault();
@@ -198,16 +198,17 @@ function Page() {
         getAppBarHeight();
 
         const resizeObserver = new ResizeObserver(getAppBarHeight);
-        if (menuDivRef.current) {
-            resizeObserver.observe(menuDivRef.current);
+        const menuDiv = menuDivRef.current;
+        if (menuDiv) {
+            resizeObserver.observe(menuDiv);
         }
 
         return () => {
-            if (menuDivRef.current) {
-                resizeObserver.unobserve(menuDivRef.current);
+            if (menuDiv) {
+                resizeObserver.unobserve(menuDiv);
             }
         };
-    }, []);
+    }, [menuDivRef]);
 
     useEffect(() => {
         const sound = new Howl({
@@ -341,7 +342,7 @@ function Page() {
         setOpenDialog(true);
     };
 
-    const confirmDelete = async () => {
+    const confirmDelete = async (setMessages,router) => {
         let isDeleted;
         if (selectedMessage?.isSenderDeleted === 'H' && selectedMessage?.sender === user?.slug) {
             isDeleted = 'SY'; // if sender delete temporary delete message
@@ -748,7 +749,7 @@ function Page() {
                                                     />
                                                     <label htmlFor="icon-button-file">
                                                         <IconButton 
-                                                            color="inherit" // Change color to inherit
+                                                            color="inherit" 
                                                             aria-label="upload picture" 
                                                             component="span"
                                                         >
@@ -768,19 +769,19 @@ function Page() {
                                             sx: { 
                                                 '& .MuiOutlinedInput-root': {
                                                     '& fieldset': {
-                                                        borderColor: darkMode ? '#fff' : '#ccc', // Consistent border color
+                                                        borderColor: darkMode ? '#fff' : '#ccc', 
                                                     },
                                                     '&:hover fieldset': {
-                                                        borderColor: darkMode ? '#fff' : '#ccc', // Consistent border color
+                                                        borderColor: darkMode ? '#fff' : '#ccc', 
                                                     },
                                                     '&.Mui-focused fieldset': {
-                                                        borderColor: darkMode ? '#fff' : '#ccc', // Consistent border color
+                                                        borderColor: darkMode ? '#fff' : '#ccc', 
                                                     },
                                                     '& input, & textarea': {
-                                                        color: darkMode ? '#fff' : '#000', // Text color
+                                                        color: darkMode ? '#fff' : '#000', 
                                                     },
                                                     '& .MuiInputLabel-root': {
-                                                        color: darkMode ? '#fff' : '#000', // Label color
+                                                        color: darkMode ? '#fff' : '#000', 
                                                     }
                                                 },
                                                 color : darkMode ? 'white' : 'black'
@@ -841,7 +842,7 @@ function Page() {
                                 color={"#6c757d"} 
                                 fontFamily={"sans-serif"}
                             >
-                                Let's live chat with your contacts
+                                {"Let's live chat with your contacts"}
                             </Typography>
                         </Box>
                     )}
@@ -912,7 +913,7 @@ function Page() {
                     <Button onClick={() => setOpenDialog(false)} sx={{ color: darkMode ? '#fff' : '#000' }}>
                         Cancel
                     </Button>
-                    <Button onClick={()=>confirmDelete(setMessages)} sx={{ color: darkMode ? '#fff' : '#000' }} autoFocus>
+                    <Button onClick={()=>confirmDelete(setMessages,router)} sx={{ color: darkMode ? '#fff' : '#000' }} autoFocus>
                         Confirm
                     </Button>
                 </DialogActions>
@@ -1028,12 +1029,11 @@ const fetchPastMessages = (receiver, setPastMessages,token,setMessages,router) =
             setMessages([])
         })
         .catch(err => {
-            console.log(err.message);
             handleUnauthorizedResponse(err, router);
         });
 };
 
-const updateChatUsersStatus = (chatUsers, setChatUsers, token) => {
+const updateChatUsersStatus = (chatUsers, setChatUsers, token,router) => {
     axios.defaults.headers = { Authorization: token };
     setChatUsers(prevUsers => prevUsers.map(chatUser => {
         axios.get(`${host}/chat/status/${chatUser.slug}`)
@@ -1042,33 +1042,30 @@ const updateChatUsersStatus = (chatUsers, setChatUsers, token) => {
                 chatUser.isOnline = user.slug === chatUser.slug ? user.isOnline : false;
             })
             .catch(err => {
-                console.log(err.message);
                 handleUnauthorizedResponse(err, router);
             });
         return chatUser;
     }));
 };
 
-const fetchContactUsers = (setContactUsers, token) => {
+const fetchContactUsers = (setContactUsers, token,router) => {
     axios.defaults.headers = { Authorization: token };
     axios.get(`${host}/contacts/all`)
         .then(res => {
             setContactUsers(res.data);
         })
         .catch(err => {
-            alert(err.message);
             handleUnauthorizedResponse(err, router);
         });
 };
 
-const fetchChatUsers = (setChatUsers, token) => {
+const fetchChatUsers = (setChatUsers, token,router) => {
     axios.defaults.headers = { Authorization: token };
     axios.get(`${host}/chat-users/all`)
         .then(res => {
             setChatUsers(res.data);
         })
         .catch(err => {
-            alert(err.message);
             handleUnauthorizedResponse(err, router);
         });
 };

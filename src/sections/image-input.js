@@ -64,7 +64,12 @@ const ImageInput = (props) => {
   );
   return (
     <>
-       <ImgCrop showGrid rotationSlider aspectSlider showReset>
+       <ImgCrop 
+         showGrid 
+         rotationSlider 
+         aspectSlider 
+         showReset
+       >
       <Upload
         //action={props.action}
         listType="picture-circle"

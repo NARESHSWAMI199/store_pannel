@@ -94,7 +94,10 @@ export const SettingsPassword = (props) => {
         <Divider />
         
         <CardActions sx={{ justifyContent: 'flex-end' }}>
-          <Button type='submit' variant="contained">
+          <Button 
+            type='submit' 
+            variant="contained"
+          >
             Update
           </Button>
         </CardActions>

@@ -38,48 +38,42 @@ const auth = useAuth()
 const user = auth.user
 const router = useRouter();
 
-useEffect(()=>{
+useEffect(() => {
   axios.defaults.headers = {
-    Authorization : auth.token
-  }
-  axios.get(host+"/wholesale/plan/is-active")
-  .then(res => {
-    let planIsActive = res.data.planIsActive;
-    if(planIsActive){
-      console.log(planIsActive)
-    }else{
-        router.push("/plans")
-    }
-  }).catch(err=>{
-    console.log(err)
-  })
-
-},[])
-
-
-
+    Authorization: auth.token
+  };
+  axios.get(host + "/wholesale/plan/is-active")
+    .then(res => {
+      let planIsActive = res.data.planIsActive;
+      if (planIsActive) {
+        console.log(planIsActive);
+      } else {
+        router.push("/plans");
+      }
+    }).catch(err => {
+      console.log(err);
+    });
+}, []);
 
 // Getting All Stores 
-useEffect( ()=>{
-    const getData = async () => {
-      axios.defaults.headers = {
-        Authorization : auth.token
-      }
-      await axios.post(host+"/wholesale/item/all",{storeId : auth.store?.id})
+useEffect(() => {
+  const getData = async () => {
+    axios.defaults.headers = {
+      Authorization: auth.token
+    };
+    await axios.post(host + "/wholesale/item/all", { storeId: auth.store?.id })
       .then(res => {
-          const data = res.data.content;
-          setItems(data);
+        const data = res.data.content;
+        setItems(data);
       })
       .catch(err => {
-        console.log(err)
-      } )
-    }
-    if(!!auth.store){
-      getData();
-    }
-
-
-  },[])
+        console.log(err);
+      });
+  };
+  if (!!auth.store) {
+    getData();
+  }
+}, []);
 
   // Get current year store count
   useEffect(() => {
@@ -131,20 +125,20 @@ useEffect( ()=>{
 
 
 // Get all basics counts 
-  useEffect( ()=>{
+  useEffect(() => {
     const getData = async () => {
       axios.defaults.headers = {
-        Authorization : auth.token
-      }
-      await axios.get(host +"/wholesale/dashboard/counts")
-      .then(res => {
+        Authorization: auth.token
+      };
+      await axios.get(host + "/wholesale/dashboard/counts")
+        .then(res => {
           const data = res.data;
-          setDashboardData(data)
-      })
-      .catch(err => {
-        console.log(err)
-      } )
-    }
+          setDashboardData(data);
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    };
     getData();
 
   },[])

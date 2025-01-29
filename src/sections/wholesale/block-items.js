@@ -212,11 +212,16 @@ export const BlockedItems = (props) => {
                         spacing={2}
                       >      
                  
-                    {!!item.avtar ? <Image src={itemImage+item.slug+"/"+item.avtars?.split(',')[0]} style={{borderRadius : "50%" , width:"50px", height : "50px" }}/>  : 
-                        <Avatar src={itemImage+item.slug+"/"+item.avtars?.split(',')[0]} >
-                          {getInitials(item.name)}
-                        </Avatar>
-                        }
+                    {!!item.avtar ? 
+                      <Image 
+                        src={itemImage+item.slug+"/"+item.avtars?.split(',')[0]} 
+                        style={{borderRadius : "50%" , width:"50px", height : "50px" }}
+                      />  
+                      : 
+                      <Avatar src={itemImage+item.slug+"/"+item.avtars?.split(',')[0]} >
+                        {getInitials(item.name)}
+                      </Avatar>
+                    }
                    
                       <Typography variant="subtitle2">
                       {toTitleCase(item.name)}
@@ -228,16 +233,34 @@ export const BlockedItems = (props) => {
        
                     <TableCell sx={{color:'text.secondary'}}>
                      <span style={{color:'green'}}>{item.slug} </span> 
-                      {!!item.isCopied && item.isCopied && isCopied ? <Badge color="primary"  badgeContent="copied" style={{marginBottom:'35px'}} /> : <></>}
+                      {!!item.isCopied && item.isCopied && isCopied ? 
+                        <Badge 
+                          color="primary"  
+                          badgeContent="copied" 
+                          style={{marginBottom:'35px'}} 
+                        /> 
+                        : <></>}
                       <CopyOutlined onClick={() => { handleCopyClick(item.slug) }} />
                     </TableCell>
 
                     <TableCell align='center'>
-                        {item.label === "O" && <Badge color="error" badgeContent={'Old'} />}
-                        {item.label === "N" && <Badge color="success" badgeContent={'New'} />}
+                        {item.label === "O" && 
+                          <Badge 
+                            color="error" 
+                            badgeContent={'Old'} 
+                          />}
+                        {item.label === "N" && 
+                          <Badge 
+                            color="success" 
+                            badgeContent={'New'} 
+                          />}
                     </TableCell>
                     <TableCell>
-                        <Rating name="read-only" value={item.rating} readOnly />
+                        <Rating 
+                          name="read-only" 
+                          value={item.rating} 
+                          readOnly 
+                        />
                     </TableCell>
 
                     <TableCell>
@@ -277,18 +300,16 @@ export const BlockedItems = (props) => {
 
                     
                     <TableCell>
-                     {item.inStock !== 'Y' ? <CancelIcon sx={ {
-                        marginX : '2px',
-                        color : 'Red'
-                        
-                        } }  titleAccess='In stock'  />
-
+                     {item.inStock !== 'Y' ? 
+                      <CancelIcon 
+                        sx={{ marginX : '2px', color : 'Red' }}  
+                        titleAccess='In stock' 
+                      />
                       : 
-                      <CheckCircleIcon sx={ {
-                        marginX : '2px',
-                        color : 'Green'
-                        
-                        } } titleAccess='Out of stock' />
+                      <CheckCircleIcon 
+                        sx={{ marginX : '2px', color : 'Green' }} 
+                        titleAccess='Out of stock' 
+                      />
                       }
                     </TableCell>
 
@@ -300,31 +321,26 @@ export const BlockedItems = (props) => {
                                         
 
                     <Link
-                            href={{
-                              pathname: '/items/comments/[slug]',
-                              query: { slug: item.slug },
-                            }}
-                          >
-                              <VisibilityIcon sx = {{
-                                  marginX : '5px',
-                                  color : '#111927'
-                            }}
-                            titleAccess='Edit'
-                            />   
-                      </Link>
-
-                      <EditIcon sx = {{
-                              marginX : '5px',
-                              color : '#111927'
-                        }}
+                      href={{
+                        pathname: '/items/comments/[slug]',
+                        query: { slug: item.slug },
+                      }}
+                    >
+                      <VisibilityIcon 
+                        sx={{ marginX : '5px', color : '#111927' }}
                         titleAccess='Edit'
-                        />   
+                      />   
+                    </Link>
+
+                      <EditIcon 
+                        sx={{ marginX : '5px', color : '#111927' }}
+                        titleAccess='Edit'
+                      />   
                      
-                      <DeleteIcon sx={ {
-                        marginX : '5px',
-                        color : 'Red'
-                        
-                        } }  titleAccess='delete'  />
+                      <DeleteIcon 
+                        sx={{ marginX : '5px', color : 'Red' }}  
+                        titleAccess='delete' 
+                      />
                     </TableCell>
                   </TableRow>
 
@@ -360,10 +376,16 @@ export const BlockedItems = (props) => {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button autoFocus onClick={handleClose}>
+          <Button 
+            autoFocus 
+            onClick={handleClose}
+          >
             Disagree
           </Button>
-          <Button onClick={()=>takeAction(action)} autoFocus>
+          <Button 
+            onClick={()=>takeAction(action)} 
+            autoFocus
+          >
             Agree
           </Button>
         </DialogActions>

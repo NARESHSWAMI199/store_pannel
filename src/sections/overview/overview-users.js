@@ -34,7 +34,7 @@ export const OverviewBox = (props) => {
     }else{
       setTag('primary.main')
     }
-  },[tag])
+  },[title])
 
 
  

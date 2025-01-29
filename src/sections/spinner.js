@@ -9,7 +9,16 @@ const Spinner = (props) => {
         console.log(props.show)
         setShow(props.show)
     },[props.show])
-    return <Spin size='large' style={{display : show ,marginTop : 200,marginBottom : 200}} />;
+    return (
+        <Spin 
+            size='large' 
+            style={{
+                display : show,
+                marginTop : 200,
+                marginBottom : 200
+            }} 
+        />
+    );
 }
 
 export default Spinner;

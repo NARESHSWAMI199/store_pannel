@@ -110,7 +110,7 @@ function Plans() {
                 color : '#6c757d!important',
                 fontSize :14,
               }}>
-                {recentPlan.servicePlan?.months} month's plan
+                {recentPlan.servicePlan?.months + " month's plan"}
               </span>
             </Typography>
           {recentPlan.createdAt > recentPlan.expiryDate ?

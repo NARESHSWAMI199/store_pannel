@@ -35,7 +35,11 @@ function UserStatus({receiver,client}) {
             {online ? 
                 "Online" :
                 <div>
-                    Last seen at <ReactTimeAgo date={!!receiver?.lastSeen ? receiver?.lastSeen : receiver?.createdAt} locale="en-US"/>
+                    Last seen at 
+                    <ReactTimeAgo 
+                        date={!!receiver?.lastSeen ? receiver?.lastSeen : receiver?.createdAt} 
+                        locale="en-US"
+                    />
                 </div>
             }
         </>

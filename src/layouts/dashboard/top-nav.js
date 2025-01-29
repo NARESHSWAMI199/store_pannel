@@ -169,9 +169,15 @@ const viewMore = () =>{
               </IconButton>
             </Tooltip>
             <Tooltip title="Notifications">
-            <DrawerRight onClose={onClose} open={open}  >
-                <AlignItemsList viewMore={viewMore} itemList={notifications} />
-                </DrawerRight>
+            <DrawerRight 
+              onClose={onClose} 
+              open={open}
+            >
+              <AlignItemsList 
+                viewMore={viewMore} 
+                itemList={notifications} 
+              />
+            </DrawerRight>
               <IconButton onClick={showLoading}>
               {/* {contextHolder} */}
                 <Badge

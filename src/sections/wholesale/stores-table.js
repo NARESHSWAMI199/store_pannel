@@ -43,7 +43,6 @@ export const StoresCard = (props) => {
     setStore(props.store)
     setStatus(store.status)
     setSlug(store.slug)
-    console.log(store)
   },[props])
 
   const updateStatus = (slug,status) => {
@@ -204,18 +203,29 @@ export const StoresCard = (props) => {
 
         
         { status !== 'A' ?
-        <Button  type='primary' variant="outlined" icon={<CheckCircleOutlined />} style={{background:'#5cb85c'}} onClick={(e)=> {
-                          setMessage("We are going to activate this store.")
-                          updateStatus(store.slug,"A")
-
-                        }} >
+        <Button  
+          type='primary' 
+          variant="outlined" 
+          icon={<CheckCircleOutlined />} 
+          style={{background:'#5cb85c'}} 
+          onClick={(e)=> {
+            setMessage("We are going to activate this store.")
+            updateStatus(store.slug,"A")
+          }} 
+        >
             Active
         </Button>
         :
-        <Button  type='primary' variant="outlined" icon={<CheckCircleOutlined />} onClick={(e)=> {
-                          setMessage("We are going to deactivate this store.")
-                          updateStatus(store.slug,"D")
-                        }} style={{background:'#ffc107', color : "black"}}>
+        <Button  
+          type='primary' 
+          variant="outlined" 
+          icon={<CheckCircleOutlined />} 
+          onClick={(e)=> {
+            setMessage("We are going to deactivate this store.")
+            updateStatus(store.slug,"D")
+          }} 
+          style={{background:'#ffc107', color : "black"}}
+        >
             Deactive
         </Button>
       } 
@@ -225,17 +235,26 @@ export const StoresCard = (props) => {
               query: { slug: store.slug },
             }}
           >
-          <Button type='primary'  style= {{marginTop : '5px',width:'110px'}}  icon={<EditFilled />} primary>
+          <Button 
+            type='primary'  
+            style= {{marginTop : '5px',width:'110px'}}  
+            icon={<EditFilled />} 
+            primary
+          >
               Edit
           </Button>
         </Link>
-        <Button type="primary" variant="outlined" style= {{marginTop : '5px'}} icon={<DeleteFilled />} danger 
+        <Button 
+          type="primary" 
+          variant="outlined" 
+          style= {{marginTop : '5px'}} 
+          icon={<DeleteFilled />} 
+          danger 
           onClick={(e) =>{
             setSlug(store.slug)
             setMessage(`Are you sure you want delete store ${store.name}`)
             confirmBox()
           }}
-
         >
             Delete
         </Button>
@@ -248,7 +267,7 @@ export const StoresCard = (props) => {
       open={confrim}
       onClose={handleClose}
       aria-labelledby="responsive-dialog-title"
-      >
+    >
       <DialogTitle id="responsive-dialog-title">
         {"Are you sure ?"}
       </DialogTitle>
@@ -258,10 +277,16 @@ export const StoresCard = (props) => {
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button autoFocus onClick={handleClose}>
+        <Button 
+          autoFocus 
+          onClick={handleClose}
+        >
           Disagree
         </Button>
-        <Button onClick={()=>takeAction()} autoFocus>
+        <Button 
+          onClick={()=>takeAction()} 
+          autoFocus
+        >
           Agree
         </Button>
       </DialogActions>
@@ -270,12 +295,17 @@ export const StoresCard = (props) => {
 
 
 
-    <Snackbar anchorOrigin={{ vertical : 'top', horizontal : 'right' }}
-        open={open}
-        onClose={handleClose}
-        key={'top' + 'right'}
-      >
-     <Alert onClose={handleClose} severity={flag} sx={{ width: '100%' }}>
+    <Snackbar 
+      anchorOrigin={{ vertical : 'top', horizontal : 'right' }}
+      open={open}
+      onClose={handleClose}
+      key={'top' + 'right'}
+    >
+     <Alert 
+       onClose={handleClose} 
+       severity={flag} 
+       sx={{ width: '100%' }}
+     >
         {message}
     </Alert>
     </Snackbar>

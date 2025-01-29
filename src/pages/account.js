@@ -70,7 +70,11 @@ const Page = () => {
         onClose={handleClose}
         key={'top' + 'right'}
       >
-     <Alert onClose={handleClose} severity={flag} sx={{ width: '100%' }}>
+     <Alert
+        onClose={handleClose}
+        severity={flag}
+        sx={{ width: '100%' }}
+     >
         {message}
     </Alert>
     </Snackbar>
@@ -110,7 +114,11 @@ const Page = () => {
                   md={6}
                   lg={8}
                 >
-                  <AccountProfileDetails user={content} updateProfile={updateProfile} userType ="W"/>
+                  <AccountProfileDetails
+                    user={content}
+                    updateProfile={updateProfile}
+                    userType="W"
+                  />
                 </Grid>
               </Grid>
             </div>

@@ -145,13 +145,14 @@ const Page = (props) => {
     getAppBarHeight();
 
     const resizeObserver = new ResizeObserver(getAppBarHeight);
-    if (appBarRef.current) {
-      resizeObserver.observe(appBarRef.current);
+    const currentAppBarRef = appBarRef.current;
+    if (currentAppBarRef) {
+      resizeObserver.observe(currentAppBarRef);
     }
 
     return () => {
-      if (appBarRef.current) {
-        resizeObserver.unobserve(appBarRef.current);
+      if (currentAppBarRef) {
+        resizeObserver.unobserve(currentAppBarRef);
       }
     };
   }, []);
@@ -193,7 +194,7 @@ const Page = (props) => {
                 color="text.secondary"
                 variant="body2"
               >
-                Don't have any account?
+                {"Don't have any account ?"}
                 &nbsp;
                 <Link
                   component={NextLink}

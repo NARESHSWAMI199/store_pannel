@@ -1,4 +1,3 @@
-
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import Divider from '@mui/material/Divider';
@@ -34,7 +33,10 @@ export default function AlignItemsList(props) {
       alignItems="flex-start"
       sx={{m:0}} >
         <ListItemAvatar>
-          <Avatar alt={toTitleCase(sendBy.username)} src={userImage+sendBy.slug+"/"+sendBy.avatar} />
+          <Avatar 
+            alt={toTitleCase(sendBy.username)} 
+            src={userImage+sendBy.slug+"/"+sendBy.avatar} 
+          />
         </ListItemAvatar>
         
         <ListItemText
@@ -59,22 +61,41 @@ export default function AlignItemsList(props) {
                 variant="body4"
                 sx={{ color: 'text.secondary',fontSize : '12px',float:'left', mt : 1}}
               >
-            <Moment interval={1000} fromNow>
-            {item.createAt}
-          </Moment>
+                <Moment 
+                  interval={1000} 
+                  fromNow
+                >
+                  {item.createAt}
+                </Moment>
               </Typography>
 
-              <Button id={"readMore"+i} sx={{float:'right'}} variant='outlined' size='small' onClick={(e)=>{
+              <Button 
+                id={"readMore"+i} 
+                sx={{float:'right'}} 
+                variant='outlined' 
+                size='small' 
+                onClick={(e)=>{
                   document.getElementById("messageBody"+i).innerText =  " ~ " + item.messageBody
                   document.getElementById("readMore"+i).style.display = "none"
                   document.getElementById("readLess"+i).style.display = "block"
-                }} > Read more</Button>
+                }} 
+              > 
+                Read more
+              </Button>
 
-                <Button id={"readLess"+i} sx={{float:'right', display:'none'}} variant='outlined' size='small' onClick={(e)=>{
-                  document.getElementById("messageBody"+i).innerText = " ~ " + item.messageBody.substring(0,40)+".."
-                  document.getElementById("readLess"+i).style.display = "none"
-                  document.getElementById("readMore"+i).style.display = "block"
-                }} > Read less</Button>
+                <Button 
+                  id={"readLess"+i} 
+                  sx={{float:'right', display:'none'}} 
+                  variant='outlined' 
+                  size='small' 
+                  onClick={(e)=>{
+                    document.getElementById("messageBody"+i).innerText = " ~ " + item.messageBody.substring(0,40)+".."
+                    document.getElementById("readLess"+i).style.display = "none"
+                    document.getElementById("readMore"+i).style.display = "block"
+                  }} 
+                > 
+                  Read less
+                </Button>
               </>
               : " ~ " +item.messageBody}
             </Fragment>
@@ -87,7 +108,14 @@ export default function AlignItemsList(props) {
       </>)
     })}
     </List>
-      <Button onClick={e=>viewMore()} color='primary' sx={{float:'right'}} variant='outline'>View More</Button>
+      <Button 
+        onClick={e=>viewMore()} 
+        color='primary' 
+        sx={{float:'right'}} 
+        variant='outline'
+      >
+        View More
+      </Button>
     </>
   );
 }

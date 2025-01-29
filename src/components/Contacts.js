@@ -43,10 +43,20 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
     return (
         <Box>
             <Box sx={{ display: 'flex', mx: 2 }}>
-                <Button variant='outlined' color='inherit' onClick={() => setActiveTab("chats")} sx={{ border: activeTab === 'chats' ? 1 : 0, flex: 1 }}>
+                <Button 
+                    variant='outlined' 
+                    color='inherit' 
+                    onClick={() => setActiveTab("chats")} 
+                    sx={{ border: activeTab === 'chats' ? 1 : 0, flex: 1 }}
+                >
                     Chats
                 </Button>
-                <Button variant='outlined' color='inherit' onClick={() => setActiveTab("contacts")} sx={{ border: activeTab === 'contacts' ? 1 : 0, flex: 1 }}>
+                <Button 
+                    variant='outlined' 
+                    color='inherit' 
+                    onClick={() => setActiveTab("contacts")} 
+                    sx={{ border: activeTab === 'contacts' ? 1 : 0, flex: 1 }}
+                >
                     Contacts
                 </Button>
             </Box>
@@ -83,7 +93,13 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
                 ))}
             </List>
             {activeTab === 'contacts' &&
-                <Button color='inherit' size='large' sx={{ m: 2 }} startIcon={<SvgIcon><AddIcon /></SvgIcon>} onClick={() => setOpenDialog(true)}>
+                <Button 
+                    color='inherit' 
+                    size='large' 
+                    sx={{ m: 2 }} 
+                    startIcon={<SvgIcon><AddIcon /></SvgIcon>} 
+                    onClick={() => setOpenDialog(true)}
+                >
                     Add new contact
                 </Button>
             }
@@ -134,7 +150,8 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
                     />
                     <List>
                         {filteredUsers.map((user, index) => (
-                            <ListItem key={index} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <ListItem key={index} 
+                                sx={{ display: 'flex', justifyContent: 'space-between' }}>
                                 <ListItemAvatar>
                                     <Avatar src={`${userImage}${user.slug}/${user.avatar}`} />
                                 </ListItemAvatar>
@@ -174,7 +191,10 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
                     </List>
                 </DialogContent>
                 <DialogActions sx={{ backgroundColor: darkMode ? '#333' : '#fff', color: darkMode ? '#fff' : '#000' }}>
-                    <Button onClick={() => setOpenDialog(false)} sx={{ color: darkMode ? '#fff' : '#000' }}>
+                    <Button 
+                        onClick={() => setOpenDialog(false)} 
+                        sx={{ color: darkMode ? '#fff' : '#000' }}
+                    >
                         Cancel
                     </Button>
                 </DialogActions>
