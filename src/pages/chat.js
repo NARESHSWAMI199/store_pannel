@@ -46,6 +46,7 @@ import ShowMessages from 'src/sections/chats-messages'
 import Contacts from 'src/components/Contacts';
 import Chats from 'src/components/Chats';
 
+
 TimeAgo.addLocale(en);
 TimeAgo.addLocale(ru);
 
@@ -1063,7 +1064,11 @@ const fetchChatUsers = (setChatUsers, token,router) => {
     axios.defaults.headers = { Authorization: token };
     axios.get(`${host}/chat-users/all`)
         .then(res => {
-            setChatUsers(res.data);
+            let response = res.data;
+            setChatUsers([...response.map(item => {
+                item.chatUser.accept = item.status
+                return item.chatUser
+            })]);
         })
         .catch(err => {
             handleUnauthorizedResponse(err, router);

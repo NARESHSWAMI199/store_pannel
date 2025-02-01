@@ -1,10 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, Avatar, Typography } from '@mui/material';
 import ReactTimeAgo from 'react-time-ago';
 import { userImage } from 'src/utils/util';
 import DarkModeIcon from '@mui/icons-material/DarkMode'; // Import DarkMode icon
+import Accept from 'src/components/Accept'
 
-const Chats = ({ receiver, pastMessages, messages, showMessage, chatDivRef, setOpenEmojis, darkMode, handleDarkModeToggle }) => {
+const Chats = (props) => {
+
+    const {receiver, pastMessages, messages, showMessage, chatDivRef, setOpenEmojis, darkMode, handleDarkModeToggle} = props
+    const [accept,setAccept] = useState(receiver.accept)
+
+    const onChangeStatus = (status) =>{
+        setAccept(status)
+    }    
+
     return (
         <Box>
             <Box 
@@ -25,7 +34,7 @@ const Chats = ({ receiver, pastMessages, messages, showMessage, chatDivRef, setO
                         sx={{ 
                             mx: 1 
                         }} 
-                        src={`${userImage}${receiver?.slug}/${receiver?.avatar}`} 
+                        src={receiver?.avatar} 
                     />
                     <Box 
                         sx={{ 
@@ -82,7 +91,13 @@ const Chats = ({ receiver, pastMessages, messages, showMessage, chatDivRef, setO
                 }} 
                 onClick={() => setOpenEmojis(false)}
             >
-                {Object.keys(pastMessages).map(date => (
+                
+                {accept == 'S' &&
+                     <Accept receiver={receiver} darkMode={darkMode} onChangeStatus={onChangeStatus} />
+                }
+                
+                
+                { accept == "A" && Object.keys(pastMessages).map(date => (
                     <React.Fragment key={date}>
                         <Box 
                             sx={{ 

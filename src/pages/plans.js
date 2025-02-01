@@ -29,6 +29,7 @@ function Plans() {
   })
   const [userPlans, setUserPlan] = useState([])
   const auth = useAuth()
+  const current = new Date().getTime()
 
 
   useEffect(()=>{
@@ -68,13 +69,14 @@ function Plans() {
         borderRadius : 2,
         p : 5
     }}>
-      <Grid xs={12} md={2.5}  sx={{
+      <Grid xs={12} md={4} lg={4} xl={4}  sx={{
         boxShadow : 3,
         borderRadius : 2,
-        m : 5
+        m : 5,
+        p : 2
       }}>
         <Box sx={{px: 5}}>
-          {recentPlan.createdAt <= recentPlan.expiryDate ? 
+          { current <= recentPlan.expiryDate ? 
             <Badge badgeContent={"Active"} color="success" />
             :
             <Badge badgeContent={"Expired"} color="error" />
@@ -113,7 +115,7 @@ function Plans() {
                 {recentPlan.servicePlan?.months + " month's plan"}
               </span>
             </Typography>
-          {recentPlan.createdAt > recentPlan.expiryDate ?
+          {current > recentPlan.expiryDate ?
             <Button sx={{mb : 2}} variant="contained" color='primary' onClick={(e)=>{
                 router.push("/pricing")
               }}
@@ -207,10 +209,10 @@ function Plans() {
                     }
                     </TableCell> 
                     <TableCell align="center">{plan.servicePlan?.months}</TableCell>
-                    <TableCell align="center">{fomratedDate(plan.createdAt)}</TableCell>
-                    <TableCell align="center">{fomratedDate(plan.expiryDate)}</TableCell>
+                    <TableCell align="center">{createdAt}</TableCell>
+                    <TableCell align="center">{expiryDate}</TableCell>
                     <TableCell align="center">
-                      {plan.createdAt <= plan.expiryDate ? 
+                      {plan.expiryDate > current ? 
                       <Badge badgeContent={"Active"} color='success' />
                       :
                       <Badge badgeContent={"Expired"} color='error' />

@@ -1,33 +1,38 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Avatar, Typography, List, ListItem, ListItemAvatar, Button, SvgIcon, ListItemText, Badge, Dialog, DialogTitle, DialogContent, DialogActions, TextField, IconButton, Paper } from '@mui/material';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Box, Avatar, Typography, List, ListItem, ListItemAvatar, Button, SvgIcon, ListItemText, Badge, Dialog, DialogTitle, DialogContent, DialogActions, TextField, IconButton, Paper, InputAdornment } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import ChatIcon from '@mui/icons-material/Chat';
 import axios from 'axios';
 import { userImage, host } from 'src/utils/util';
+import SearchIcon from '@mui/icons-material/Search';
 
 const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth, user, darkMode }) => {
     const [openDialog, setOpenDialog] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [userList, setUserList] = useState([]);
-    const [filteredUsers, setFilteredUsers] = useState([]);
 
-    useEffect(() => {
+    const searchUsers = () =>{
+        axios.post(`${host}/wholesale/auth/chat/users`,{
+            searchKey : searchQuery
+        })
+        .then(response => {
+            setUserList(response.data.content);
+            // setFilteredUsers(response.data.content);
+        })
+        .catch(error => {
+            console.error('Error fetching users:', error);
+        });
+    }
+
+    useEffect(()=>{
         if (openDialog) {
-            axios.post(`${host}/admin/auth/W/all`,{})
-                .then(response => {
-                    setUserList(response.data.content);
-                    setFilteredUsers(response.data.content);
-                })
-                .catch(error => {
-                    console.error('Error fetching users:', error);
-                });
+            searchUsers()
         }
-    }, [openDialog]);
+    },[openDialog])
 
     const handleSearchChange = (event) => {
         const query = event.target.value;
         setSearchQuery(query);
-        setFilteredUsers(userList.filter(user => user.username.toLowerCase().includes(query.toLowerCase())));
     };
 
     const handleAddContact = (contact) => {
@@ -82,7 +87,7 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
                                 badgeContent={contact.chatNotification} 
                                 invisible={contact.chatNotification === 0}
                             >
-                                <Avatar src={`${userImage}${contact.slug}/${contact.avatar}`} />
+                                <Avatar src={contact.avatar} />
                             </Badge>
                         </ListItemAvatar>
                         <ListItemText 
@@ -112,11 +117,17 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
                     sx: {
                         backgroundColor: darkMode ? '#333' : '#fff',
                         color: darkMode ? '#fff' : '#000',
+                        border : '20px solid #444',
+                        borderRadius : 4
                     }
                 }}
             >
                 <DialogTitle sx={{ backgroundColor: darkMode ? '#333' : '#fff', color: darkMode ? '#fff' : '#000' }}>Add New Contact</DialogTitle>
-                <DialogContent sx={{ backgroundColor: darkMode ? '#333' : '#fff', color: darkMode ? '#fff' : '#000' }}>
+                <DialogContent 
+                sx={{ 
+                        backgroundColor: darkMode ? '#333' : '#fff', 
+                        color: darkMode ? '#fff' : '#000',
+                    }}>
                     <TextField
                         autoFocus
                         margin="dense"
@@ -144,16 +155,31 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
                                     '& .MuiInputLabel-root': {
                                         color: darkMode ? '#fff' : '#000',
                                     }
-                                }
+                                },
+                                color : darkMode ? 'white' : 'black'
                             }
-                        }}
+                        ,
+                        endAdornment: 
+                        <InputAdornment position='end'>
+                            <IconButton 
+                                onClick={searchUsers}
+                                color="inherit" 
+                                aria-label="upload picture" 
+                                component="span"
+                            >
+                                <SearchIcon />
+                            </IconButton>
+                        </InputAdornment>
+                        }
+                    
+                    }
                     />
                     <List>
-                        {filteredUsers.map((user, index) => (
+                        {userList.map((user, index) => (
                             <ListItem key={index} 
                                 sx={{ display: 'flex', justifyContent: 'space-between' }}>
                                 <ListItemAvatar>
-                                    <Avatar src={`${userImage}${user.slug}/${user.avatar}`} />
+                                    <Avatar src={user.avatar} />
                                 </ListItemAvatar>
                                 <ListItemText primary={user.username} />
                                 <Box sx={{ display: 'flex', gap: 1 }}>
