@@ -149,8 +149,12 @@ const Page = () => {
     const onDelete = (slug) => {
         axios.defaults.headers = {
             Authorization: auth.token
-        }
-        axios.get(host + `/wholesale/item/delete/${slug}`)
+        }  
+        axios.post(host + `/wholesale/item/delete`,
+            {
+                slug: slug
+            }
+        )
             .then(res => {
                 setFlag("success")
                 setMessage(res.data.message)
