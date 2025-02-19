@@ -139,8 +139,7 @@ const CreateStore = () => {
         []
     );
 
-    const handleSubmit = useCallback(
-        (e) => {
+    const handleSubmit = (e) => {
             setDisable(true);
             e.preventDefault();
             if (store.storePic === '') {
@@ -182,9 +181,7 @@ const CreateStore = () => {
                     setOpen(true);
                     setDisable(false);
                 });
-        },
-        []
-    );
+        };
 
     const handleClose = useCallback(() => {
         setOpen(false)

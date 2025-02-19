@@ -177,8 +177,7 @@ import ImageInput from "src/sections/image-input";
       );
 
 
-      const handleSubmit = useCallback(
-        (e) =>{
+      const handleSubmit = (e) =>{
         e.preventDefault()
         const form = e.target;
         const formData = new FormData(form)
@@ -215,7 +214,7 @@ import ImageInput from "src/sections/image-input";
             setOpen(true)
         })
     
-      })
+      }
 
       const handleClose = useCallback(()=>{
             setOpen(false)
