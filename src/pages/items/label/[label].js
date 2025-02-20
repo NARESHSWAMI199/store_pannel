@@ -4,7 +4,7 @@ import { Alert, Box, Button, Container, Snackbar, Stack, SvgIcon } from '@mui/ma
 import axios from 'axios';
 import Head from 'next/head';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAuth } from 'src/hooks/use-auth';
 import { useSelection } from 'src/hooks/use-selection';

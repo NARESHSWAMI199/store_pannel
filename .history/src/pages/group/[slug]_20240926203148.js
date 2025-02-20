@@ -9,7 +9,7 @@ import { BasicHeaders } from 'src/sections/basic-header';
 import axios from 'axios';
 import { useAuth } from 'src/hooks/use-auth';
 import { host } from 'src/utils/util';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 const Page = ()=> {
   const [state, setState] = useState({

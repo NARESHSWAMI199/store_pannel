@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import Router from 'next/router';
+import Router from 'next/navigation';
 import nProgress from 'nprogress';
 
 export function useNProgress() {

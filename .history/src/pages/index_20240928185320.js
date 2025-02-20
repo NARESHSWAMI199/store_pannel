@@ -11,7 +11,7 @@ import { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from 'src/hooks/use-auth';
 import { host } from 'src/utils/util';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 
 

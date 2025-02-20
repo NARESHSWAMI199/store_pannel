@@ -18,7 +18,7 @@
         Autocomplete
     } from "@mui/material";
     import axios from "axios";
-    import { useRouter } from "next/router";
+    import { useRouter } from "next/navigation";
     import { useCallback, useEffect, useState } from "react";
     import { useAuth } from "src/hooks/use-auth";
     import { ArrowButtons } from "src/layouts/arrow-button";

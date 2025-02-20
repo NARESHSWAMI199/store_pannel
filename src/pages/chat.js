@@ -41,7 +41,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import MuiAlert from '@mui/material/Alert';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SettingsIcon from '@mui/icons-material/Settings';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import ShowMessages from 'src/sections/chats-messages'
 import Contacts from 'src/components/Contacts';
 import Chats from 'src/components/Chats';

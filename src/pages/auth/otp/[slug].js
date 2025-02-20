@@ -1,5 +1,5 @@
 import { Alert, Box, Button, Grid, Snackbar, Stack, TextField, Typography } from '@mui/material'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 import bg from 'public/assets/bg2.png'
 import React, { useCallback, useState } from 'react'
 import { useAuth } from 'src/hooks/use-auth'

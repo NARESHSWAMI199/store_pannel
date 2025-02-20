@@ -5,7 +5,7 @@ import Step from '@mui/material/Step';
 import StepLabel from '@mui/material/StepLabel';
 import Stepper from '@mui/material/Stepper';
 import Typography from '@mui/material/Typography';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import bg from 'public/assets/bg2.png';
 import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';

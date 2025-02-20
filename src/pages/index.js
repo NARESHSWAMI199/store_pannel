@@ -10,7 +10,7 @@ import { useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from 'src/hooks/use-auth';
 import { host, suId } from 'src/utils/util';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { StockTraffic } from 'src/sections/overview/stock-traffic';
 import Link from 'next/link';
 

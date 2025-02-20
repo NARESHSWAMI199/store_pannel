@@ -2,7 +2,7 @@
 import { CheckCircleOutline } from '@mui/icons-material'
 import { Alert, Box, Button, Grid, Link, Snackbar, Typography } from '@mui/material'
 import axios from 'axios'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 import bg from 'public/assets/bg.png'
 import { useEffect, useState } from 'react'
 import { useAuth } from 'src/hooks/use-auth'

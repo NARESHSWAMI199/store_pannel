@@ -15,7 +15,7 @@ import { Box,
     Alert
 } from "@mui/material";
 import axios from "axios";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { Container, Stack } from "react-bootstrap";
 import { useAuth } from "src/hooks/use-auth";

@@ -23,7 +23,7 @@ import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { host } from "src/utils/util";
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { redirect } from "next/navigation";
 
 

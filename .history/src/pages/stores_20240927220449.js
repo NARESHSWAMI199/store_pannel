@@ -16,7 +16,7 @@ import { CustomerHeaders } from 'src/sections/customer/customers-header';
 import { StoresCard } from 'src/sections/wholesale/stores-table';
 import { Divider } from 'antd';
 import { ArrowRightIcon } from '@mui/x-date-pickers';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { ro } from 'date-fns/locale';
 
 

@@ -4,7 +4,7 @@ import { Client } from '@stomp/stompjs';
 import axios from 'axios';
 import { format } from 'date-fns';
 import TimeAgo from 'javascript-time-ago';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useAuth } from 'src/hooks/use-auth';
 import { host, userImage } from 'src/utils/util';

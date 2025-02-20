@@ -12,7 +12,7 @@ import axios from 'axios'
 import { useAuth } from 'src/hooks/use-auth';
 import { host,dataNotFoundImage} from 'src/utils/util';
 import { format } from 'date-fns';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 function Plans() {

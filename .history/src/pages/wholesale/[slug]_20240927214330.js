@@ -11,7 +11,7 @@ import axios from 'axios';
 import { host } from 'src/utils/util';
 import { useAuth } from 'src/hooks/use-auth';
 import { ItemsTable } from 'src/sections/wholesale/wholesale-table';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getInitials } from 'src/utils/get-initials';
 import { Image } from 'antd';

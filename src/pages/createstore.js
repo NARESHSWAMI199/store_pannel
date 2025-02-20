@@ -16,7 +16,7 @@ import {
 import CircularProgress from '@mui/material/CircularProgress';
 import axios from "axios";
 import { ca, id } from "date-fns/locale";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { set } from "nprogress";
 import bg from 'public/assets/bg2.png';
 import { useCallback, useEffect, useState } from "react";
@@ -148,7 +148,7 @@ const CreateStore = () => {
                 return false;
             }
             const form = e.target;
-            const formData = new FormData(form);
+            //const formData = new FormData(form);
             let data = {
                 description: values.description,
                 storeEmail: values.storeEmail,

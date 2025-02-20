@@ -26,7 +26,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import ImageInput from "src/sections/image-input";
 import { margin } from "@mui/system";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import MultipleImageInput from "src/sections/multipleImage-input";
 
 

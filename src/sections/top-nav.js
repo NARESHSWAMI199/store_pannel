@@ -12,7 +12,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { Avatar } from 'antd';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import logo from 'public/assets/logos/logow.png';
 import * as React from 'react';
 import { useAuth } from 'src/hooks/use-auth';
