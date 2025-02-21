@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
 import { Image, Upload } from 'antd';
+import ImgCrop from "antd-img-crop";
 const getBase64 = (file) =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -80,6 +81,12 @@ const MultipleImageInput = (props) => {
   );
   return (
     <>
+      <ImgCrop 
+         showGrid 
+         rotationSlider 
+         aspectSlider 
+         showReset
+       >
       <Upload
         //action={props.action}
         listType="picture-circle"
@@ -91,6 +98,7 @@ const MultipleImageInput = (props) => {
       >
         {fileList.length >= totalImage ? null : uploadButton}
       </Upload>
+      </ImgCrop>
       {previewImage && (
         <Image
           wrapperStyle={{
