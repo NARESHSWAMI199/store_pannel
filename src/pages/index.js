@@ -145,6 +145,7 @@ useEffect(() => {
 
 
   const getPercentage = useCallback((currentCount,totalCount) =>{
+    if(currentCount === 0 || totalCount === 0) return 0;
     return Math.round((currentCount/totalCount) * 100);
   },[])
   return ( <>
@@ -230,7 +231,7 @@ useEffect(() => {
                 getPercentage(dashboardData.newItems.all, dashboardData.items.all), 
                 getPercentage(dashboardData.oldItems.all, dashboardData.items.all), 
               ]}
-              title = "Items Labels Detail"
+              title = "ITEM LABELS DETAIL"
               labels={['New Items', 'Old Items']}
               sx={{ height: '100%' }}
             />
@@ -246,7 +247,7 @@ useEffect(() => {
                 getPercentage(dashboardData.inStock.all, dashboardData.items.all), 
                 getPercentage(dashboardData.outStock.all, dashboardData.items.all), 
               ]}
-              title = "Items Stock Detail"
+              title = "ITEMS STOCK DETAIL"
               labels={['In stock', 'Out of stock']}
               sx={{ height: '100%' }}
             />
