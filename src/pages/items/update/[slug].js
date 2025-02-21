@@ -20,7 +20,7 @@ import {
     TextField
 } from "@mui/material";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "src/hooks/use-auth";
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
@@ -29,10 +29,8 @@ import { host, itemImage } from "src/utils/util";
 
 
 const CreateItem = () => {
-
-    const router = useRouter()
-    const { slug} = router.query
-
+    const searchParams = useSearchParams();
+    const slug = searchParams.get('slug');
     const [open, setOpen] = useState(false)
     const [message, setMessage] = useState("")
     const [flag, setFlag] = useState("success")

@@ -20,6 +20,7 @@ import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import DirectionsIcon from '@mui/icons-material/Directions';
+import { useSearchParams } from 'next/navigation';
 
 TimeAgo.addDefaultLocale(en)
 TimeAgo.addLocale(ru)
@@ -29,8 +30,8 @@ function Page() {
     const [client, setClient] = useState(null);
     const auth = useAuth();
     const user = auth.user
-    const router = useRouter()
-    const {slug} = router.query
+    const searchParams = useSearchParams();
+    const slug = searchParams.get('slug');
     const [reciver,setReciver] = useState()
     const [userStatus,setUserStatus] = useState()
     const [disabled,setDisabled] = useState(true)

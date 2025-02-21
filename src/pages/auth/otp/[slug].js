@@ -1,5 +1,5 @@
 import { Alert, Box, Button, Grid, Snackbar, Stack, TextField, Typography } from '@mui/material'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import bg from 'public/assets/bg2.png'
 import React, { useCallback, useState } from 'react'
 import { useAuth } from 'src/hooks/use-auth'
@@ -14,7 +14,8 @@ const [message,setMessage] = useState("")
 const [flag,setFlag] = useState("success")
 const auth = useAuth();
 const router = useRouter();
-const { slug } = router.query;
+const searchParams = useSearchParams();
+const slug = searchParams.get('slug');
 
 
 const handleClose = useCallback(() => {

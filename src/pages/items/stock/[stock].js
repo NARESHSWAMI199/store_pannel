@@ -11,7 +11,7 @@ import axios from 'axios';
 import { host, toTitleCase } from 'src/utils/util';
 import { useAuth } from 'src/hooks/use-auth';
 import { ItemsTable } from 'src/sections/wholesale/wholesale-table';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import DialogFormForExcelImport from 'src/layouts/excel/import-excel';
 import { StoresCard } from 'src/sections/wholesale/stores-table';
@@ -34,15 +34,14 @@ const Page = () => {
 
     /** snackbar varibatles */
 
-    const router = useRouter()
-    const { stock } = router.query
 
     const [open, setOpen] = useState()
     const [message, setMessage] = useState("")
     const [flag, setFlag] = useState("warning")
 
-
-
+    const router = useRouter()
+    const searchParams = useSearchParams();
+    const stock = searchParams.get('stock');
     const auth = useAuth()
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -51,6 +50,7 @@ const Page = () => {
     const itemsSelection = useSelection(itemSlugs);
     const [totalElements, setTotalElements] = useState(0)
     const [wholesale, setWholesale] = useState(auth.store)
+
     
     
     const [data, setData] = useState({

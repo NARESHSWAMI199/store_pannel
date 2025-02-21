@@ -35,11 +35,8 @@ const CreateItem = () =>{
 const [open,setOpen] = useState(false)
 const [message,setMessage] = useState("")
 const [flag,setFlag] = useState("success")
-
-const router = useRouter();
-const {label,stock} = router.query
 const auth = useAuth()
-const [values,setValues] = useState({itemLabel:label})
+const [values,setValues] = useState({})
 const [categories,setItemCategories] = useState([])
 const [subcategories,setItemSubCategories] = useState([])
 const [newImages,setNewImages] = useState([])

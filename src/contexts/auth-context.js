@@ -10,6 +10,7 @@ const HANDLERS = {
 };
 
 let authToken = () => {
+  if (typeof window === 'undefined') return null;
   try {
     return window.sessionStorage.getItem('token');
   } catch (err) {
@@ -18,6 +19,7 @@ let authToken = () => {
 }
 
 let getUser = () => {
+  if (typeof window === 'undefined') return null;
   try {
     let user = window.sessionStorage.getItem('user');
      user = !!user ? JSON.parse(user) : null;
@@ -28,6 +30,7 @@ let getUser = () => {
 }
 
 let getStore = () => {
+  if (typeof window === 'undefined') return null;
   try {
     let store = window.sessionStorage.getItem('store');
      store = !!store ? JSON.parse(store) : null;
@@ -123,6 +126,7 @@ export const AuthProvider = (props) => {
     let isAuthenticated = false;
 
     try {
+      if (typeof window === 'undefined') return null;
       isAuthenticated = window.sessionStorage.getItem('authenticated') === 'true';
     } catch (err) {
       console.error(err);
@@ -163,12 +167,15 @@ export const AuthProvider = (props) => {
       })
       .then (res => {
         const token = res.data.token
-        window.sessionStorage.setItem('authenticated', 'true');
-        window.sessionStorage.setItem('token', token);
         const user = res.data.user
         const store = res.data.store
-        window.sessionStorage.setItem("user",JSON.stringify(user))
-        window.sessionStorage.setItem("store",JSON.stringify(store))
+
+        if (typeof window !== 'undefined') {
+          window.sessionStorage.setItem('authenticated', 'true');
+          window.sessionStorage.setItem('token', token);
+          window.sessionStorage.setItem("user",JSON.stringify(user))
+          window.sessionStorage.setItem("store",JSON.stringify(store))
+        }
         dispatch({
           type: HANDLERS.SIGN_IN,
           token: token,
@@ -190,9 +197,11 @@ export const AuthProvider = (props) => {
       await axios.get(host+"/wholesale/auth/detail")
       .then (res => {
         const user = res.data.user
-        window.sessionStorage.setItem("user",JSON.stringify(user))
         const store = res.data.store
-        window.sessionStorage.setItem("store",JSON.stringify(store))
+        if (typeof window !== 'undefined') {
+          window.sessionStorage.setItem("user",JSON.stringify(user))
+          window.sessionStorage.setItem("store",JSON.stringify(store))
+        }
         
         setTimeout(()=>{
           signOut();
@@ -233,10 +242,12 @@ export const AuthProvider = (props) => {
   };
 
   const signOut = () => {
-    window.sessionStorage.removeItem('authenticated');
-    window.sessionStorage.removeItem('user');
-    window.sessionStorage.removeItem('store');
-    window.sessionStorage.removeItem('token');
+    if (typeof window !== 'undefined') {
+      window.sessionStorage.removeItem('authenticated');
+      window.sessionStorage.removeItem('user');
+      window.sessionStorage.removeItem('store');
+      window.sessionStorage.removeItem('token');
+    }
     dispatch({
       type: HANDLERS.SIGN_OUT,
       token : null,
@@ -247,7 +258,9 @@ export const AuthProvider = (props) => {
 
 
   const updateUser = (updatedUser) => {
-    window.sessionStorage.setItem('user', updateUser);
+    if (typeof window !== 'undefined') {
+     window.sessionStorage.setItem('user', updateUser);
+    }
     dispatch({
       type: HANDLERS.SIGN_OUT
     });
@@ -262,12 +275,15 @@ export const AuthProvider = (props) => {
     })
     .then(res => {
       const token = res.data.token
-      window.sessionStorage.setItem('authenticated', 'true');
-      window.sessionStorage.setItem('token', token);
       const user = res.data.user
       const store = res.data.store
-      window.sessionStorage.setItem("user",JSON.stringify(user))
-      window.sessionStorage.setItem("store",JSON.stringify(store))
+
+      if (typeof window !== 'undefined') {
+        window.sessionStorage.setItem('authenticated', 'true');
+        window.sessionStorage.setItem('token', token);
+        window.sessionStorage.setItem("user",JSON.stringify(user))
+        window.sessionStorage.setItem("store",JSON.stringify(store))
+      }
 
       dispatch({
         type: HANDLERS.SIGN_IN,

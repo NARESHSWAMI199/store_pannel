@@ -7,7 +7,7 @@ import axios from 'axios';
 import { format } from 'date-fns';
 import Head from 'next/head';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useAuth } from 'src/hooks/use-auth';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
@@ -24,8 +24,8 @@ const Page = () => {
   const [flag, setFlag] = useState("warning")
 
   const auth = useAuth()
-  const router = useRouter()
-  const {slug}  = router.query
+  const searchParams = useSearchParams();
+  const slug = searchParams.get('slug');
   const [item,setItem] = useState({})
   const itemCreatedAt =   format(!!item.createdAt ? item.createdAt : 0, 'dd/MM/yyyy')
   const [page, setPage] = useState(0);

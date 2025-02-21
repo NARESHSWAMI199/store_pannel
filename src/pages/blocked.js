@@ -32,8 +32,6 @@ const Page = () => {
     /** snackbar varibatles */
 
     const router = useRouter()
-    const { userSlug } = router.query
-
     const [open, setOpen] = useState()
     const [message, setMessage] = useState("")
     const [flag, setFlag] = useState("warning")
@@ -210,10 +208,6 @@ const Page = () => {
                                 <Link
                                     href={{
                                         pathname: '/items/create/',
-                                        query: {
-                                            slug: wholesale?.slug,
-                                            us: userSlug
-                                        },
                                     }}>
                                     <Button
                                         startIcon={(
