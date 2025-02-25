@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import { Alert, Box, Container, Snackbar, Stack, Typography } from '@mui/material';
 import { SettingsNotifications } from 'src/sections/settings/settings-notifications';
+import { PaginationSettings } from 'src/sections/settings/pagination-settings';
 import { SettingsPassword } from 'src/sections/settings/settings-password';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { useState } from 'react';
@@ -75,6 +76,8 @@ const Page = () => {
           </Typography>
           {/* <SettingsNotifications /> */}
             <SettingsPassword handleSubmit={handleSubmit} reset={reset} />
+            <PaginationSettings/>
+
         </Stack>
       </Container>
     </Box>
