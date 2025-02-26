@@ -53,6 +53,13 @@ const Page = () => {
     }
 
 
+    const showError = (err) => {
+      console.log(err)
+      setMessage(!!err.response ? err.response.data.message : err.message)
+      setFlag("error")
+      setOpen(true)
+    }
+
 
   return (
   
@@ -76,7 +83,7 @@ const Page = () => {
           </Typography>
           {/* <SettingsNotifications /> */}
             <SettingsPassword handleSubmit={handleSubmit} reset={reset} />
-            <PaginationSettings/>
+            <PaginationSettings showError={showError}/>
 
         </Stack>
       </Container>

@@ -5,27 +5,40 @@ import { host } from 'src/utils/util';
 
 
 
-export const  PaginationSettings = () => {
+export const  PaginationSettings = (props) => {
     const [sortingLables, setSortingLabels] = useState([])
+    const [rowsPerPageObj , setRowPerPageObj] = useState({})
 
     useEffect(()=> {
         // get all pagination setting labels
         axios.get(host + "/wholesale/pagination/all")
         .then(res => {
-            setSortingLabels(res.data)
+            let sortingLables = res.data;
+            setSortingLabels(sortingLables)
+            sortingLables.map(label => {
+                let fieldFor = label.pagination?.fieldFor;
+                rowsPerPageObj[fieldFor] = label.rowsNumber
+                setRowPerPageObj(rowsPerPageObj)
+            })
         })
+        .catch(err=>{
+            props.showError(err);
+        })
+        
     },[])
 
 
-    const handleChange = (event) => {
-        alert(event.target.value);
-      };
+    const handleChange = (event,fieldFor) => {
+        rowsPerPageObj[fieldFor] = event.target.value
+        setRowPerPageObj(rowsPerPageObj)
+        // alert(JSON.stringify(rowsPerPageObj))
+    };
 
   return (<>
         <Card>
                 <CardHeader
                 subheader="Show per page rows"
-                title="Paginations"
+                title="Rows per page"
                 />
                 <Divider />
                 <CardContent>
@@ -43,8 +56,9 @@ export const  PaginationSettings = () => {
                     >
                         <Stack spacing={1}>
                         {sortingLables.map((label,key)=>{
+                            let fieldFor = label.pagination?.fieldFor;
                             return (
-                                <Box sx={{display  : 'flex', alignItems : 'center',justifyContent : 'center'}}>
+                                <Box key={key} sx={{display  : 'flex', alignItems : 'center',justifyContent : 'center'}}>
                                         <Typography sx={{minWidth : 100}} variant="h6">
                                             {label.pagination?.fieldFor}
                                         </Typography>
@@ -53,9 +67,10 @@ export const  PaginationSettings = () => {
                                             <Select
                                                 labelId="demo-simple-select-label"
                                                 id="demo-simple-select"
-                                                value={label.rowsNumber}
-                                                onChange={handleChange}
+                                                value={rowsPerPageObj[fieldFor]}
+                                                onChange={(e) => handleChange(e,fieldFor)}
                                             >
+                                                <MenuItem value={10}>{JSON.stringify(rowsPerPageObj)}</MenuItem>
                                                 <MenuItem value={10}>10</MenuItem>
                                                 <MenuItem value={25}>25</MenuItem>
                                                 <MenuItem value={50}>50</MenuItem>
