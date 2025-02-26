@@ -18,7 +18,6 @@ const Page = () => {
 
   const [reset ,setReset] = useState(false)
   const auth = useAuth()
-  const user = auth.user;
 
   /** for snackbar close */
   const handleClose = () => {
@@ -60,6 +59,13 @@ const Page = () => {
       setOpen(true)
     }
 
+    const showSuccess = (message) => {
+      setMessage(message)
+      setFlag("success")
+      setOpen(true)
+    }
+
+
 
   return (
   
@@ -83,7 +89,7 @@ const Page = () => {
           </Typography>
           {/* <SettingsNotifications /> */}
             <SettingsPassword handleSubmit={handleSubmit} reset={reset} />
-            <PaginationSettings showError={showError}/>
+            <PaginationSettings showError={showError} showSuccess={showSuccess}/>
 
         </Stack>
       </Container>

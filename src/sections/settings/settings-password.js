@@ -78,6 +78,7 @@ export const SettingsPassword = (props) => {
               onChange={handleChange}
               type="password"
               value={values.password}
+              required
             />
             <TextField
               fullWidth
@@ -87,6 +88,7 @@ export const SettingsPassword = (props) => {
               onChange={handleChange}
               type="password"
               value={values.confirm}
+              required
             />
           </Stack>
           <span style={{ color: 'red' }}>{error}</span> 

@@ -13,12 +13,12 @@ export const  PaginationSettings = (props) => {
         // get all pagination setting labels
         axios.get(host + "/wholesale/pagination/all")
         .then(res => {
-            let sortingLables = res.data;
+            let sortingLables = Object.values(res.data);  // there we get a object with key ; value where in value we all detail about keys and rowNumbers
             setSortingLabels(sortingLables)
             sortingLables.map(label => {
                 let fieldFor = label.pagination?.fieldFor;
                 rowsPerPageObj[fieldFor] = label.rowsNumber
-                setRowPerPageObj(rowsPerPageObj)
+                setRowPerPageObj({...rowsPerPageObj})
             })
         })
         .catch(err=>{
@@ -27,11 +27,21 @@ export const  PaginationSettings = (props) => {
         
     },[])
 
-
-    const handleChange = (event,fieldFor) => {
-        rowsPerPageObj[fieldFor] = event.target.value
-        setRowPerPageObj(rowsPerPageObj)
-        // alert(JSON.stringify(rowsPerPageObj))
+    // TODO ; make sure call from auth-context or redux side 
+    const handleChange = (event,pagination) => {
+        let rowsNumber = event.target.value;
+        axios.post(host + "/wholesale/pagination/update", {
+            paginationId : pagination.id,
+            rowsNumber : rowsNumber
+        })
+        .then(res => {
+            props.showSuccess(res.data.message)
+        })
+        .catch(err => {
+            props.showError(err);
+        })
+        rowsPerPageObj[pagination?.fieldFor] = rowsNumber
+        setRowPerPageObj({...rowsPerPageObj})
     };
 
   return (<>
@@ -50,7 +60,7 @@ export const  PaginationSettings = (props) => {
             
                     <Grid
                     item
-                    md={6}
+                    md={8}
                     sm={6}
                     xs={12}
                     >
@@ -59,7 +69,7 @@ export const  PaginationSettings = (props) => {
                             let fieldFor = label.pagination?.fieldFor;
                             return (
                                 <Box key={key} sx={{display  : 'flex', alignItems : 'center',justifyContent : 'center'}}>
-                                        <Typography sx={{minWidth : 100}} variant="h6">
+                                        <Typography sx={{minWidth : 150}} variant="h6">
                                             {label.pagination?.fieldFor}
                                         </Typography>
 
@@ -68,9 +78,8 @@ export const  PaginationSettings = (props) => {
                                                 labelId="demo-simple-select-label"
                                                 id="demo-simple-select"
                                                 value={rowsPerPageObj[fieldFor]}
-                                                onChange={(e) => handleChange(e,fieldFor)}
+                                                onChange={(e) => handleChange(e,label.pagination)}
                                             >
-                                                <MenuItem value={10}>{JSON.stringify(rowsPerPageObj)}</MenuItem>
                                                 <MenuItem value={10}>10</MenuItem>
                                                 <MenuItem value={25}>25</MenuItem>
                                                 <MenuItem value={50}>50</MenuItem>

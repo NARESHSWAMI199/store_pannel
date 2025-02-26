@@ -40,12 +40,25 @@ let getStore = () => {
   }
 }
 
+
+let getPaginations = () => {
+  if (typeof window === 'undefined') return null;
+  try {
+    let paginations = window.sessionStorage.getItem('paginations');
+    paginations = !!paginations ? JSON.parse(paginations) : null;
+    return paginations
+  } catch (err) {
+    console.error(err);
+  }
+}
+
 const initialState = {
   token : authToken(),
   isAuthenticated: false,
   isLoading: true,
   user: getUser(),
-  store : getStore()
+  store : getStore(),
+  paginations : getPaginations()
 };
 
 const handlers = {
@@ -71,11 +84,12 @@ const handlers = {
   [HANDLERS.SIGN_IN]: (state, action) => {
     const user = action.payload;
     const store = action.store;
+    const paginations = action.paginations;
     return {
       ...state,
       token : action.token,
       isAuthenticated: true,
-      user,store
+      user,store,paginations
     };
   },
   [HANDLERS.SIGN_OUT]: (state) => {
@@ -84,7 +98,8 @@ const handlers = {
       isAuthenticated: false,
       user: null,
       token : null,
-      store : null
+      store : null,
+      paginations : null
     };
   },
   [HANDLERS.UPDATE_USER]: (state,action) => {
@@ -169,12 +184,13 @@ export const AuthProvider = (props) => {
         const token = res.data.token
         const user = res.data.user
         const store = res.data.store
-
+        const paginations = res.data.paginations
         if (typeof window !== 'undefined') {
           window.sessionStorage.setItem('authenticated', 'true');
           window.sessionStorage.setItem('token', token);
           window.sessionStorage.setItem("user",JSON.stringify(user))
           window.sessionStorage.setItem("store",JSON.stringify(store))
+          window.sessionStorage.setItem("paginations",JSON.stringify(paginations))
         }
         dispatch({
           type: HANDLERS.SIGN_IN,
@@ -247,6 +263,7 @@ export const AuthProvider = (props) => {
       window.sessionStorage.removeItem('user');
       window.sessionStorage.removeItem('store');
       window.sessionStorage.removeItem('token');
+      window.sessionStorage.removeItem("paginations")
     }
     dispatch({
       type: HANDLERS.SIGN_OUT,
@@ -277,19 +294,21 @@ export const AuthProvider = (props) => {
       const token = res.data.token
       const user = res.data.user
       const store = res.data.store
-
+      const paginations = res.data.paginations
       if (typeof window !== 'undefined') {
         window.sessionStorage.setItem('authenticated', 'true');
         window.sessionStorage.setItem('token', token);
         window.sessionStorage.setItem("user",JSON.stringify(user))
         window.sessionStorage.setItem("store",JSON.stringify(store))
+        window.sessionStorage.setItem("paginations",JSON.stringify(paginations))
       }
 
       dispatch({
         type: HANDLERS.SIGN_IN,
         token: token,
         payload : user,
-        store : store
+        store : store,
+        paginations : paginations
       });
     }).catch(err => {
       const errorMessage = (!!err.response) ? err.response.data.message : err.message;
