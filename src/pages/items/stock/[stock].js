@@ -42,7 +42,8 @@ const Page = () => {
     const router = useRouter()
     const searchParams = useSearchParams();
     const stock = searchParams.get('stock');
-    const auth = useAuth()
+    const auth = useAuth();
+    const paginations = auth.paginations;
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [items, setItems] = useState([])
@@ -58,6 +59,16 @@ const Page = () => {
         pageNumber: page,
         size: rowsPerPage
     })
+
+    // setting default rows per page item
+    useEffect(()=>{
+        if(stock !== 'Y'){
+            setRowsPerPage(paginations?.OUTOFSTOCK?.rowsNumber)
+        }else{
+            setRowsPerPage(paginations?.INSTOCK?.rowsNumber)
+        }
+    },[stock])
+
 
     useEffect(()=>{
         setData((previous)=>({...data , 

@@ -6,7 +6,9 @@ import { host } from 'src/utils/util';
 const HANDLERS = {
   INITIALIZE: 'INITIALIZE',
   SIGN_IN: 'SIGN_IN',
-  SIGN_OUT: 'SIGN_OUT'
+  SIGN_OUT: 'SIGN_OUT',
+  UPDATE_USER : 'UPDATE_USER',
+  UPDATE_PAGINATIONS : 'UPDATE_PAGINATIONS'
 };
 
 let authToken = () => {
@@ -110,6 +112,14 @@ const handlers = {
       isAuthenticated: false,
       user,
       store
+    };
+  },
+  // updating user paginations
+  [HANDLERS.UPDATE_PAGINATIONS]: (state,action) => {
+    const paginations = action.paginations
+    return {
+      ...state,
+      paginations
     };
   }
 
@@ -318,6 +328,26 @@ export const AuthProvider = (props) => {
 }
 
 
+const updatePaginations = (rowsNumber,pagination) =>{
+  let preSavePaginations =  getPaginations();
+  for(let label of  Object.values(preSavePaginations)){
+    if(pagination?.fieldFor === label.pagination?.fieldFor){
+      label.rowsNumber = rowsNumber
+    }
+  }
+  console.log(preSavePaginations)
+  if (typeof window !== 'undefined') {
+    window.sessionStorage.setItem("paginations",JSON.stringify(preSavePaginations))
+  }
+
+  dispatch({
+    type : HANDLERS.UPDATE_PAGINATIONS,
+    paginations : preSavePaginations
+  })
+
+}
+
+
   return (
     <AuthContext.Provider
       value={{
@@ -326,7 +356,8 @@ export const AuthProvider = (props) => {
         signUp,
         signOut,
         updateUserDetail,
-        validateOtp
+        validateOtp,
+        updatePaginations
       }}
     >
       {children}

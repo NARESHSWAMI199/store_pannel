@@ -41,18 +41,27 @@ const Page = () => {
 
     const auth = useAuth()
     const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [rowsPerPage, setRowsPerPage] = useState();
     const [items, setItems] = useState([])
     const itemSlugs = UseitemSlugs(items);
     const itemsSelection = useSelection(itemSlugs);
     const [totalElements, setTotalElements] = useState(0)
     const wholesale = auth.store
+    const paginations = auth.paginations
     
+    // setting default rows per page item
+    useEffect(()=>{
+        if(label === 'O'){
+            setRowsPerPage(paginations?.OLDITEMS?.rowsNumber)
+        }else{
+            setRowsPerPage(paginations?.NEWITEMS?.rowsNumber)
+        }
+    },[label])
     
     const [data, setData] = useState({
         label : label,
         pageNumber: page,
-        size: rowsPerPage
+        size: !!rowsPerPage ? rowsPerPage : 10
     })
 
     useEffect(()=>{

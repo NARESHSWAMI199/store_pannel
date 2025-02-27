@@ -2,12 +2,14 @@ import { Box, Button, Card, CardActions, CardContent, CardHeader, Divider, FormC
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { host } from 'src/utils/util';
+import { useAuth } from 'src/hooks/use-auth';
 
 
 
 export const  PaginationSettings = (props) => {
     const [sortingLables, setSortingLabels] = useState([])
     const [rowsPerPageObj , setRowPerPageObj] = useState({})
+    const auth = useAuth()
 
     useEffect(()=> {
         // get all pagination setting labels
@@ -42,6 +44,8 @@ export const  PaginationSettings = (props) => {
         })
         rowsPerPageObj[pagination?.fieldFor] = rowsNumber
         setRowPerPageObj({...rowsPerPageObj})
+        // updated with redux also 
+        auth.updatePaginations(rowsNumber,pagination)
     };
 
   return (<>
