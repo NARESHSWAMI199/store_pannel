@@ -206,7 +206,8 @@ export const AuthProvider = (props) => {
           type: HANDLERS.SIGN_IN,
           token: token,
           payload : user,
-          store : store
+          store : store,
+          paginations : paginations
         });
       })
       .catch (err =>{ 
@@ -273,7 +274,7 @@ export const AuthProvider = (props) => {
       window.sessionStorage.removeItem('user');
       window.sessionStorage.removeItem('store');
       window.sessionStorage.removeItem('token');
-      window.sessionStorage.removeItem("paginations")
+      window.sessionStorage.removeItem("paginations");
     }
     dispatch({
       type: HANDLERS.SIGN_OUT,
