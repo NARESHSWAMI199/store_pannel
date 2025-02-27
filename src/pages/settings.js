@@ -1,14 +1,12 @@
-import Head from 'next/head';
 import { Alert, Box, Container, Snackbar, Stack, Typography } from '@mui/material';
-import { SettingsNotifications } from 'src/sections/settings/settings-notifications';
+import axios from 'axios';
+import Head from 'next/head';
+import { useState } from 'react';
+import { useAuth } from 'src/hooks/use-auth';
+import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { PaginationSettings } from 'src/sections/settings/pagination-settings';
 import { SettingsPassword } from 'src/sections/settings/settings-password';
-import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
-import { useState } from 'react';
 import { host } from 'src/utils/util';
-import axios from 'axios';
-import { useAuth } from 'src/hooks/use-auth';
-import { tr } from 'date-fns/locale';
 
 const Page = () => {
 
