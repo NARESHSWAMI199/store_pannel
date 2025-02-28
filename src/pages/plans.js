@@ -17,6 +17,11 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 function Plans() {
 
+
+  const [open, setOpen] = useState()
+  const [message, setMessage] = useState("")
+  const [flag, setFlag] = useState("warning")
+
   const router = useRouter()
   const appBarRef = useRef(null);
   const [appBarHeight, setAppBarHeight] = useState(0);
@@ -45,7 +50,9 @@ function Plans() {
           }
       })
       .catch(err => {
-        console.log(err)
+        setMessage(!!err.response ? err.response.data.message : err.message)
+        setFlag("error")
+        setOpen(true)
       } )
   },[])
 
@@ -246,6 +253,17 @@ function Plans() {
       </Grid>
     </Grid>
   </Grid>
+
+
+  <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        open={open}
+        onClose={handleClose}
+        key={'top' + 'right'}
+    >
+        <Alert onClose={handleClose} severity={flag} sx={{ width: '100%' }}>
+            {message}
+        </Alert>
+    </Snackbar>
  </>
   )
 }

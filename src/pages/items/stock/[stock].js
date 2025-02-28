@@ -45,7 +45,7 @@ const Page = () => {
     const auth = useAuth();
     const paginations = auth.paginations;
     const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [rowsPerPage, setRowsPerPage] = useState();
     const [items, setItems] = useState([])
     const itemSlugs = UseitemSlugs(items);
     const itemsSelection = useSelection(itemSlugs);
@@ -57,7 +57,7 @@ const Page = () => {
     const [data, setData] = useState({
         inStock : stock,
         pageNumber: page,
-        size: rowsPerPage
+        size:  !!rowsPerPage ? rowsPerPage : rowsPerPageOptions[0]
     })
 
     // setting default rows per page item

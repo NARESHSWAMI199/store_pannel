@@ -12,7 +12,7 @@ import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import DialogFormForExcelImport from 'src/layouts/excel/import-excel';
 import { BasicSearch } from 'src/sections/basic-search';
 import { ItemsTable } from 'src/sections/wholesale/wholesale-table';
-import { host, toTitleCase } from 'src/utils/util';
+import { host, rowsPerPageOptions, toTitleCase } from 'src/utils/util';
 
 const UseitemSlugs = (items) => {
     return useMemo(
@@ -48,7 +48,7 @@ const Page = () => {
 
     const [data, setData] = useState({
         pageNumber: page,
-        size: !!rowsPerPage ? parseInt(rowsPerPage) : 10
+        size: !!rowsPerPage ? parseInt(rowsPerPage) : rowsPerPageOptions[0]
     })
 
     useEffect(()=>{

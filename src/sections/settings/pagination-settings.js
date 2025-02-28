@@ -1,7 +1,7 @@
 import { Box, Button, Card, CardActions, CardContent, CardHeader, Divider, FormControl, Grid, InputLabel, MenuItem, Select, Stack, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
-import { host } from 'src/utils/util';
+import { host, rowsPerPageOptions } from 'src/utils/util';
 import { useAuth } from 'src/hooks/use-auth';
 
 
@@ -84,9 +84,9 @@ export const  PaginationSettings = (props) => {
                                                 value={rowsPerPageObj[fieldFor]}
                                                 onChange={(e) => handleChange(e,label.pagination)}
                                             >
-                                                <MenuItem value={10}>10</MenuItem>
-                                                <MenuItem value={25}>25</MenuItem>
-                                                <MenuItem value={50}>50</MenuItem>
+                                              {rowsPerPageOptions.map((value , index)=>{
+                                                    return <MenuItem key={index} value={value}>{value}</MenuItem>
+                                             })}
                                             </Select>
                                         </FormControl>
                                 </Box>

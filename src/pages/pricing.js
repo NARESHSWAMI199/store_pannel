@@ -45,8 +45,7 @@ function Pricing() {
                 window.open(res.data.url);
             })
             .catch(err => {
-                console.log(err)
-                setMessage(!!err.respone ? err.response.data.message : err.message)
+                setMessage(!!err.response ? err.response.data.message : err.message)
                 setFlag("error")
                 setOpen(true)
             });
@@ -149,10 +148,10 @@ function Pricing() {
             </Grid>
         </Grid>
         </Grid>
-        <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        <Snackbar anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
             open={open}
             onClose={handleClose}
-            key={'top' + 'right'}
+            key={'bottom' + 'left'}
         >
             <Alert onClose={handleClose} severity={flag} sx={{ width: '100%' }}>
                 {message}

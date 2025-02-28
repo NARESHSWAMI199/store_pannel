@@ -33,3 +33,5 @@ export const toTitleCase = (str) => {
 
   export const dataNotFoundImage = "https://cdn-icons-png.flaticon.com/512/7466/7466073.png";
   export const defaultChatImage = "https://static.vecteezy.com/system/resources/thumbnails/008/508/957/small_2x/3d-chat-mail-message-notification-chatting-illustration-png.png"
+
+  export const rowsPerPageOptions=[10, 25 , 50]

@@ -36,7 +36,7 @@ import { getInitials } from 'src/utils/get-initials';
 import React, {useEffect, useState } from 'react';
 import Link from 'next/link';
 import EditIcon from '@mui/icons-material/Edit';
-import { itemImage, toTitleCase } from 'src/utils/util';
+import { itemImage, rowsPerPageOptions, toTitleCase } from 'src/utils/util';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { CopyOutlined } from '@ant-design/icons';
 
@@ -395,8 +395,8 @@ export const ItemsTable = (props) => {
         onPageChange={onPageChange}
         onRowsPerPageChange={onRowsPerPageChange}
         page={page}
-        rowsPerPage={rowsPerPage}
-        rowsPerPageOptions={[10, 25, 50]}
+        rowsPerPage={!!rowsPerPage ? rowsPerPage : rowsPerPageOptions[0]}
+        rowsPerPageOptions={rowsPerPageOptions}
       />
     </Card>
 

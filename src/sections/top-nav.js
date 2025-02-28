@@ -70,7 +70,7 @@ React.useEffect(()=>{
     }else if(pageName == "Pricing"){
       router.push("/pricing")
     }else {
-      router.push("/welcome")
+      router.push("/")
     }
   }
 
