@@ -1,4 +1,4 @@
-import { Badge, Box, Button, Grid, SvgIcon, Typography } from '@mui/material'
+import { Alert, Badge, Box, Button, Grid, Snackbar, SvgIcon, Typography } from '@mui/material'
 import React, { useEffect, useRef, useState } from 'react'
 import HomeNavbar from 'src/sections/top-nav'
 import Table from '@mui/material/Table';
@@ -66,6 +66,11 @@ function Plans() {
     }
   }
 
+
+    /** for snackbar close */
+    const handleClose = () => {
+      setOpen(false)
+    };
 
   return (
  <>
