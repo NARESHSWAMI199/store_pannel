@@ -13,6 +13,7 @@ import DialogFormForExcelImport from 'src/layouts/excel/import-excel';
 import { BasicSearch } from 'src/sections/basic-search';
 import { ItemsTable } from 'src/sections/wholesale/wholesale-table';
 import { host, rowsPerPageOptions, toTitleCase } from 'src/utils/util';
+import { ItemHeaders } from 'src/sections/items-header';
 
 const UseitemSlugs = (items) => {
     return useMemo(
@@ -224,7 +225,6 @@ const Page = () => {
                 </title>
             </Head>
             <Box
-
                 component="main"
                 sx={{
                     flexGrow: 1,
@@ -234,50 +234,7 @@ const Page = () => {
                 <Container maxWidth="xl">
                     <Stack spacing={3}>
 
-                        {/* <StoresCard deleteStore={onDeleteStore} store={wholesale} /> */}
-
-                        <Stack
-                            direction="row"
-                            justifyContent="space-between"
-                            spacing={4}
-                        >
-
-                            <Stack
-                                alignItems="center"
-                                direction="row"
-                                spacing={1}
-                            >
-                                <DialogFormForExcelImport importExcelSheet={importItemExcelSheet} />
-                                <Button
-                                    color="inherit"
-                                    startIcon={(
-                                        <SvgIcon fontSize="small">
-                                            <ArrowDownOnSquareIcon />
-                                        </SvgIcon>
-                                    )}
-                                >
-                                    Export
-                                </Button>
-                            </Stack>
-                            <div>
-                                <Link
-                                    href={{
-                                        pathname: '/items/create/'
-                                    }}>
-                                    <Button
-                                        startIcon={(
-                                            <SvgIcon fontSize="small">
-                                                <PlusIcon />
-                                            </SvgIcon>
-                                        )}
-                                        variant="contained"
-                                    >
-                                        Add
-                                    </Button>
-                                </Link>
-                            </div>
-                        </Stack>
-
+                        <ItemHeaders headerTitle={toTitleCase("All Items")} searchFilters ={data} />
                         
                         <BasicSearch onSearch={onSearch} type="item" />
                         <ItemsTable

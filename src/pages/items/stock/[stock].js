@@ -8,7 +8,7 @@ import { useSelection } from 'src/hooks/use-selection';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { applyPagination } from 'src/utils/apply-pagination';
 import axios from 'axios';
-import { host, toTitleCase } from 'src/utils/util';
+import { host, rowsPerPageOptions, toTitleCase } from 'src/utils/util';
 import { useAuth } from 'src/hooks/use-auth';
 import { ItemsTable } from 'src/sections/wholesale/wholesale-table';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -18,6 +18,7 @@ import { StoresCard } from 'src/sections/wholesale/stores-table';
 import { BasicSearch } from 'src/sections/basic-search';
 import { ReloadOutlined } from '@ant-design/icons';
 import { ArrowButtons } from 'src/layouts/arrow-button';
+import { ItemHeaders } from 'src/sections/items-header';
 
 const UseitemSlugs = (items) => {
     return useMemo(
@@ -51,7 +52,7 @@ const Page = () => {
     const itemsSelection = useSelection(itemSlugs);
     const [totalElements, setTotalElements] = useState(0)
     const [wholesale, setWholesale] = useState(auth.store)
-
+    const [title,setTitle] = useState("Items")
     
     
     const [data, setData] = useState({
@@ -64,8 +65,10 @@ const Page = () => {
     useEffect(()=>{
         if(stock !== 'Y'){
             setRowsPerPage(paginations?.OUTOFSTOCK?.rowsNumber)
+            setTitle("Out Of Stock")
         }else{
             setRowsPerPage(paginations?.INSTOCK?.rowsNumber)
+            setTitle("In Stock")
         }
     },[stock])
 
@@ -258,52 +261,8 @@ const Page = () => {
                 <Container maxWidth="xl">
                     <Stack spacing={3}>
 
-                        {/* <StoresCard deleteStore={onDeleteStore} store={wholesale} /> */}
+                        <ItemHeaders headerTitle={title} searchFilters ={data} />
 
-                        <Stack
-                            direction="row"
-                            justifyContent="space-between"
-                            spacing={4}
-                        >
-
-                            <Stack
-                                alignItems="center"
-                                direction="row"
-                                spacing={1}
-                            >
-                                <DialogFormForExcelImport importExcelSheet={importItemExcelSheet} />
-                                <Button
-                                    color="inherit"
-                                    startIcon={(
-                                        <SvgIcon fontSize="small">
-                                            <ArrowDownOnSquareIcon />
-                                        </SvgIcon>
-                                    )}
-                                >
-                                    Export
-                                </Button>
-                            </Stack>
-                            <div>
-                                <Link
-                                    href={{
-                                        pathname: '/items/create',
-                                    }}>
-                                    <Button
-                                        startIcon={(
-                                            <SvgIcon fontSize="small">
-                                                <PlusIcon />
-                                            </SvgIcon>
-                                        )}
-                                        variant="contained"
-                                    >
-                                        Add
-                                    </Button>
-                                </Link>
-                            </div>
-                        </Stack>
-
-                        
-                    
                         <BasicSearch onSearch={onSearch} type="item" />
                         <ItemsTable
                             count={totalElements}

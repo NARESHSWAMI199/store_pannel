@@ -11,6 +11,7 @@ import { useSelection } from 'src/hooks/use-selection';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import DialogFormForExcelImport from 'src/layouts/excel/import-excel';
 import { BasicSearch } from 'src/sections/basic-search';
+import { ItemHeaders } from 'src/sections/items-header';
 import { ItemsTable } from 'src/sections/wholesale/wholesale-table';
 import { host, rowsPerPageOptions, toTitleCase } from 'src/utils/util';
 
@@ -36,6 +37,7 @@ const Page = () => {
     const [open, setOpen] = useState()
     const [message, setMessage] = useState("")
     const [flag, setFlag] = useState("warning")
+    const [title, setTitle] = useState("Items")
 
 
 
@@ -67,7 +69,13 @@ const Page = () => {
     useEffect(()=>{
         setData((previous)=>({...data ,
             label : label,
-            storeId : wholesale?.id}))
+            storeId : wholesale?.id})
+        )
+        if(label === "N"){
+            setTitle("New Items")
+        }else if(label === "O"){
+            setTitle("Old Items")
+        }
     },[label])
     
 
@@ -252,54 +260,7 @@ const Page = () => {
                 <Container maxWidth="xl">
                     <Stack spacing={3}>
 
-                        {/* <StoresCard deleteStore={onDeleteStore} store={wholesale} /> */}
-
-                        <Stack
-                            direction="row"
-                            justifyContent="space-between"
-                            spacing={4}
-                        >
-
-                            <Stack
-                                alignItems="center"
-                                direction="row"
-                                spacing={1}
-                            >
-                                <DialogFormForExcelImport importExcelSheet={importItemExcelSheet} />
-                                <Button
-                                    color="inherit"
-                                    startIcon={(
-                                        <SvgIcon fontSize="small">
-                                            <ArrowDownOnSquareIcon />
-                                        </SvgIcon>
-                                    )}
-                                >
-                                    Export
-                                </Button>
-                            </Stack>
-                            <div>
-                                <Link
-                                    href={{
-                                        pathname: '/items/create/',
-                                        query: {
-                                            label : label
-                                        },
-                                    }}>
-                                    <Button
-                                        startIcon={(
-                                            <SvgIcon fontSize="small">
-                                                <PlusIcon />
-                                            </SvgIcon>
-                                        )}
-                                        variant="contained"
-                                    >
-                                        Add
-                                    </Button>
-                                </Link>
-                            </div>
-                        </Stack>
-
-                        
+                        <ItemHeaders headerTitle={title} searchFilters ={data} query= {{label : label }} />
                     
                         <BasicSearch onSearch={onSearch} type="item" />
                         <ItemsTable
