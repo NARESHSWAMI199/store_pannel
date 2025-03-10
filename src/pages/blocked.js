@@ -178,9 +178,9 @@ const Page = () => {
             >
                  <Container maxWidth="xxl" sx={{
                     px : {
-                            xs : 0,
-                            sm : 0,
-                            md : 0,
+                            xs : 1,
+                            sm : 1,
+                            md : 1,
                             lg : 5,
                             xl : 5
                         } 
