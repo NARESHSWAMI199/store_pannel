@@ -81,7 +81,7 @@ const Page = () => (
         py: 8
       }}
     >
-      <Container maxWidth="xl">
+      <Container maxWidth="xxl">
         <Stack spacing={3}>
           <Stack
             direction="row"

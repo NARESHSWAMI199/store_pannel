@@ -257,7 +257,15 @@ const Page = () => {
                     py :5
                 }}
             >
-                <Container maxWidth="xl">
+               <Container maxWidth="xxl" sx={{
+                    px : {
+                            xs : 0,
+                            sm : 0,
+                            md : 0,
+                            lg : 5,
+                            xl : 5
+                        } 
+                    }}>
                     <Stack spacing={3}>
 
                         <ItemHeaders headerTitle={title} searchFilters ={data} query= {{label : label }} />
