@@ -1,19 +1,18 @@
-import { CurrencyRupee, Discount, EditOutlined } from '@mui/icons-material';
+import { CurrencyRupee, Discount } from '@mui/icons-material';
 import KeyIcon from '@mui/icons-material/Key';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Alert, Box, Button, Card, CardContent, Container, Grid, Rating, Snackbar, Typography } from '@mui/material';
 import { Carousel, Image } from 'antd';
 import axios from 'axios';
 import { format } from 'date-fns';
 import Head from 'next/head';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from 'src/hooks/use-auth';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
-import { OptionMenu } from 'src/layouts/option-menu';
+import { ItemReviews } from 'src/sections/items/item-reviews';
 import { host, itemImage, toTitleCase } from 'src/utils/util';
-
+import CommentIcon from '@mui/icons-material/Comment';
 
 const now = new Date();
 
@@ -30,25 +29,14 @@ const Page = () => {
   const itemCreatedAt =   format(!!item.createdAt ? item.createdAt : 0, 'dd/MM/yyyy')
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [comments,setComments] = useState([])
   const [currentTarget,setCurrentTarget] = useState(null)
-  const openMenu = Boolean(currentTarget);
+  const [itemReviews,setItemReviews] = useState([])
   const [data,setData] = useState({
     pageNumber : page,
     size : rowsPerPage
   })
 
   const [totalElements , setTotalElements] = useState(0)
-
-
-  const handleOptionMenu = (e) =>{
-    setCurrentTarget(e.currentTarget)
-  }
-
-  const handleCloseMenu = () => {
-    setCurrentTarget(null);
-  };
-
 
   useEffect(() => {
     const getData = async () => {
@@ -71,37 +59,53 @@ const Page = () => {
 
 }, [])
 
-/** for item comments */
+
+// Getting item reviews */
 useEffect( ()=>{
-    const getData = async () => {
-       axios.defaults.headers = {
-         Authorization : auth.token
-       }
-       await axios.post(host+"/wholesale/item/comments/all",data)
-       .then(res => {
-          const data = res.data;
-           setComments(data);
-           console.log(data)
-       })
-       .catch(err => {
-         setFlag("error")
-         setMessage(!!err.response ? err.response.data.message : err.message)
-         setOpen(true)
-       } )
+  const getData = async () => {
+     axios.defaults.headers = {
+       Authorization : auth.token
      }
+     await axios.post(host+"/wholesale/item/review/all",{...data,itemId : item.id})
+     .then(res => {
+        const response = res.data;
+         setItemReviews(response.content);
+         setTotalElements(response.totalElements)
+     })
+     .catch(err => {
+       setFlag("error")
+       setMessage(!!err.response ? err.response.data.message : err.message)
+       setOpen(true)
+     } )
+   }
+   if(!!item?.id){
     getData();
+   }
+ },[data])
 
-   },[data])
 
-
-     /** for snackbar close */
+  /** for snackbar close */
   const handleClose = () => {
     setOpen(false)
   };
 
+  const handlePageChange = useCallback(
+    (event, value) => {
+      setPage(value);
+      setData({...data, pageNumber : value})
+    },
+    []
+  );
 
 
-  
+  const handleRowsPerPageChange = useCallback(
+    (event) => {
+      setRowsPerPage(event.target.value);
+    },
+    []
+  );
+
+
   return (
     <>
 
@@ -128,43 +132,48 @@ useEffect( ()=>{
             py: 8
           }}
       >
-        <Container maxWidth="xl">
-          <Card>
+        <Container maxWidth="xxl">
+        <Card>
             <CardContent>
-              {/* <BasicSearch onSearch={onSearch} /> */}
-              <Grid container spacing={3}>
-                  <Grid xs={12} md={3}> 
-                    <Carousel style={{
-                      height : 400,
-                      background : '#303030'
-                    }}>
-                      {!!item.avtars && item.avtars.split(',').map((avtar,index) =>{
-                       return (<Image
-                            key={index}
-                            width ={376}
-                            height={'auto'}
-                            max-width='300px'
-                            max-height='300px'
-                            src={itemImage+item.slug+"/"+avtar}
-                        />)
-                      })}
-                      </Carousel>
+              <Grid container>
+                  <Grid item xs={12} md={3}> 
+
+                    {/* image carousel */}
+                      <Carousel style={{
+                          width : '100%',
+                          height : 'auto',
+                          maxHeight : 400,
+                          background : '#303030'
+                        }}>
+                            {!!item.avtars && item.avtars.split(',').map((avtar,i) =>{
+                            return (<Image
+                                  key={i}
+                                  src={itemImage+item.slug+"/"+avtar}
+                                  height={400}
+                                  width={'100%'}
+                                  alt={item.name}
+                                  style={{objectFit : 'contain'}} 
+                              />)
+                            })}
+                        </Carousel>
                   </Grid>
+
                   {/* item Detail */}
-                    <Grid item xs={12} md={7} 
-                          style={{
+                    <Grid item xs={12} md={6} 
+                          sx={{
                             display : 'flex',
                             flexDirection : 'column',
                             justifyContent : 'center',
-                            // alignItems : 'center',
-                            textAlign : 'left'
+                            px : 5
                           }}
                       >
+            
+                      <Box sx={{ textAlign : 'left',}}>
                           <Typography component="div" variant="h5">
                               {toTitleCase(item.name)}
                           </Typography>
                           <Typography
-                              variant="subtitle"
+                              variant="h6"
                               component="div"
                               sx={{ color: 'text.secondary',fontSize : 15, my:1 }}
                           >
@@ -180,7 +189,7 @@ useEffect( ()=>{
                           </Typography>
 
                           <Typography
-                              variant="subtitle"
+                              variant="h6"
                               component="div"
                               sx={{ color: 'text.secondary',fontSize : 15, my:1 }}
                           >
@@ -196,7 +205,22 @@ useEffect( ()=>{
 
 
                           <Typography
-                              variant="subtitle"
+                              variant="h6"
+                              component="div"
+                              sx={{ color: 'text.secondary',fontSize : 15, my:1 }}
+                          >
+                              <div style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              flexWrap: 'wrap',
+                              }}>
+                              <CommentIcon sx={{ mr: 1, padding: 0.2 }} />
+                              <span>{(item.totalComments)} Comments</span>
+                              </div>  
+                          </Typography>
+
+                          <Typography
+                              variant="h6"
                               component="div"
                               sx={{ color: 'text.secondary', fontSize: 15, my: 1 }}
                           >
@@ -210,14 +234,16 @@ useEffect( ()=>{
                                       textDecoration : 'none'
                                       }}>
                                     
-                                      <div>Current Pice : <span style={{ fontWeight:'bold' , fontSize : '20px', marginRight : '10px' }}> { (Math.round((item.price - item.discount) * 100) / 100).toFixed(2)}</span></div>
+                                      <div> 
+                                        <span style={{ fontWeight:'bold' , color : 'black', fontSize : '20px', marginRight : '10px' }}> 
+                                        { (Math.round((item.price - item.discount) * 100) / 100).toFixed(2)}</span></div>
                                       <CurrencyRupee sx={{ padding: 0.3, mr: 1}}/>
                                       </div>  
                                   </Grid>
                               </Grid>
-                              </Typography>
+                          </Typography>
 
-                              <Typography
+                          <Typography
                                   variant="subtitle"
                                   component="div"
                                   sx={{ color: 'text.secondary', fontSize: 15, my: 1 }}
@@ -228,11 +254,14 @@ useEffect( ()=>{
                                         display: 'flex'
                                       }}>
                                       <div style={{display:'flex'}}>
-                                          <strike style={{fontSize : 20}}>{(Math.round((item.price) * 100) / 100).toFixed(2)}</strike>
+                                          <strike style={{fontSize : 14}}>{(Math.round((item.price) * 100) / 100).toFixed(2)}</strike>
                                           <CurrencyRupee sx={{ padding: 0.3, mr: 1 }}/>
                                       </div>
                                       <div style={{display:'flex'}}>
-                                          <span style={{ color:'red',fontSize : 20}}>{(Math.round((item.discount) * 100) / 100).toFixed(2)}</span>
+                                          <span style={{ color:'red',fontSize : 14}}>
+                                            {(Math.round((item.discount) * 100) / 100).toFixed(2)}
+                                            </span>
+                                          <CurrencyRupee sx={{ padding: 0.3, mr: 1 }}/>
                                           <Discount sx={{ padding: 0.3, mr: 1 }}/>
                                       </div>
                                       </div>  
@@ -240,25 +269,30 @@ useEffect( ()=>{
                               </Grid>
                           </Typography>
 
-                          <Rating value={parseFloat(item.rating)} sx={{my:1}}/>
-
+                        <Box sx={{display : 'flex', alignItems : 'center',my:1}}>
+                          <Rating readOnly value={parseFloat(item.rating)} sx={{mx : 1}}/>
+                            <Typography>
+                                  {item.totalRatingCount} Ratings
+                            </Typography>
+                        </Box>
+                      
+                        <Box sx={{display : 'flex', alignItems : 'center',my:1}}>
                           <Typography
-                                  variant="subtitle"
+                                  variant="h6"
                                   component="div"
                                   sx={{ color: 'text.secondary', fontSize: 15, mt: 1 }}
                               >
-                          
-                                  <div style={{
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      flexWrap: 'wrap',
-                                      }}>
-                                      <span style={{ color: "green" ,  fontSize : 15}}>Currently {item.inStock == "Y" ? <span style={{color:'green'}}>Avilable</span> : <span>Unavilable</span>}</span>
-                                  </div>  
+                                  {item.inStock == "Y" ? 
+                                    <span style={{color:'green'}}>Currently Avilable</span> : 
+                                    <span style={{ color: "red"}}>Currently Unavilable</span>
+                                  }
                           </Typography>
+                        </Box>
+                        </Box>
                   </Grid>
 
-                 <Grid xs={2} md={2} 
+
+                 <Grid item xs={12} md={2} 
                   style={{
                     display : "flex",
                     justifyContent : 'flex-end',
@@ -266,7 +300,7 @@ useEffect( ()=>{
                   }}
                  >
                         <Link href = {{
-                            pathname : "/item/update/[slug]",
+                            pathname : "/items/update/[slug]",
                             query : {slug : slug}
                         }}
                           style={{ 
@@ -278,48 +312,32 @@ useEffect( ()=>{
                             Edit
                           </Typography> </Button>
                       </Link>         
-                  </Grid>`
+                </Grid>
 
               </Grid>
             </CardContent>
           </Card>
-            <Box sx={{mt : 10, boxShadow : 1}}>
-              <Typography variant='h6' sx={{color : 'text.primary'}}>
-                  Customer Reviews :
-              </Typography>
-              {comments.map((comment,i) => {
-                  return (<Box 
-                  key ={i}
-                  style={{width : '100%' , padding : 20}} sx={{boxShadow : 1}}>
-                    <Grid container spacing={3}>
-                      <Grid item xs={11} md={11} >
-                        <Typography variant='subtitle' sx={{color : "text.primary", fontSize : 15}}>
-                          {comment.message}
-                        </Typography>
-                        <Typography variant='subtitle' component="div" sx={{color : "text.secondary",fontSize : 10}}>
-                          <span>{!!comment.createdAt ? format(parseInt(comment.createdAt),'dd/MM/yyyy') : '01/01/2000'}</span>
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={1} md={1} sx={{color:'text.secondary'}} >
 
+          <Box sx={{
+            my : 5
+          }}>
+            <Typography variant='h6'>
+                 Customers reivews : 
+            </Typography>
+          </Box>
 
-                      <Button
-                        id="demo-customized-button"
-                        aria-controls={openMenu ? 'demo-customized-menu' : undefined}
-                        aria-haspopup="true"
-                        aria-expanded={openMenu ? 'true' : undefined}
-                        // variant="contained"
-                        disableElevation
-                        onClick={handleOptionMenu}
-                        endIcon={<MoreVertIcon />}
-                      >
-                      </Button> 
-                          <OptionMenu currentTarget={currentTarget} handleClose={handleCloseMenu} />
-                      </Grid>
-                    </Grid>
-                  </Box>)
-              })}
-            </Box>
+          {/* Item Reviews */}
+          <Box>
+            <ItemReviews 
+              count={totalElements}
+              itemReviews={itemReviews}
+              onPageChange={handlePageChange}
+              onRowsPerPageChange={handleRowsPerPageChange}
+              page={page}
+              rowsPerPage={rowsPerPage}
+
+            />
+          </Box>
 
         </Container>
 
