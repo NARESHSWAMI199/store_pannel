@@ -47,6 +47,7 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
 
     return (
         <Box>
+            {/* Tabs for switching between chats and contacts */}
             <Box sx={{ display: 'flex', mx: 2 }}>
                 <Button 
                     variant='outlined' 
@@ -65,6 +66,7 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
                     Contacts
                 </Button>
             </Box>
+            {/* Contacts list */}
             <List>
                 {(activeTab === 'chats' ? contacts.filter(contact => contact.slug !== user.slug) : contacts).map((contact, index) => (
                     <ListItem 
@@ -81,6 +83,7 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
                             backgroundColor: activeTab === 'chats' ? (darkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)') : 'transparent',
                         }}
                     >
+                        {/* Contact avatar */}
                         <ListItemAvatar>
                             <Badge 
                                 color="secondary" 
@@ -90,6 +93,7 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
                                 <Avatar src={contact.avatar} />
                             </Badge>
                         </ListItemAvatar>
+                        {/* Contact details */}
                         <ListItemText 
                             primary={contact.username} 
                             secondary={contact.isOnline ? "Online" : `Last seen at ${new Date(contact.lastSeen).toLocaleTimeString()}`} 
@@ -108,6 +112,7 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
                     Add new contact
                 </Button>
             }
+            {/* Dialog for adding new contact */}
             <Dialog 
                 open={openDialog} 
                 onClose={() => setOpenDialog(false)} 
@@ -174,6 +179,7 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
                     
                     }
                     />
+                    {/* List of users found by search */}
                     <List>
                         {userList.map((user, index) => (
                             <ListItem key={index} 

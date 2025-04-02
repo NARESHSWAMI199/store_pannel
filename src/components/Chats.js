@@ -1,21 +1,57 @@
 import React, { useState } from 'react';
-import { Box, Avatar, Typography } from '@mui/material';
+import { Box, Avatar, Typography, Dialog, DialogTitle, DialogContent, IconButton, Button } from '@mui/material';
 import ReactTimeAgo from 'react-time-ago';
-import { userImage } from 'src/utils/util';
+import { host, toTitleCase, userImage } from 'src/utils/util';
 import DarkModeIcon from '@mui/icons-material/DarkMode'; // Import DarkMode icon
+import CloseIcon from '@mui/icons-material/Close';
 import Accept from 'src/components/Accept'
+import axios from 'axios';
 
 const Chats = (props) => {
 
     const {receiver, pastMessages, messages, showMessage, chatDivRef, setOpenEmojis, darkMode, handleDarkModeToggle} = props
     const [accept,setAccept] = useState(receiver.accept)
+    const [isDialogOpen, setIsDialogOpen] = useState(false); // State to manage dialog visibility
 
+    // Function to handle status change
     const onChangeStatus = (status) =>{
         setAccept(status)
     }    
 
+    // Function to toggle the dialog visibility
+    const toggleDialog = () => {
+        setIsDialogOpen(!isDialogOpen); // Toggle dialog visibility
+    };
+
+    // Function to get user type based on the code
+    const getUserType = (type) => {
+        switch (type) {
+            case 'W': return 'Wholesaler';
+            case 'R': return 'Retailer';
+            case 'S': return 'Company Person';
+            default: return 'Unknown';
+        }
+    };
+
+    // Function to block the user
+    const handleBlockUser = async () => {
+        try {
+            axios.get(host+`/block/${receiver?.slug}`)
+            .then(res => {
+                let response = res.data;
+                console.log(`User ${receiver?.username} has been blocked.`, response);
+                toggleDialog();
+            }).catch(error =>{
+                console.error(`Error blocking user ${receiver?.username}:`, error);
+            });
+        } catch (error) {
+           
+        }
+    };
+
     return (
         <Box>
+            {/* Header section with receiver's profile and dark mode toggle */}
             <Box 
                 sx={{ 
                     display: { xs: 'none', md: 'flex' }, 
@@ -29,7 +65,11 @@ const Chats = (props) => {
                     padding: '8px',
                 }}
             >
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                {/* Receiver's profile section */}
+                <Box 
+                    sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} 
+                    onClick={toggleDialog} // Open dialog on profile click
+                >
                     <Avatar 
                         sx={{ 
                             mx: 1 
@@ -65,6 +105,7 @@ const Chats = (props) => {
                         </Typography>
                     </Box>
                 </Box>
+                {/* Dark mode toggle button */}
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <DarkModeIcon 
                         sx={{ color: darkMode ? '#fff' : '#000', cursor: 'pointer' , mr : 5 }} 
@@ -72,6 +113,7 @@ const Chats = (props) => {
                     /> {/* Use DarkMode icon */}
                 </Box>
             </Box>
+            {/* Chat messages container */}
             <Box 
                 ref={chatDivRef} 
                 sx={{ 
@@ -92,11 +134,13 @@ const Chats = (props) => {
                 onClick={() => setOpenEmojis(false)}
             >
                 
+                {/* Accept component for pending status */}
                 {accept == 'S' &&
                      <Accept receiver={receiver} darkMode={darkMode} onChangeStatus={onChangeStatus} />
                 }
                 
                 
+                {/* Display past messages grouped by date */}
                 { accept == "A" && Object.keys(pastMessages).map(date => (
                     <React.Fragment key={date}>
                         <Box 
@@ -135,10 +179,68 @@ const Chats = (props) => {
                         ))}
                     </React.Fragment>
                 ))}
+                {/* Display current messages */}
                 {messages.map((message, index) => (
                     showMessage(message, index)
                 ))}
             </Box>
+
+            {/* Dialog for receiver details */}
+            <Dialog 
+                open={isDialogOpen} 
+                onClose={toggleDialog} 
+                PaperProps={{
+                    sx: {
+                        backgroundColor: darkMode ? '#333' : '#fff',
+                        color: darkMode ? '#fff' : '#000',
+                        width: 600,
+                        borderRadius: '8px'
+                    }
+                }}
+            >
+                {/* Dialog header with close button */}
+                <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    {toTitleCase(receiver?.username)}
+                    <IconButton onClick={toggleDialog} sx={{ color: darkMode ? '#fff' : '#000' }}>
+                        <CloseIcon />
+                    </IconButton>
+                </DialogTitle>
+                <DialogContent>
+                    {/* Receiver details */}
+                    <Box sx={{ textAlign: 'center', mb: 2 }}>
+                        <Avatar 
+                            sx={{ width: 80, height: 80, mx: 'auto', mb: 2 }} 
+                            src={receiver?.avatar} 
+                        />
+                        <Typography variant="h6">{receiver?.username}</Typography>
+                        <Typography variant="body2" sx={{ color: darkMode ? '#ccc' : '#666' }}>
+                            {receiver?.email || 'No email provided'}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: darkMode ? '#ccc' : '#666' }}>
+                            {getUserType(receiver?.userType)}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: darkMode ? '#ccc' : '#666' }}>
+                            Last Seen: 
+                            {receiver?.isOnline ? "Online" : (
+                                <ReactTimeAgo 
+                                    date={receiver?.lastSeen || receiver?.createdAt} 
+                                    locale="en-US" 
+                                    style={{ fontSize: '10px' }} 
+                                />
+                            )}
+                        </Typography>
+                        {/* Block button */}
+                        <Button 
+                            variant="contained" 
+                            color="error" 
+                            sx={{ mt: 2 }} 
+                            onClick={handleBlockUser}
+                        >
+                            Block
+                        </Button>
+                    </Box>
+                </DialogContent>
+            </Dialog>
         </Box>
     );
 };

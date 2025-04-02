@@ -1,3 +1,5 @@
+// Import statements
+// Importing necessary libraries, components, and utilities
 import React from 'react'
 import SendIcon from '@mui/icons-material/Send';
 import {
@@ -50,6 +52,7 @@ import Chats from 'src/components/Chats';
 TimeAgo.addLocale(en);
 TimeAgo.addLocale(ru);
 
+// Helper function to fetch username by slug
 const fetchUsername = async (slug, token) => {
     try {
         const response = await axios.get(`${host}/wholesale/auth/detail`, {
@@ -63,13 +66,16 @@ const fetchUsername = async (slug, token) => {
     }
 };
 
+// Helper function to handle unauthorized responses
 const handleUnauthorizedResponse = (error, router) => {
     if (error.response && error.response.status === 401) {
         router.push('/auth/login');
     }
 };
 
+// Main Page component
 function Page() {
+    // Router and state variables
     const router = useRouter();
     const [newMessage, setNewMessage] = useState();
     const [messages, setMessages] = useState([]);
@@ -103,11 +109,13 @@ function Page() {
     const [darkMode, setDarkMode] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
 
+    // Effect to load dark mode preference from localStorage
     useEffect(() => {
         const savedDarkMode = localStorage.getItem('darkMode') === 'true';
         setDarkMode(savedDarkMode);
     }, []);
 
+    // Scroll event handler to check if the user is at the bottom of the chat
     const handleScroll = () => {
         if (chatDivRef.current) {
             const { scrollTop, scrollHeight, clientHeight } = chatDivRef.current;
@@ -115,6 +123,7 @@ function Page() {
         }
     };
 
+    // Cleanup scroll event listener on component unmount
     useEffect(() => {
         return () => {
             if (chatDivRef.current) {
@@ -123,6 +132,7 @@ function Page() {
         };
     }, [ chatDivRef.current?.addEventListener('scroll',handleScroll)]);
 
+    // Effect to initialize WebSocket client and handle connection lifecycle
     useEffect(() => {
         document.cookie = `X-Username=${user?.slug}; path=/`;
         const wsClient = createWebSocketClient(user, setNewMessage, setMessages,setPastMessages, setChatUsers, setIsPlaying,showNotification,auth);
@@ -137,6 +147,7 @@ function Page() {
         };
     }, []);
 
+    // Effect to subscribe to "seen" messages when receiver changes
     useEffect(() => {
         if (client && client.connected && receiver) {
             client.publish({ destination: `/app/chats/was-seen/${receiver.slug}` });
@@ -144,16 +155,19 @@ function Page() {
         }
     }, [receiver, newMessage]);
 
+    // Effect to fetch past messages when receiver changes
     useEffect(() => {
         if (receiver) {
             fetchPastMessages(receiver, setPastMessages, auth.token, setMessages, router);
         }
     }, [receiver]);
 
+    // Effect to close emoji picker when receiver changes
     useEffect(() => {
         setOpenEmojis(false);
     }, [receiver]);
 
+    // Effect to periodically update chat users' online status
     useEffect(() => {
         const intervalId = setInterval(() => {
             updateChatUsersStatus(chatUsers, setChatUsers, auth.token,router);
@@ -162,20 +176,24 @@ function Page() {
         return () => clearInterval(intervalId);
     }, [chatUsers]);
 
+    // Effect to fetch contact users on component mount
     useEffect(() => {
         fetchContactUsers(setContactUsers, auth.token,router);
     }, []);
 
+    // Effect to fetch chat users on component mount
     useEffect(() => {
         fetchChatUsers(setChatUsers, auth.token,router);
     }, []);
 
+    // Effect to update seen messages when receiver or new message changes
     useEffect(() => {
         if (receiver) {
             updateSeenMessages(receiver, setChatUsers, auth.token, router);
         }
     }, [receiver, newMessage]);
 
+    // Effect to handle "Enter" key press for sending messages
     useEffect(() => {
         const listener = (event) => {
             if ((event.code === "Enter" || event.code === "NumpadEnter") && !event.shiftKey) {
@@ -189,6 +207,7 @@ function Page() {
         };
     }, [chatMessage, auth.token]);
 
+    // Effect to observe menu div width for responsive layout
     useEffect(() => {
         const getAppBarHeight = () => {
             if (menuDivRef.current) {
@@ -211,6 +230,7 @@ function Page() {
         };
     }, [menuDivRef]);
 
+    // Effect to initialize and cleanup notification sound
     useEffect(() => {
         const sound = new Howl({
             src: ['/assets/notification.mp3'],
@@ -232,18 +252,21 @@ function Page() {
         setIsPlaying(false);
     }, [isPlaying]);
 
+    // Effect to request notification permission on component mount
     useEffect(() => {
         if (Notification.permission !== "granted") {
             Notification.requestPermission();
         }
     }, []);
 
+    // Effect to redirect to login if token is missing
     useEffect(() => {
         if (!auth.token) {
             router.push('/auth/login');
         }
     }, [auth.token]);
 
+    // Function to handle sending messages
     const handleSendMessage = (token) => {
         if (chatMessage || selectedImages.length > 0) {
             const messageBody = createMessageBody(chatMessage, user, receiver, selectedImages);
@@ -257,6 +280,7 @@ function Page() {
         }
     };
 
+    // Function to handle key down events for sending messages
     const handleKeyDown = (event) => {
         if ((event.code === "Enter" || event.code === "NumpadEnter") && !event.shiftKey) {
             handleSendMessage(auth.token);
@@ -271,10 +295,12 @@ function Page() {
         };
     }, [chatMessage, selectedImages, auth.token]);
 
+    // Function to handle chat message input change
     const handleChange = (event) => {
         setChatMessage(event.target.value);
     };
 
+    // Function to handle image selection for messages
     const handleImageChange = (event) => {
         if (event.target.files) {
             const filesArray = Array.from(event.target.files);
@@ -287,17 +313,20 @@ function Page() {
         }
     };
 
+    // Function to remove selected image
     const handleRemoveImage = (index) => {
         setSelectedImages(prevImages => prevImages.filter((_, i) => i !== index));
         setImagePreviews(prevPreviews => prevPreviews.filter((_, i) => i !== index));
     };
 
+    // Function to reset file input value
     const handleFileInputClick = () => {
         if (fileInputRef.current) {
             fileInputRef.current.value = null; // Reset the input value to allow selecting the same file again
         }
     };
 
+    // Function to scroll down to the latest message
     const scrollDown = useCallback(() => {
         setNewMessage(undefined);
         if (chatDivRef.current) {
@@ -311,20 +340,24 @@ function Page() {
         }
     }, [chatMessage]);
 
+    // Function to handle image download
     const handleDownloadImage = (url) => {
         window.open(url)
     };
 
+    // Function to open message menu
     const handleMenuOpen = (event, message) => {
         setAnchorEl(event.currentTarget);
         setSelectedMessage(message);
     };
 
+    // Function to close message menu
     const handleMenuClose = () => {
         setAnchorEl(null);
         setSelectedMessage(null);
     };
 
+    // Function to reply to a message
     const handleReply = async () => {
         const username = await fetchUsername(selectedMessage.sender, auth.token);
         if (username) {
@@ -333,16 +366,19 @@ function Page() {
         handleMenuClose();
     };
 
+    // Function to copy message text
     const handleCopy = () => {
         navigator.clipboard.writeText(selectedMessage.message);
         handleMenuClose();
     };
 
+    // Function to handle message deletion
     const handleDelete = (type) => {
         setDeleteType(type);
         setOpenDialog(true);
     };
 
+    // Function to confirm message deletion
     const confirmDelete = async (setMessages,router) => {
         let isDeleted;
         if (selectedMessage?.isSenderDeleted === 'H' && selectedMessage?.sender === user?.slug) {
@@ -417,6 +453,7 @@ function Page() {
         });
     };
 
+    // Mouse enter and leave handlers for hover effects
     const handleMouseEnter = () => {
         setIsHovered(true);
     };
@@ -425,10 +462,12 @@ function Page() {
         setIsHovered(false);
     };
 
+    // Snackbar close handler
     const handleSnackbarClose = () => {
         setSnackbarOpen(false);
     };
 
+    // Function to highlight text (e.g., URLs, usernames)
     const highlightText = (text) => {
         const emailRegex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/gi;
         const urlRegex = /(https?:\/\/[^\s]+)/gi;
@@ -440,6 +479,7 @@ function Page() {
             .replace(usernameRegex, '<span style="color: blue;">$&</span>');
     };
 
+    // Function to render individual messages
     const showMessage = (message, index) => {
         return (
             <ShowMessages
@@ -457,6 +497,7 @@ function Page() {
         );
     };
 
+    // Function to render past messages grouped by date
     const showPastMessages = (pastMessages) => {
         return Object.keys(pastMessages).map((date, index) => (
             <div key={index}>
@@ -468,17 +509,20 @@ function Page() {
         ));
     };
 
+    // Function to handle back button click (mobile view)
     const handleBackClick = () => {
         setReceiver(null);
         setShowChatList(true);
     };
 
+    // Function to get initials from a username
     const getInitials = (name) => {
         const names = name.split(' ');
         const initials = names.map(n => n[0]).join('');
         return initials.toUpperCase();
     };
 
+    // Function to toggle dark mode
     const handleDarkModeToggle = () => {
         setDarkMode(prevMode => {
             const newMode = !prevMode;
@@ -487,10 +531,12 @@ function Page() {
         });
     };
 
+    // Function to handle search input change
     const handleSearchChange = (event) => {
         setSearchQuery(event.target.value);
     };
 
+    // Filtered contacts and chats based on search query
     const filteredContacts = contactUsers.filter(contact => 
         contact.username.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -501,6 +547,7 @@ function Page() {
 
     return (
         <Box 
+            // Main container for the chat page
             sx={{ 
                 position: 'fixed', 
                 bottom: 0, 
@@ -513,6 +560,7 @@ function Page() {
             <Grid container>
                 {showChatList && (
                     <Grid 
+                        // Sidebar for chat list and contacts
                         ref={menuDivRef} 
                         item 
                         xs={12} 
@@ -526,6 +574,7 @@ function Page() {
                         }}
                     >
                         <Stack 
+                            // Search bar for filtering contacts or chats
                             spacing={1.5} 
                             sx={{ 
                                 py: 1, 
@@ -533,6 +582,7 @@ function Page() {
                             }}
                         >
                             <Paper 
+                                // Search input field
                                 component="form" 
                                 sx={{ 
                                     p: '2px 4px', 
@@ -542,6 +592,7 @@ function Page() {
                                 }}
                             >
                                 <InputBase 
+                                    // Input for search query
                                     sx={{ 
                                         ml: 1, 
                                         flex: 1, 
@@ -556,6 +607,7 @@ function Page() {
                                     onChange={handleSearchChange}
                                 />
                                 <IconButton 
+                                    // Search button
                                     type="button" 
                                     sx={{ 
                                         p: '10px' 
@@ -568,6 +620,7 @@ function Page() {
                         </Stack>
                         {/* Contacts */}
                         <Contacts
+                            // Component to display contacts or chats
                             contacts={activeTab === 'chats' ? filteredChats : filteredContacts}
                             activeTab={activeTab}
                             setActiveTab={setActiveTab}
@@ -579,6 +632,7 @@ function Page() {
                     </Grid>
                 )}
                 <Grid 
+                    // Main chat area
                     item 
                     xs={12} 
                     md={8} 
@@ -591,6 +645,7 @@ function Page() {
                     {!!receiver ? (
                         <>
                             <Box 
+                                // Header for chat with receiver details (mobile view)
                                 sx={{ 
                                     display: { xs: 'flex', md: 'none' }, 
                                     alignItems: 'center', 
@@ -600,6 +655,7 @@ function Page() {
                                 }}
                             >
                                 <IconButton 
+                                    // Back button for mobile view
                                     onClick={handleBackClick} 
                                     sx={{ 
                                         color: 'white' 
@@ -609,6 +665,7 @@ function Page() {
                                 </IconButton>
                                 {receiver.avatar ? (
                                     <Avatar 
+                                        // Avatar for receiver
                                         src={`${userImage}${receiver.slug}/${receiver.avatar}`} 
                                         sx={{ 
                                             ml: 2 
@@ -616,6 +673,7 @@ function Page() {
                                     />
                                 ) : (
                                     <Avatar 
+                                        // Initials for receiver if no avatar
                                         sx={{ 
                                             ml: 2 
                                         }}
@@ -624,6 +682,7 @@ function Page() {
                                     </Avatar>
                                 )}
                                 <Box 
+                                    // Receiver details (username, online status)
                                     sx={{ 
                                         display: 'flex', 
                                         flexDirection: 'column', 
@@ -631,11 +690,13 @@ function Page() {
                                     }}
                                 >
                                     <Typography 
+                                        // Receiver username
                                         variant="h6"
                                     >
                                         {receiver.username}
                                     </Typography>
                                     <Typography 
+                                        // Receiver online status or last seen
                                         variant="caption"
                                         sx={{ fontSize: '0.8em' }}
                                     >
@@ -645,6 +706,7 @@ function Page() {
                             </Box>
                             {/* Chats */}
                             <Chats
+                                // Component to display chat messages
                                 receiver={receiver}
                                 pastMessages={pastMessages}
                                 messages={messages}
@@ -655,6 +717,7 @@ function Page() {
                                 handleDarkModeToggle={handleDarkModeToggle}
                             />
                             <Box 
+                                // Input area for typing and sending messages
                                 sx={{ 
                                     position: 'absolute', 
                                     bottom: 2, 
@@ -665,11 +728,13 @@ function Page() {
                                 }}
                             >
                                 <EmojiPicker 
+                                    // Emoji picker for adding emojis to messages
                                     open={openEmojis} 
                                     width={'100%'} 
                                     onEmojiClick={(emojiObj) => setChatMessage(prev => `${prev || ''} ${emojiObj.emoji}`)} 
                                 />
                                 <Box 
+                                    // Container for message input and image previews
                                     sx={{ 
                                         display: 'flex', 
                                         flexDirection: 'column', 
@@ -678,6 +743,7 @@ function Page() {
                                     }}
                                 >
                                     <Box 
+                                        // Image previews for selected images
                                         sx={{ 
                                             display: 'flex', 
                                             flexWrap: 'wrap', 
@@ -686,6 +752,7 @@ function Page() {
                                     >
                                         {imagePreviews.map((preview, index) => (
                                             <Box 
+                                                // Individual image preview
                                                 key={index} 
                                                 sx={{ 
                                                     position: 'relative', 
@@ -693,6 +760,7 @@ function Page() {
                                                 }}
                                             >
                                                 <img 
+                                                    // Image preview
                                                     src={preview} 
                                                     alt={`preview-${index}`} 
                                                     style={{ 
@@ -703,6 +771,7 @@ function Page() {
                                                     }} 
                                                 />
                                                 <IconButton 
+                                                    // Remove image button
                                                     sx={{ 
                                                         position: 'absolute', 
                                                         top: 0, 
@@ -716,6 +785,7 @@ function Page() {
                                         ))}
                                     </Box>
                                     <TextField 
+                                        // Input field for typing messages
                                         sx={{ 
                                             backgroundColor: darkMode ? '#333' : '#fff', 
                                             justifyContent: 'center',
@@ -793,6 +863,7 @@ function Page() {
                             </Box>
                             {!isAtBottom && (
                                 <Box 
+                                    // Scroll down button when not at the bottom
                                     sx={{ 
                                         position: 'absolute', 
                                         right: 20, 
@@ -803,11 +874,13 @@ function Page() {
                                     onClick={scrollDown}
                                 >
                                     <Badge 
+                                        // Notification badge for new messages
                                         color='success' 
                                         variant="dot" 
                                         invisible={!(newMessage?.sender === receiver.slug)}
                                     >
                                         <KeyboardArrowDownIcon 
+                                            // Scroll down icon
                                             sx={{ 
                                                 borderRadius: 50, 
                                                 justifySelf: 'center', 
@@ -822,6 +895,7 @@ function Page() {
                         </>
                     ) : (
                         <Box 
+                            // Placeholder when no chat is selected
                             sx={{ 
                                 display: 'flex', 
                                 flexDirection: 'column', 
@@ -831,6 +905,7 @@ function Page() {
                             }}
                         >
                             <img 
+                                // Default chat image
                                 src={defaultChatImage} 
                                 style={{ 
                                     minHeight: 200, 
@@ -839,6 +914,7 @@ function Page() {
                                 alt="Live chat" 
                             />
                             <Typography 
+                                // Placeholder text
                                 variant='h5' 
                                 color={"#6c757d"} 
                                 fontFamily={"sans-serif"}
@@ -850,6 +926,7 @@ function Page() {
                 </Grid>
             </Grid>
             <Menu
+                // Context menu for message actions (reply, copy, delete)
                 anchorEl={anchorEl}
                 open={Boolean(anchorEl)}
                 onClose={handleMenuClose}
@@ -891,6 +968,7 @@ function Page() {
                 </MenuList>
             </Menu>
             <Dialog
+                // Confirmation dialog for message deletion
                 open={openDialog}
                 onClose={() => setOpenDialog(false)}
                 aria-labelledby="alert-dialog-title"
@@ -902,24 +980,47 @@ function Page() {
                     }
                 }}
             >
-                <DialogTitle id="alert-dialog-title" sx={{ backgroundColor: darkMode ? '#333' : '#fff', color: darkMode ? '#fff' : '#000' }}>
+                <DialogTitle 
+                    // Dialog title
+                    id="alert-dialog-title" 
+                    sx={{ backgroundColor: darkMode ? '#333' : '#fff', color: darkMode ? '#fff' : '#000' }}
+                >
                     {"Confirm Deletion"}
                 </DialogTitle>
-                <DialogContent sx={{ backgroundColor: darkMode ? '#333' : '#fff', color: darkMode ? '#fff' : '#000' }}>
-                    <DialogContentText id="alert-dialog-description">
+                <DialogContent 
+                    // Dialog content
+                    sx={{ backgroundColor: darkMode ? '#333' : '#fff', color: darkMode ? '#fff' : '#000' }}
+                >
+                    <DialogContentText 
+                        // Dialog description
+                        id="alert-dialog-description"
+                    >
                         Are you sure you want to delete this message?
                     </DialogContentText>
                 </DialogContent>
-                <DialogActions sx={{ backgroundColor: darkMode ? '#333' : '#fff', color: darkMode ? '#fff' : '#000' }}>
-                    <Button onClick={() => setOpenDialog(false)} sx={{ color: darkMode ? '#fff' : '#000' }}>
+                <DialogActions 
+                    // Dialog actions (Cancel, Confirm)
+                    sx={{ backgroundColor: darkMode ? '#333' : '#fff', color: darkMode ? '#fff' : '#000' }}
+                >
+                    <Button 
+                        // Cancel button
+                        onClick={() => setOpenDialog(false)} 
+                        sx={{ color: darkMode ? '#fff' : '#000' }}
+                    >
                         Cancel
                     </Button>
-                    <Button onClick={()=>confirmDelete(setMessages,router)} sx={{ color: darkMode ? '#fff' : '#000' }} autoFocus>
+                    <Button 
+                        // Confirm button
+                        onClick={()=>confirmDelete(setMessages,router)} 
+                        sx={{ color: darkMode ? '#fff' : '#000' }} 
+                        autoFocus
+                    >
                         Confirm
                     </Button>
                 </DialogActions>
             </Dialog>
             <Snackbar
+                // Snackbar for showing notifications
                 open={snackbarOpen}
                 autoHideDuration={6000}
                 onClose={handleSnackbarClose}
@@ -942,6 +1043,7 @@ export default Page;
 
 
 // Helper functions
+// Function to create WebSocket client
 const createWebSocketClient = (user, setNewMessage, setMessages,setPastMessages, setChatUsers, setIsPlaying, showNotification,auth) => {
     const wsClient = new Client({
         brokerURL: 'ws://localhost:8080/chat',
@@ -1000,6 +1102,7 @@ const createWebSocketClient = (user, setNewMessage, setMessages,setPastMessages,
     return wsClient;
 };
 
+// Function to handle browser unload event
 const handleBeforeUnload = async (event,client) => {
     event.preventDefault();
     await updateUserLastSeen()
@@ -1012,6 +1115,7 @@ const handleBeforeUnload = async (event,client) => {
         });
 };
 
+// Function to subscribe to "seen" messages
 const subscribeToSeenMessages = (client, user, setMessages) => {
     client.subscribe(`/user/${user?.slug}/queue/private/chat/seen`, (data) => {
         const seen = JSON.parse(data.body);
@@ -1022,6 +1126,7 @@ const subscribeToSeenMessages = (client, user, setMessages) => {
     });
 };
 
+// Function to fetch past messages
 const fetchPastMessages = (receiver, setPastMessages,token,setMessages,router) => {
     axios.defaults.headers = { Authorization: token };
     axios.post(`${host}/chats/all`, { receiver: receiver.slug })
@@ -1034,6 +1139,7 @@ const fetchPastMessages = (receiver, setPastMessages,token,setMessages,router) =
         });
 };
 
+// Function to update chat users' online status
 const updateChatUsersStatus = (chatUsers, setChatUsers, token,router) => {
     axios.defaults.headers = { Authorization: token };
     setChatUsers(prevUsers => prevUsers.map(chatUser => {
@@ -1049,6 +1155,7 @@ const updateChatUsersStatus = (chatUsers, setChatUsers, token,router) => {
     }));
 };
 
+// Function to fetch contact users
 const fetchContactUsers = (setContactUsers, token,router) => {
     axios.defaults.headers = { Authorization: token };
     axios.get(`${host}/contacts/all`)
@@ -1060,6 +1167,7 @@ const fetchContactUsers = (setContactUsers, token,router) => {
         });
 };
 
+// Function to fetch chat users
 const fetchChatUsers = (setChatUsers, token,router) => {
     axios.defaults.headers = { Authorization: token };
     axios.get(`${host}/chat-users/all`)
@@ -1075,6 +1183,7 @@ const fetchChatUsers = (setChatUsers, token,router) => {
         });
 };
 
+// Function to update seen messages
 const updateSeenMessages = (receiver, setChatUsers, token, router) => {
     axios.defaults.headers = { Authorization: token };
     axios.post(`${host}/chat/seen`, { sender: receiver?.slug })
@@ -1092,6 +1201,7 @@ const updateSeenMessages = (receiver, setChatUsers, token, router) => {
         });
 };
 
+// Function to create message body
 const createMessageBody = (chatMessage, user, receiver, images) => {
     const messageBody = {
         type: 'chat',
@@ -1104,6 +1214,7 @@ const createMessageBody = (chatMessage, user, receiver, images) => {
     return messageBody;
 };
 
+// Function to send message
 const sendMessage = (client,token,messageBody) => {
     if (client) { 
         client.activate();
@@ -1128,6 +1239,7 @@ const sendMessage = (client,token,messageBody) => {
     }
 };
 
+// Function to update user's last seen
 const updateUserLastSeen = async () => {
     return axios.get(`${host}/wholesale/auth/last-seen`)
         .then(res => res.data)
@@ -1136,6 +1248,7 @@ const updateUserLastSeen = async () => {
         });
 };
 
+// Function to show browser notification
 const showNotification = async (message,token) => {
     const username = await fetchUsername(message.sender, token);
     if (username && Notification.permission === "granted") {
