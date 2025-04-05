@@ -1,15 +1,20 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, use } from 'react';
 import { Box, Avatar, Typography, List, ListItem, ListItemAvatar, Button, SvgIcon, ListItemText, Badge, Dialog, DialogTitle, DialogContent, DialogActions, TextField, IconButton, Paper, InputAdornment } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import ChatIcon from '@mui/icons-material/Chat';
 import axios from 'axios';
 import { userImage, host } from 'src/utils/util';
 import SearchIcon from '@mui/icons-material/Search';
+import { set } from 'nprogress';
 
 const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth, user, darkMode }) => {
     const [openDialog, setOpenDialog] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [userList, setUserList] = useState([]);
+    const [contactList, setContactList] = useState([]);
+    useEffect(() => {
+        setContactList(contacts);
+    }, []);
 
     const searchUsers = () =>{
         axios.post(`${host}/wholesale/auth/chat/users`,{
@@ -25,19 +30,39 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
     }
 
     useEffect(()=>{
-        if (openDialog) {
-            searchUsers()
-        }
+        refreshContacts(); // Refresh contacts after closing the dialog
     },[openDialog])
 
+    useEffect(() => {
+        searchUsers();
+    },[searchQuery]);
+   
     const handleSearchChange = (event) => {
         const query = event.target.value;
         setSearchQuery(query);
     };
 
     const handleAddContact = (contact) => {
-        // Implement the logic to add the contact
-        console.log('Add contact:', contact);
+        axios.post(`${host}/contacts/add`, { contactSlug: contact.slug })
+            .then(response => {
+                console.log('Contact added successfully:', response.data);
+                setUserList(prevList => prevList.map(user => 
+                    user.slug === contact.slug ? { ...user, added: true } : user
+                )); // Mark the contact as "Added"
+            })
+            .catch(error => {
+                console.error('Error adding contact:', error);
+            });
+    };
+
+    const refreshContacts = () => {
+        axios.get(`${host}/contacts/all`)
+            .then(response => {
+                setContactList(response.data); // Refresh the contacts list
+            })
+            .catch(error => {
+                console.error('Error refreshing contacts:', error);
+            });
     };
 
     const handleChat = (contact) => {
@@ -68,7 +93,7 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
             </Box>
             {/* Contacts list */}
             <List>
-                {(activeTab === 'chats' ? contacts.filter(contact => contact.slug !== user.slug) : contacts).map((contact, index) => (
+                {(activeTab === 'chats' ? contactList.filter(contact => contact.slug !== user.slug) : contactList).map((contact, index) => (
                     <ListItem 
                         key={index} 
                         button 
@@ -189,20 +214,23 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
                                 </ListItemAvatar>
                                 <ListItemText primary={user.username} />
                                 <Box sx={{ display: 'flex', gap: 1 }}>
-                                    <Button 
-                                        color="inherit" 
-                                        onClick={() => handleAddContact(user)}
-                                        startIcon={<AddIcon />}
-                                        sx={{
-                                            boxShadow: 1,
-                                            '&:hover': {
-                                                boxShadow: 3,
-                                                backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-                                            }
-                                        }}
-                                    >
-                                        Add
-                                    </Button>
+                                    {!contacts.some(contact => contact.slug === user.slug) && (
+                                        <Button 
+                                            color="inherit" 
+                                            onClick={() => handleAddContact(user)}
+                                            startIcon={<AddIcon />}
+                                            disabled={user.added} // Disable button if already added
+                                            sx={{
+                                                boxShadow: 1,
+                                                '&:hover': {
+                                                    boxShadow: 3,
+                                                    backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+                                                }
+                                            }}
+                                        >
+                                            {user.added ? "Added" : "Add"}
+                                        </Button>
+                                    )}
                                     <Button 
                                         color="inherit" 
                                         onClick={() => handleChat(user)}
@@ -222,9 +250,13 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
                         ))}
                     </List>
                 </DialogContent>
-                <DialogActions sx={{ backgroundColor: darkMode ? '#333' : '#fff', color: darkMode ? '#fff' : '#000' }}>
+                <DialogActions 
+                    sx={{ backgroundColor: darkMode ? '#333' : '#fff', color: darkMode ? '#fff' : '#000' }}
+                >
                     <Button 
-                        onClick={() => setOpenDialog(false)} 
+                        onClick={() => {
+                            setOpenDialog(false);
+                        }} 
                         sx={{ color: darkMode ? '#fff' : '#000' }}
                     >
                         Cancel

@@ -1119,7 +1119,6 @@ const handleBeforeUnload = async (event,client) => {
 const subscribeToSeenMessages = (client, user, setMessages) => {
     client.subscribe(`/user/${user?.slug}/queue/private/chat/seen`, (data) => {
         const seen = JSON.parse(data.body);
-        alert('You are now connected to the chat', {seen});
         setMessages(prevMessages => prevMessages.map(message => {
             message.seen = seen;
             return message;
