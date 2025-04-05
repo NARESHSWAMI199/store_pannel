@@ -1063,7 +1063,7 @@ const createWebSocketClient = (user, setNewMessage, setMessages,setPastMessages,
             showNotification(message,auth.token);
             const visitedUser = [];
             setChatUsers(prevChatUsers => prevChatUsers.map(chatUser => {
-                if (chatUser.slug === message.sender && !message.seen && !visitedUser.includes(chatUser.slug)) {
+                if (chatUser.slug === message.sender && !message.seen && message.isSent==="S" && !visitedUser.includes(chatUser.slug)) {
                     chatUser.chatNotification += 1;
                     visitedUser.push(chatUser.slug);
                     setIsPlaying(true);
@@ -1119,6 +1119,7 @@ const handleBeforeUnload = async (event,client) => {
 const subscribeToSeenMessages = (client, user, setMessages) => {
     client.subscribe(`/user/${user?.slug}/queue/private/chat/seen`, (data) => {
         const seen = JSON.parse(data.body);
+        alert('You are now connected to the chat', {seen});
         setMessages(prevMessages => prevMessages.map(message => {
             message.seen = seen;
             return message;

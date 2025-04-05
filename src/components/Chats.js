@@ -9,7 +9,8 @@ import axios from 'axios';
 
 const Chats = (props) => {
 
-    const {receiver, pastMessages, messages, showMessage, chatDivRef, setOpenEmojis, darkMode, handleDarkModeToggle} = props
+    const {pastMessages, messages, showMessage, chatDivRef, setOpenEmojis, darkMode, handleDarkModeToggle} = props
+    const [receiver, setReceiver] = useState(props.receiver)
     const [accept,setAccept] = useState(receiver.accept)
     const [isDialogOpen, setIsDialogOpen] = useState(false); // State to manage dialog visibility
 
@@ -40,7 +41,7 @@ const Chats = (props) => {
             .then(res => {
                 let response = res.data;
                 console.log(`User ${receiver?.username} has been blocked.`, response);
-                toggleDialog();
+                setReceiver({...receiver, blocked: true}); // Update receiver state to reflect blocking
             }).catch(error =>{
                 console.error(`Error blocking user ${receiver?.username}:`, error);
             });
@@ -48,6 +49,22 @@ const Chats = (props) => {
            
         }
     };
+
+    // Function to unblock the user
+    const handleUnblockUser = async () => { 
+        try {
+            axios.get(host+`/unblock/${receiver?.slug}`)
+            .then(res => {
+                let response = res.data;
+                console.log(`User ${receiver?.username} has been unblocked.`, response);
+                setReceiver({...receiver, blocked: false}); // Update receiver state to reflect unblocking
+            }).catch(error =>{
+                console.error(`Error unblocking user ${receiver?.username}:`, error);
+            });
+        } catch (error) {
+           
+        }
+    }
 
     return (
         <Box>
@@ -229,7 +246,19 @@ const Chats = (props) => {
                                 />
                             )}
                         </Typography>
-                        {/* Block button */}
+
+                        {receiver.blocked ?     
+                        //  Ublock button
+                        <Button 
+                            variant="contained" 
+                            color="success" 
+                            sx={{ mt: 2 }} 
+                            onClick={handleUnblockUser}
+                        >
+                            Unblock
+                        </Button>:
+
+                         // Block button
                         <Button 
                             variant="contained" 
                             color="error" 
@@ -238,6 +267,7 @@ const Chats = (props) => {
                         >
                             Block
                         </Button>
+}
                     </Box>
                 </DialogContent>
             </Dialog>
