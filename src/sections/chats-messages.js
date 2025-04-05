@@ -33,6 +33,11 @@ const ShowMessages = ({ message, user, receiver, handleMouseEnter, handleMouseLe
     const shouldHideImages = (message.isSenderDeleted === 'H' && message.sender === user?.slug) || 
                              (message.isReceiverDeleted === 'H' && message.receiver === user?.slug);
 
+    // Exclude messages with isSent = "F" for the receiver
+    if (message.isSent === "F" && message.receiver === user?.slug) {
+        return null;
+    }
+
     // Highlight URLs in the message
     const highlightText = (text) => {
         const urlRegex = /(https?:\/\/[^\s]+)/gi;
