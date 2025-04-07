@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import { Box, Avatar, Typography, Dialog, DialogTitle, DialogContent, IconButton, Button } from '@mui/material';
 import ReactTimeAgo from 'react-time-ago';
 import { host, toTitleCase, userImage } from 'src/utils/util';
@@ -11,8 +11,15 @@ const Chats = (props) => {
 
     const {pastMessages, messages, showMessage, chatDivRef, setOpenEmojis, darkMode, handleDarkModeToggle} = props
     const [receiver, setReceiver] = useState(props.receiver)
-    const [accept,setAccept] = useState(receiver.accept)
+    const [accept,setAccept] = useState(props.receiver?.accept)
     const [isDialogOpen, setIsDialogOpen] = useState(false); // State to manage dialog visibility
+
+    useEffect(() => {
+        setReceiver(props.receiver);
+        setAccept(props.receiver?.accept) // Update receiver state when props change
+    }, [props.receiver]);
+
+    
 
     // Function to handle status change
     const onChangeStatus = (status) =>{
@@ -156,9 +163,8 @@ const Chats = (props) => {
                      <Accept receiver={receiver} darkMode={darkMode} onChangeStatus={onChangeStatus} />
                 }
                 
-                
-                {/* Display past messages grouped by date */}
-                { accept == "A" && Object.keys(pastMessages).map(date => (
+                {/* Display past messages */}
+                { accept == "A" &&  Object.keys(pastMessages).map(date => (
                     <React.Fragment key={date}>
                         <Box 
                             sx={{ 
@@ -247,7 +253,7 @@ const Chats = (props) => {
                             )}
                         </Typography>
 
-                        {receiver.blocked ?     
+                        {receiver?.blocked ?     
                         //  Ublock button
                         <Button 
                             variant="contained" 

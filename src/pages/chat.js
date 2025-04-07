@@ -270,7 +270,7 @@ function Page() {
     const handleSendMessage = (token) => {
         if (chatMessage || selectedImages.length > 0) {
             const messageBody = createMessageBody(chatMessage, user, receiver, selectedImages);
-            sendMessage(client, token, messageBody);
+            sendMessage(client, token, messageBody,receiver);
             setMessages(prev => [...prev, { ...messageBody, imagesUrls: selectedImages.map(file => URL.createObjectURL(file)) }]);
             setChatMessage('');
             setSelectedImages([]);
@@ -363,6 +363,8 @@ function Page() {
         if (username) {
             setChatMessage(`@${username}: ${selectedMessage.message}`);
         }
+        
+
         handleMenuClose();
     };
 
@@ -1215,7 +1217,15 @@ const createMessageBody = (chatMessage, user, receiver, images) => {
 };
 
 // Function to send message
-const sendMessage = (client,token,messageBody) => {
+const sendMessage = (client,token,messageBody,receiver) => {
+
+
+    // Check if the reciver is blocked then ask the user to unblock the reciver
+    if (receiver?.blocked) {
+        alert("You need to unblock this user to send message");
+        return;
+    }
+
     if (client) { 
         client.activate();
         if (client.connected) {

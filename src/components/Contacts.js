@@ -14,7 +14,7 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
     const [contactList, setContactList] = useState([]);
     useEffect(() => {
         setContactList(contacts);
-    }, []);
+    }, [contacts]);
 
     const searchUsers = () =>{
         axios.post(`${host}/wholesale/auth/chat/users`,{
@@ -28,10 +28,6 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
             console.error('Error fetching users:', error);
         });
     }
-
-    useEffect(()=>{
-        refreshContacts(); // Refresh contacts after closing the dialog
-    },[openDialog])
 
     useEffect(() => {
         searchUsers();
