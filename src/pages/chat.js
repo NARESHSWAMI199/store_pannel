@@ -1175,10 +1175,7 @@ const fetchChatUsers = (setChatUsers, token,router) => {
     axios.get(`${host}/chat-users/all`)
         .then(res => {
             let response = res.data;
-            setChatUsers([...response.map(item => {
-                item.chatUser.accept = item.status
-                return item.chatUser
-            })]);
+            setChatUsers(response)
         })
         .catch(err => {
             handleUnauthorizedResponse(err, router);

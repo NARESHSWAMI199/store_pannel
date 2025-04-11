@@ -11,19 +11,18 @@ const Chats = (props) => {
 
     const {pastMessages, messages, showMessage, chatDivRef, setOpenEmojis, darkMode, handleDarkModeToggle} = props
     const [receiver, setReceiver] = useState(props.receiver)
-    const [accept,setAccept] = useState(props.receiver?.accept)
+    const [accepted,setAccepted] = useState(props.receiver?.accepted)
     const [isDialogOpen, setIsDialogOpen] = useState(false); // State to manage dialog visibility
 
     useEffect(() => {
         setReceiver(props.receiver);
-        setAccept(props.receiver?.accept) // Update receiver state when props change
     }, [props.receiver]);
 
     
 
     // Function to handle status change
     const onChangeStatus = (status) =>{
-        setAccept(status)
+        setAccepted(status)
     }    
 
     // Function to toggle the dialog visibility
@@ -159,12 +158,12 @@ const Chats = (props) => {
             >
                 
                 {/* Accept component for pending status */}
-                {accept == 'S' &&
+                {accepted === 'P'  &&
                      <Accept receiver={receiver} darkMode={darkMode} onChangeStatus={onChangeStatus} />
                 }
                 
                 {/* Display past messages */}
-                { accept == "A" &&  Object.keys(pastMessages).map(date => (
+                {accepted ===  "A" &&  Object.keys(pastMessages).map(date => (
                     <React.Fragment key={date}>
                         <Box 
                             sx={{ 
