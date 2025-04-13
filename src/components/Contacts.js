@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback, use } from 'react';
-import { Box, Avatar, Typography, List, ListItem, ListItemAvatar, Button, SvgIcon, ListItemText, Badge, Dialog, DialogTitle, DialogContent, DialogActions, TextField, IconButton, Paper, InputAdornment } from '@mui/material';
+import { Box, Avatar, Typography, List, ListItem, ListItemAvatar, Button, SvgIcon, ListItemText, Badge, Dialog, DialogTitle, DialogContent, DialogActions, TextField, IconButton, Paper, InputAdornment, Switch, FormControlLabel } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import ChatIcon from '@mui/icons-material/Chat';
+import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios';
 import { userImage, host } from 'src/utils/util';
 import SearchIcon from '@mui/icons-material/Search';
@@ -12,6 +13,10 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
     const [searchQuery, setSearchQuery] = useState('');
     const [userList, setUserList] = useState([]);
     const [contactList, setContactList] = useState([]);
+    const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
+    const [deleteChats, setDeleteChats] = useState(false);
+    const [selectedContact, setSelectedContact] = useState(null);
+
     useEffect(() => {
         setContactList(contacts);
     }, [contacts]);
@@ -22,7 +27,6 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
         })
         .then(response => {
             setUserList(response.data.content);
-            // setFilteredUsers(response.data.content);
         })
         .catch(error => {
             console.error('Error fetching users:', error);
@@ -42,9 +46,10 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
         axios.post(`${host}/contacts/add`, { contactSlug: contact.slug })
             .then(response => {
                 console.log('Contact added successfully:', response.data);
+                setContactList(prevList => [...prevList, response.data?.contact]);
                 setUserList(prevList => prevList.map(user => 
                     user.slug === contact.slug ? { ...user, added: true } : user
-                )); // Mark the contact as "Added"
+                ));
             })
             .catch(error => {
                 console.error('Error adding contact:', error);
@@ -54,11 +59,32 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
     const refreshContacts = () => {
         axios.get(`${host}/contacts/all`)
             .then(response => {
-                setContactList(response.data); // Refresh the contacts list
+                setContactList(response.data);
             })
             .catch(error => {
                 console.error('Error refreshing contacts:', error);
             });
+    };
+
+    const handleRemoveContact = (contact) => {
+        setSelectedContact(contact);
+        setOpenConfirmDialog(true);
+    };
+
+    const confirmRemoveContact = () => {
+        axios.post(`${host}/contacts/remove`, { 
+            contactSlug: selectedContact.slug, 
+            deleteChats: deleteChats 
+        })
+        .then(response => {
+            console.log('Contact removed successfully:', response.data);
+            setContactList(prevList => prevList.filter(c => c.slug !== selectedContact.slug));
+            setOpenConfirmDialog(false);
+            setDeleteChats(false);
+        })
+        .catch(error => {
+            console.error('Error removing contact:', error);
+        });
     };
 
     const handleChat = (contact) => {
@@ -108,17 +134,31 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
                         <ListItemAvatar>
                             <Badge 
                                 color="secondary" 
-                                badgeContent={contact.chatNotification} 
-                                invisible={contact.chatNotification === 0}
+                                badgeContent={contact?.chatNotification} 
+                                invisible={contact?.chatNotification === 0}
                             >
-                                <Avatar src={contact.avatar} />
+                                <Avatar src={contact?.avatar} />
                             </Badge>
                         </ListItemAvatar>
                         {/* Contact details */}
                         <ListItemText 
-                            primary={contact.username} 
-                            secondary={contact.isOnline ? "Online" : `Last seen at ${new Date(contact.lastSeen).toLocaleTimeString()}`} 
+                            primary={contact?.username} 
+                            secondary={contact?.isOnline ? "Online" : `Last seen at ${new Date(contact.lastSeen).toLocaleTimeString()}`} 
                         />
+                        <IconButton 
+                            color="error" 
+                            onClick={(e) => {
+                                e.stopPropagation(); // Prevent triggering the parent onClick
+                                handleRemoveContact(contact);
+                            }}
+                            sx={{
+                                '&:hover': {
+                                    backgroundColor: darkMode ? 'rgba(255, 0, 0, 0.1)' : 'rgba(255, 0, 0, 0.1)',
+                                }
+                            }}
+                        >
+                            <DeleteIcon />
+                        </IconButton>
                     </ListItem>
                 ))}
             </List>
@@ -257,6 +297,21 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
                     >
                         Cancel
                     </Button>
+                </DialogActions>
+            </Dialog>
+            {/* Confirmation dialog for removing contact */}
+            <Dialog open={openConfirmDialog} onClose={() => setOpenConfirmDialog(false)}>
+                <DialogTitle>Confirm Remove Contact</DialogTitle>
+                <DialogContent>
+                    Are you sure you want to remove this contact?
+                    <FormControlLabel
+                        control={<Switch checked={deleteChats} onChange={(e) => setDeleteChats(e.target.checked)} />}
+                        label="Delete chats as well"
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpenConfirmDialog(false)}>Cancel</Button>
+                    <Button color="error" onClick={confirmRemoveContact}>Remove</Button>
                 </DialogActions>
             </Dialog>
         </Box>

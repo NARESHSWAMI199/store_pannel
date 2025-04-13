@@ -1,13 +1,16 @@
 // Import statements
 // Importing necessary libraries, components, and utilities
-import React from 'react'
 import SendIcon from '@mui/icons-material/Send';
 import {
     Avatar, Badge, Box,
     Button,
-    Grid, InputAdornment, Menu, MenuItem, MenuList, Stack,
-    SvgIcon,
-    TextField, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Snackbar, IconButton, Switch, FormControlLabel
+    Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
+    Grid,
+    IconButton,
+    InputAdornment, Menu, MenuItem, MenuList,
+    Snackbar,
+    Stack,
+    TextField, Typography
 } from '@mui/material';
 import { Client } from '@stomp/stompjs';
 import axios from 'axios';
@@ -21,32 +24,26 @@ import SearchIcon from '@mui/icons-material/Search';
 import InputBase from '@mui/material/InputBase';
 import Paper from '@mui/material/Paper';
 
-import AddIcon from '@mui/icons-material/Add';
-import DoneAllTwoToneIcon from '@mui/icons-material/DoneAllTwoTone';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CloseIcon from '@mui/icons-material/Close';
+import ContentCopy from '@mui/icons-material/ContentCopy';
+import DeleteIcon from '@mui/icons-material/Delete';
 import EmojiEmotionsOutlinedIcon from '@mui/icons-material/EmojiEmotionsOutlined';
+import PhotoCamera from '@mui/icons-material/PhotoCamera';
+import ReplyIcon from '@mui/icons-material/Reply';
+import Divider from '@mui/material/Divider';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
 import EmojiPicker from 'emoji-picker-react';
 import { Howl } from 'howler';
 import TimeAgo from 'javascript-time-ago';
 import en from 'javascript-time-ago/locale/en';
 import ru from 'javascript-time-ago/locale/ru';
-import ReactTimeAgo from 'react-time-ago';
-import PhotoCamera from '@mui/icons-material/PhotoCamera';
-import CloseIcon from '@mui/icons-material/Close';
-import OpenInNewIcon from '@mui/icons-material/OpenInNew';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import Divider from '@mui/material/Divider';
-import ContentCopy from '@mui/icons-material/ContentCopy';
-import ReplyIcon from '@mui/icons-material/Reply';
-import DeleteIcon from '@mui/icons-material/Delete';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import MuiAlert from '@mui/material/Alert';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import SettingsIcon from '@mui/icons-material/Settings';
 import { useRouter } from 'next/navigation';
-import ShowMessages from 'src/sections/chats-messages'
-import Contacts from 'src/components/Contacts';
+import ReactTimeAgo from 'react-time-ago';
 import Chats from 'src/components/Chats';
+import Contacts from 'src/components/Contacts';
+import ShowMessages from 'src/sections/chats-messages';
 
 
 TimeAgo.addLocale(en);
