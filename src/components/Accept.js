@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Image } from "antd";
 import Typography from '@mui/material/Typography';
 import { Box, Button, Stack} from '@mui/material';
-import { host, toTitleCase } from 'src/utils/util';
+import { host, toTitleCase, getInitials } from 'src/utils/util';
 import axios from 'axios';
 import { useAuth } from 'src/hooks/use-auth';
 
@@ -48,11 +48,22 @@ const {receiver,darkMode} = props
      >
         <Image 
             style={{
-                height : 100,
-                width : 100,
-                borderRadius : 50
+                height: 100,
+                width: 100,
+                borderRadius: 50,
+                background: darkMode ? '#555' : '#ddd',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                fontSize: '2rem',
+                color: darkMode ? '#fff' : '#000'
             }} 
-            src={receiver.avatar}
+            src={receiver.avatar || ''}
+            fallback={
+                !receiver.avatar && (
+                    <div>{getInitials(receiver.username)}</div>
+                )
+            }
         />    
 
         <Typography 
