@@ -44,6 +44,7 @@ import ReactTimeAgo from 'react-time-ago';
 import Chats from 'src/components/Chats';
 import Contacts from 'src/components/Contacts';
 import ShowMessages from 'src/sections/chats-messages';
+import { set } from 'nprogress';
 
 
 TimeAgo.addLocale(en);
@@ -105,6 +106,7 @@ function Page() {
     const [showChatList, setShowChatList] = useState(true);
     const [darkMode, setDarkMode] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+
 
     // Effect to load dark mode preference from localStorage
     useEffect(() => {
@@ -627,6 +629,8 @@ function Page() {
                             menuDivWidth={menuDivWidth}
                             user={user}
                             darkMode={darkMode}
+                            setContactUsers={setContactUsers}
+                            setChatUsers={setChatUsers}
                         />
                     </Grid>
                 )}

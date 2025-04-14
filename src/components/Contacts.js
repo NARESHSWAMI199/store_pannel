@@ -1,14 +1,13 @@
-import React, { useState, useEffect, useCallback, use } from 'react';
-import { Box, Avatar, Typography, List, ListItem, ListItemAvatar, Button, SvgIcon, ListItemText, Badge, Dialog, DialogTitle, DialogContent, DialogActions, TextField, IconButton, Paper, InputAdornment, Switch, FormControlLabel } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import ChatIcon from '@mui/icons-material/Chat';
 import DeleteIcon from '@mui/icons-material/Delete';
-import axios from 'axios';
-import { userImage, host } from 'src/utils/util';
 import SearchIcon from '@mui/icons-material/Search';
-import { set } from 'nprogress';
+import { Avatar, Badge, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, IconButton, InputAdornment, List, ListItem, ListItemAvatar, ListItemText, SvgIcon, Switch, TextField } from '@mui/material';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
+import { host } from 'src/utils/util';
 
-const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth, user, darkMode }) => {
+const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth, user, darkMode ,setContactUsers,setChatUsers}) => {
     const [openDialog, setOpenDialog] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [userList, setUserList] = useState([]);
@@ -46,29 +45,37 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
         axios.post(`${host}/contacts/add`, { contactSlug: contact.slug })
             .then(response => {
                 console.log('Contact added successfully:', response.data);
-                setContactList(prevList => [...prevList, response.data?.contact]);
+                setContactUsers(prevList => [...prevList, response.data?.contact]);
                 setUserList(prevList => prevList.map(user => 
                     user.slug === contact.slug ? { ...user, added: true } : user
                 ));
+                refreshContacts(); //TODO : make this dynamic
             })
             .catch(error => {
                 console.error('Error adding contact:', error);
             });
     };
 
-    const refreshContacts = () => {
-        axios.get(`${host}/contacts/all`)
-            .then(response => {
-                setContactList(response.data);
-            })
-            .catch(error => {
-                console.error('Error refreshing contacts:', error);
-            });
-    };
-
     const handleRemoveContact = (contact) => {
         setSelectedContact(contact);
         setOpenConfirmDialog(true);
+    };
+
+
+    const confirmRemoveChatUser = () => {
+        axios.post(`${host}/chat-users/remove`, { 
+            contactSlug: selectedContact.slug, 
+            deleteChats: deleteChats 
+        })
+        .then(response => {
+            console.log('Chat user removed successfully:', response.data);
+            setChatUsers(prevList => prevList.filter(c => c.slug !== selectedContact.slug));
+            setOpenConfirmDialog(false);
+            setDeleteChats(false);
+        })
+        .catch(error => {
+            console.error('Error removing contact:', error);
+        });
     };
 
     const confirmRemoveContact = () => {
@@ -78,7 +85,7 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
         })
         .then(response => {
             console.log('Contact removed successfully:', response.data);
-            setContactList(prevList => prevList.filter(c => c.slug !== selectedContact.slug));
+            setContactUsers(prevList => prevList.filter(c => c.slug !== selectedContact.slug));
             setOpenConfirmDialog(false);
             setDeleteChats(false);
         })
@@ -311,7 +318,14 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setOpenConfirmDialog(false)}>Cancel</Button>
-                    <Button color="error" onClick={confirmRemoveContact}>Remove</Button>
+                    <Button color="error" onClick={ ()=>{
+                        if(activeTab === 'contacts'){
+                            confirmRemoveContact()
+                        }
+                        if(activeTab === 'chats'){
+                            confirmRemoveChatUser()
+                        }
+                    }}>Remove</Button>
                 </DialogActions>
             </Dialog>
         </Box>
