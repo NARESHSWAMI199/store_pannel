@@ -7,7 +7,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { host } from 'src/utils/util';
 
-const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth, user, darkMode ,setContactUsers,setChatUsers}) => {
+const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth, user, darkMode ,setContactUsers,setChatUsers,setSnackbarMessage,setSnackbarOpen}) => {
     const [openDialog, setOpenDialog] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [userList, setUserList] = useState([]);
@@ -51,8 +51,11 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
                 ));
                 refreshContacts(); //TODO : make this dynamic
             })
-            .catch(error => {
-                console.error('Error adding contact:', error);
+            .catch(err => {
+                console.error('Error adding contact:', err);
+                let error = err.response?.data?.message || err.message;
+                setSnackbarMessage(error);
+                setSnackbarOpen(true);
             });
     };
 
@@ -73,8 +76,11 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
             setOpenConfirmDialog(false);
             setDeleteChats(false);
         })
-        .catch(error => {
-            console.error('Error removing contact:', error);
+        .catch(err => {
+            console.error('Error removing contact:', err);
+            let error = err.response?.data?.message || err.message;
+            setSnackbarMessage(error);
+            setSnackbarOpen(true);
         });
     };
 
@@ -89,8 +95,11 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
             setOpenConfirmDialog(false);
             setDeleteChats(false);
         })
-        .catch(error => {
-            console.error('Error removing contact:', error);
+        .catch(err => {
+            console.error('Error removing contact:', err);
+            let error = err.response?.data?.message || err.message;
+            setSnackbarMessage(error);
+            setSnackbarOpen(true);
         });
     };
 

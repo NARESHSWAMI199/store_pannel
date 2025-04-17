@@ -634,6 +634,8 @@ function Page() {
                             darkMode={darkMode}
                             setContactUsers={setContactUsers}
                             setChatUsers={setChatUsers}
+                            setSnackbarMessage={setSnackbarMessage}
+                            setSnackbarOpen={setSnackbarOpen}
                         />
                     </Grid>
                 )}
