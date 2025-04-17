@@ -60,6 +60,9 @@ const fetchUsername = async (slug, token) => {
         return response.data.user?.username;
     } catch (error) {
         console.error('Error fetching username:', error);
+        let err = !!err.response ? err.response.data?.message : err.message; 
+        setSnackbarMessage(error);
+        setSnackbarOpen(true);
         return null;
     }
 };
@@ -157,7 +160,7 @@ function Page() {
     // Effect to fetch past messages when receiver changes
     useEffect(() => {
         if (receiver) {
-            fetchPastMessages(receiver, setPastMessages, auth.token, setMessages, router);
+            fetchPastMessages(receiver, setPastMessages, auth.token, setMessages, router,setSnackbarMessage,setSnackbarOpen);
         }
     }, [receiver]);
 
@@ -169,7 +172,7 @@ function Page() {
     // Effect to periodically update chat users' online status
     useEffect(() => {
         const intervalId = setInterval(() => {
-            updateChatUsersStatus(chatUsers, setChatUsers, auth.token,router);
+            updateChatUsersStatus(chatUsers, setChatUsers, auth.token,router,setSnackbarMessage,setSnackbarOpen);
         }, 10000);
 
         return () => clearInterval(intervalId);
@@ -177,18 +180,18 @@ function Page() {
 
     // Effect to fetch contact users on component mount
     useEffect(() => {
-        fetchContactUsers(setContactUsers, auth.token,router);
+        fetchContactUsers(setContactUsers, auth.token,router,setSnackbarMessage,setSnackbarOpen);
     }, []);
 
     // Effect to fetch chat users on component mount
     useEffect(() => {
-        fetchChatUsers(setChatUsers, auth.token,router);
+        fetchChatUsers(setChatUsers, auth.token,router,setSnackbarMessage,setSnackbarOpen);
     }, []);
 
     // Effect to update seen messages when receiver or new message changes
     useEffect(() => {
         if (receiver) {
-            updateSeenMessages(receiver, setChatUsers, auth.token, router);
+            updateSeenMessages(receiver, setChatUsers, auth.token, router,setSnackbarMessage,setSnackbarOpen);
         }
     }, [receiver, newMessage]);
 
@@ -1130,7 +1133,7 @@ const subscribeToSeenMessages = (client, user, setMessages) => {
 };
 
 // Function to fetch past messages
-const fetchPastMessages = (receiver, setPastMessages,token,setMessages,router) => {
+const fetchPastMessages = (receiver, setPastMessages,token,setMessages,router,setSnackbarMessage,setSnackbarOpen) => {
     axios.defaults.headers = { Authorization: token };
     axios.post(`${host}/chats/all`, { receiver: receiver.slug })
         .then(res => {
@@ -1139,11 +1142,14 @@ const fetchPastMessages = (receiver, setPastMessages,token,setMessages,router) =
         })
         .catch(err => {
             handleUnauthorizedResponse(err, router);
+            let error = !!err.response ? err.response.data?.message : err.message; 
+            setSnackbarMessage(error);
+            setSnackbarOpen(true);
         });
 };
 
 // Function to update chat users' online status
-const updateChatUsersStatus = (chatUsers, setChatUsers, token,router) => {
+const updateChatUsersStatus = (chatUsers, setChatUsers, token,router,setSnackbarMessage,setSnackbarOpen) => {
     axios.defaults.headers = { Authorization: token };
     setChatUsers(prevUsers => prevUsers.map(chatUser => {
         axios.get(`${host}/chat/status/${chatUser.slug}`)
@@ -1153,25 +1159,32 @@ const updateChatUsersStatus = (chatUsers, setChatUsers, token,router) => {
             })
             .catch(err => {
                 handleUnauthorizedResponse(err, router);
+                let error = !!err.response ? err.response.data?.message : err.message; 
+                setSnackbarMessage(error);
+                setSnackbarOpen(true);
             });
         return chatUser;
     }));
 };
 
 // Function to fetch contact users
-const fetchContactUsers = (setContactUsers, token,router) => {
+const fetchContactUsers = (setContactUsers, token,router,setSnackbarMessage,setSnackbarOpen) => {
     axios.defaults.headers = { Authorization: token };
     axios.get(`${host}/contacts/all`)
         .then(res => {
             setContactUsers(res.data);
         })
         .catch(err => {
+            console.log(err)
             handleUnauthorizedResponse(err, router);
+            let error = !!err.response ? err.response.data?.message : err.message; 
+            setSnackbarMessage(error);
+            setSnackbarOpen(true);
         });
 };
 
 // Function to fetch chat users
-const fetchChatUsers = (setChatUsers, token,router) => {
+const fetchChatUsers = (setChatUsers, token,router,setSnackbarMessage,setSnackbarOpen) => {
     axios.defaults.headers = { Authorization: token };
     axios.get(`${host}/chat-users/all`)
         .then(res => {
@@ -1180,11 +1193,14 @@ const fetchChatUsers = (setChatUsers, token,router) => {
         })
         .catch(err => {
             handleUnauthorizedResponse(err, router);
+            let error = !!err.response ? err.response.data?.message : err.message;  
+            setSnackbarMessage(error);
+            setSnackbarOpen(true);
         });
 };
 
 // Function to update seen messages
-const updateSeenMessages = (receiver, setChatUsers, token, router) => {
+const updateSeenMessages = (receiver, setChatUsers, token, router,setSnackbarMessage,setSnackbarOpen) => {
     axios.defaults.headers = { Authorization: token };
     axios.post(`${host}/chat/seen`, { sender: receiver?.slug })
         .then(res => {
@@ -1196,8 +1212,10 @@ const updateSeenMessages = (receiver, setChatUsers, token, router) => {
             }));
         })
         .catch(err => {
-            console.log(err);
             handleUnauthorizedResponse(err, router);
+            let error = !!err.response ? err.response.data?.message : err.message; 
+            setSnackbarMessage(error);
+            setSnackbarOpen(true);
         });
 };
 
@@ -1235,8 +1253,11 @@ const sendMessage = (client,token,messageBody,receiver) => {
                 }
                 axios.post(`${host}/chat/upload`,messageBody).then(response => {
                     console.log('Images sent successfully');
-                }).catch(error => {
-                    console.error('Error sending images:', error);
+                }).catch(err => {
+                    console.error('Error sending images:', err);
+                    let error = !!err.response ? err.response.data?.message : err.message; 
+                    setSnackbarMessage(error);
+                    setSnackbarOpen(true);
                 });
             } else {
                 client.publish({ destination: `/app/chat/private/${messageBody.receiver}`, body: JSON.stringify(messageBody) });
@@ -1252,7 +1273,9 @@ const updateUserLastSeen = async () => {
     return axios.get(`${host}/wholesale/auth/last-seen`)
         .then(res => res.data)
         .catch(err => {
-            console.log(err.message);
+            let error = !!err.response ? err.response.data?.message : err.message; 
+            setSnackbarMessage(error);
+            setSnackbarOpen(true);
         });
 };
 
