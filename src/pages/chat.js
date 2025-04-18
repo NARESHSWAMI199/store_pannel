@@ -17,7 +17,7 @@ import axios from 'axios';
 import { format } from 'date-fns';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth } from 'src/hooks/use-auth';
-import { defaultChatImage, host, userImage } from 'src/utils/util';
+import { defaultChatImage, host, userImage, wbhost } from 'src/utils/util';
 
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import SearchIcon from '@mui/icons-material/Search';
@@ -43,8 +43,9 @@ import { useRouter } from 'next/navigation';
 import ReactTimeAgo from 'react-time-ago';
 import Chats from 'src/components/Chats';
 import Contacts from 'src/components/Contacts';
-import ShowMessages from 'src/sections/chats-messages';
+import {ShowMessages,ShowRepliedMessages} from 'src/sections/chats-messages';
 import { set } from 'nprogress';
+import { id } from 'date-fns/locale';
 
 
 TimeAgo.addLocale(en);
@@ -109,6 +110,7 @@ function Page() {
     const [showChatList, setShowChatList] = useState(true);
     const [darkMode, setDarkMode] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [parentMessageId, setParentMessageId] = useState(null);
 
 
     // Effect to load dark mode preference from localStorage
@@ -136,7 +138,6 @@ function Page() {
 
     // Effect to initialize WebSocket client and handle connection lifecycle
     useEffect(() => {
-        document.cookie = `X-Username=${user?.slug}; path=/`;
         const wsClient = createWebSocketClient(user, setNewMessage, setMessages,setPastMessages, setChatUsers, setIsPlaying,showNotification,auth);
         setClient(wsClient);
         wsClient.activate();
@@ -271,12 +272,13 @@ function Page() {
     // Function to handle sending messages
     const handleSendMessage = (token) => {
         if (chatMessage || selectedImages.length > 0) {
-            const messageBody = createMessageBody(chatMessage, user, receiver, selectedImages);
-            sendMessage(client, token, messageBody,receiver);
+            const messageBody = createMessageBody(chatMessage, user, receiver, selectedImages,parentMessageId);
+            sendMessage(client, token, messageBody,receiver,setSnackbarMessage,setSnackbarOpen);
             setMessages(prev => [...prev, { ...messageBody, imagesUrls: selectedImages.map(file => URL.createObjectURL(file)) }]);
             setChatMessage('');
             setSelectedImages([]);
             setImagePreviews([]);
+            setParentMessageId(null);
         } else {
             console.log("Message: " + chatMessage);
         }
@@ -362,9 +364,16 @@ function Page() {
     // Function to reply to a message
     const handleReply = async () => {
         const username = await fetchUsername(selectedMessage.sender, auth.token);
-        if (username) {
-            setChatMessage(`@${username}: ${selectedMessage.message}`);
+        setParentMessageId(selectedMessage?.id)
+        setChatMessage(``); // Clear the input field
+        handleMenuClose();
+        const inputField = document.getElementById('message');
+        if (inputField) {
+            inputField.focus();
         }
+        // if (username) {
+        //     setChatMessage(`@${username}: ${selectedMessage.message}`);
+        // }
         
 
         handleMenuClose();
@@ -501,6 +510,24 @@ function Page() {
         );
     };
 
+        // Function to render individual messages
+        const showReplyMessage = (message, index) => {
+            return (
+                <ShowRepliedMessages
+                    key={index}
+                    message={{ ...message, message: highlightText(message.message) }}
+                    user={user}
+                    receiver={receiver}
+                    handleMouseEnter={handleMouseEnter}
+                    handleMouseLeave={handleMouseLeave}
+                    handleMenuOpen={handleMenuOpen}
+                    isHovered={isHovered}
+                    handleDownloadImage={handleDownloadImage}
+                    darkMode={darkMode}
+                />
+            );
+        };
+
     // Function to render past messages grouped by date
     const showPastMessages = (pastMessages) => {
         return Object.keys(pastMessages).map((date, index) => (
@@ -508,7 +535,15 @@ function Page() {
                 <Typography variant="subtitle2" color="textSecondary" align="center">
                     {format(new Date(date), 'MMMM dd, yyyy')}
                 </Typography>
-                {pastMessages[date].map((message, idx) => showMessage(message, idx))}
+                {
+                    pastMessages[date].map((message, idx) => {
+                        if(message.parentId) {
+                            return showReplyMessage(message, idx)
+                        }else {
+                            return showMessage(message, idx)
+                        }
+                    })
+                }
             </div>
         ));
     };
@@ -719,6 +754,7 @@ function Page() {
                                 pastMessages={pastMessages}
                                 messages={messages}
                                 showMessage={showMessage}
+                                showReplyMessage = {showReplyMessage}
                                 chatDivRef={chatDivRef}
                                 setOpenEmojis={setOpenEmojis}
                                 darkMode={darkMode}
@@ -1054,7 +1090,7 @@ export default Page;
 // Function to create WebSocket client
 const createWebSocketClient = (user, setNewMessage, setMessages,setPastMessages, setChatUsers, setIsPlaying, showNotification,auth) => {
     const wsClient = new Client({
-        brokerURL: 'ws://localhost:8080/chat',
+        brokerURL: `${wbhost}/chat?${user?.slug}`,
         debug: function (str) {
             console.log(str);
         },
@@ -1222,20 +1258,21 @@ const updateSeenMessages = (receiver, setChatUsers, token, router,setSnackbarMes
 };
 
 // Function to create message body
-const createMessageBody = (chatMessage, user, receiver, images) => {
+const createMessageBody = (chatMessage, user, receiver, images,parentMessageId) => {
     const messageBody = {
         type: 'chat',
         message: chatMessage,
         sender: user?.slug,
         receiver: receiver?.slug,
         createdAt: new Date().getTime(),
-        images : images
+        images : images,
+        parentId : parentMessageId
     };
     return messageBody;
 };
 
 // Function to send message
-const sendMessage = (client,token,messageBody,receiver) => {
+const sendMessage = (client,token,messageBody,receiver,setSnackbarMessage,setSnackbarOpen) => {
 
 
     // Check if the reciver is blocked then ask the user to unblock the reciver

@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { use, useEffect, useState } from 'react';
 import { Box, Typography, IconButton } from '@mui/material';
 import DoneAllTwoToneIcon from '@mui/icons-material/DoneAllTwoTone';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { format } from 'date-fns';
+import axios from 'axios';
+import { host } from 'src/utils/util';
 
 const ShowMessages = ({ message, user, receiver, handleMouseEnter, handleMouseLeave, handleMenuOpen, isHovered, handleDownloadImage, darkMode }) => {
     // Format message time
@@ -40,9 +42,9 @@ const ShowMessages = ({ message, user, receiver, handleMouseEnter, handleMouseLe
     };
 
     return (
-        (message.sender === user?.slug && message.receiver === receiver?.slug) ||
-        (message.sender === receiver?.slug && message.receiver === user?.slug)
-    ) && (
+    //     (message.sender === user?.slug && message.receiver === receiver?.slug) ||
+    //     (message.sender === receiver?.slug && message.receiver === user?.slug)
+    // ) && (
         <Box 
           key={message.id} 
           sx={{ display: 'flex', padding: '8px 16px' }}
@@ -114,4 +116,133 @@ const ShowMessages = ({ message, user, receiver, handleMouseEnter, handleMouseLe
     )
 }
 
-export default ShowMessages;
+
+
+const ShowRepliedMessages = ({ message, user, receiver, handleMouseEnter, handleMouseLeave, handleMenuOpen, isHovered, handleDownloadImage, darkMode }) => {
+  // Format message time
+  let time = format(message.createdAt || 0, "hh:mm a");
+
+  // Determine alignment of the message
+  let justifyMessage = message.sender === user?.slug ? 'flex-end' : 'flex-start';
+
+  // Handle deleted messages
+  let displayMessage = message.message;
+
+  const [parentMessage, setParentMessage] = useState(null);
+
+  useEffect(() => {
+      if (!message.parentId) return;
+      axios.get(`${host}/chats/message/${message.parentId}`)
+          .then((res) => {
+              if (res.data) {
+                  setParentMessage(res.data);
+              }
+          })
+          .catch((err) => {
+              console.log(err);
+          });
+  }, []);
+
+  if ((message.isSenderDeleted === 'Y' && message.sender === user?.slug) || 
+      (message.isReceiverDeleted === 'Y' && message.receiver === user?.slug)) {
+      return null;
+  }
+
+  if ((message.isSenderDeleted === 'H' && message.isReceiverDeleted === 'H')) {
+      displayMessage = "This message was deleted.";
+  } else if ((message.isSenderDeleted === 'H' && message.sender === user?.slug) || 
+             (message.isReceiverDeleted === 'H' && message.receiver === user?.slug)) {
+      displayMessage = "Message was deleted";
+  }
+
+  // Highlight URLs in the message
+  const highlightText = (text) => {
+      const urlRegex = /(https?:\/\/[^\s]+)/gi;
+      return text.replace(urlRegex, (url) => `<a href="${url}" style="color: blue;" target="_blank">${url}</a>`);
+  };
+
+  return (
+      <Box 
+          key={message.id} 
+          sx={{ display: 'flex', flexDirection: 'column', padding: '8px 16px', alignItems: justifyMessage }}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+      >
+          {/* Parent message block */}
+          {parentMessage && (
+              <Box 
+                  sx={{
+                      backgroundColor: darkMode ? '#444' : '#f9f9f9',
+                      padding: '8px',
+                      borderRadius: '8px',
+                      marginBottom: '8px',
+                      borderLeft: `4px solid ${darkMode ? '#888' : '#ccc'}`,
+                      maxWidth: '70%',
+                      wordBreak: 'break-word',
+                      fontStyle: 'italic',
+                      fontSize: '0.9em',
+                      color: darkMode ? '#ccc' : '#555'
+                  }}
+              >
+                  <Typography variant="body2" sx={{ fontWeight: 'bold', marginBottom: '4px' }}>
+                      {parentMessage.sender === user?.slug ? "You" : parentMessage.sender}
+                  </Typography>
+                  <Typography 
+                      dangerouslySetInnerHTML={{ __html: highlightText(parentMessage.message) }}
+                  ></Typography>
+              </Box>
+          )}
+
+          {/* Main message block */}
+          <Box 
+              sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  backgroundColor: darkMode ? '#666' : '#e0e0e0',
+                  padding: '12px',
+                  borderRadius: '12px',
+                  boxShadow: 3,
+                  maxWidth: '70%',
+                  wordBreak: 'break-word',
+              }}
+          >
+              {/* Display images */}
+              {message.imagesUrls && message.imagesUrls.map((url, imgIndex) => (
+                  <Box 
+                      key={imgIndex} 
+                      sx={{ position: 'relative', marginBottom: '8px' }}
+                  >
+                      <img 
+                          src={url} 
+                          alt={`message-img-${imgIndex}`} 
+                          style={{ width: '100%', borderRadius: '8px' }} 
+                      />
+                      <IconButton 
+                          sx={{ position: 'absolute', top: 0, right: 0 }} 
+                          onClick={() => handleDownloadImage(url)}
+                      >
+                          <OpenInNewIcon />
+                      </IconButton>
+                  </Box>
+              ))}
+
+              {/* Display message text */}
+              <Typography 
+                  sx={{ marginBottom: '8px' }} 
+                  dangerouslySetInnerHTML={{ __html: highlightText(displayMessage) }}
+              ></Typography>
+
+              {/* Display message time */}
+              <Typography 
+                  variant="caption" 
+                  sx={{ fontSize: '0.8em', alignSelf: 'flex-end', color: darkMode ? '#bbb' : '#666' }}
+              >
+                  {time}
+              </Typography>
+          </Box>
+      </Box>
+  );
+};
+
+
+export { ShowMessages, ShowRepliedMessages };

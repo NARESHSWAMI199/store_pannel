@@ -9,7 +9,7 @@ import axios from 'axios';
 
 const Chats = (props) => {
 
-    const {pastMessages, messages, showMessage, chatDivRef, setOpenEmojis, darkMode, handleDarkModeToggle} = props
+    const {pastMessages, messages, showMessage,showReplyMessage, chatDivRef, setOpenEmojis, darkMode, handleDarkModeToggle} = props
     const [receiver, setReceiver] = useState(props.receiver)
     const [accepted,setAccepted] = useState(props.receiver?.accepted)
     const [isDialogOpen, setIsDialogOpen] = useState(false); // State to manage dialog visibility
@@ -196,15 +196,23 @@ const Chats = (props) => {
                                 }} 
                             />
                         </Box>
-                        {pastMessages[date].map((message, index) => (
-                            showMessage(message, index)
-                        ))}
+                        {pastMessages[date].map((message, index) => {
+                            if(message.parentId) {
+                                return showReplyMessage(message, index)
+                            }else {
+                                return showMessage(message, index)
+                            }
+                        })}
                     </React.Fragment>
                 ))}
                 {/* Display current messages */}
-                {messages.map((message, index) => (
-                    showMessage(message, index)
-                ))}
+                {messages.map((message, index) => {
+                if(message.parentId) {
+                    return showReplyMessage(message, index)
+                }else {
+                    return showMessage(message, index)
+                }
+})}
             </Box>
 
             {/* Dialog for receiver details */}

@@ -8,7 +8,13 @@ export const updateObject = (state, updatedObject) => {
     }
 }
 
-export const host = "http://localhost:8080"
+const hostIp = "192.168.1.6"
+const port = "8080"
+
+
+// export const host = "http://localhost:8080"
+export const host = `http://${hostIp}:${port}` // connected with macbook
+export const wbhost = `ws://${hostIp}:${port}` // for websocket
 
 // export const host = "http://202.157.82.29:8080" 
 
