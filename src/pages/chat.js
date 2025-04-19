@@ -358,7 +358,7 @@ function Page() {
     // Function to close message menu
     const handleMenuClose = () => {
         setAnchorEl(null);
-        setSelectedMessage(null);
+        // setSelectedMessage(null);
     };
 
     // Function to reply to a message
@@ -374,9 +374,6 @@ function Page() {
         // if (username) {
         //     setChatMessage(`@${username}: ${selectedMessage.message}`);
         // }
-        
-
-        handleMenuClose();
     };
 
     // Function to copy message text
@@ -828,81 +825,128 @@ function Page() {
                                             </Box>
                                         ))}
                                     </Box>
-                                    <TextField 
-                                        // Input field for typing messages
-                                        sx={{ 
-                                            backgroundColor: darkMode ? '#333' : '#fff', 
-                                            justifyContent: 'center',
-                                        }} 
-                                        fullWidth 
-                                        multiline 
-                                        id='message' 
-                                        label='Type your message.' 
-                                        name='message' 
-                                        value={chatMessage} 
-                                        onChange={handleChange} 
-                                        InputProps={{
-                                            endAdornment: 
-                                                <InputAdornment position='end'>
-                                                    <SendIcon 
-                                                        sx={{ 
-                                                            cursor: 'pointer' 
-                                                        }} 
-                                                        onClick={() => handleSendMessage(auth.token)} 
-                                                    />
-                                                    <input
-                                                        accept="image/*"
-                                                        style={{ 
-                                                            display: 'none' 
-                                                        }}
-                                                        id="icon-button-file"
-                                                        type="file"
-                                                        multiple
-                                                        onChange={handleImageChange}
-                                                        onClick={handleFileInputClick}
-                                                        ref={fileInputRef}
-                                                    />
-                                                    <label htmlFor="icon-button-file">
-                                                        <IconButton 
-                                                            color="inherit" 
-                                                            aria-label="upload picture" 
-                                                            component="span"
-                                                        >
-                                                            <PhotoCamera />
-                                                        </IconButton>
-                                                    </label>
-                                                </InputAdornment>,
-                                            startAdornment: 
-                                                <InputAdornment position='start'>
-                                                    <EmojiEmotionsOutlinedIcon 
-                                                        sx={{ 
-                                                            cursor: 'pointer' 
-                                                        }} 
-                                                        onClick={() => setOpenEmojis(prev => !prev)} 
-                                                    />
-                                                </InputAdornment>,
-                                            sx: { 
-                                                '& .MuiOutlinedInput-root': {
-                                                    '& fieldset': {
-                                                        borderColor: darkMode ? '#fff' : '#ccc', 
-                                                    },
-                                                    '&:hover fieldset': {
-                                                        borderColor: darkMode ? '#fff' : '#ccc', 
-                                                    },
-                                                    '&.Mui-focused fieldset': {
-                                                        borderColor: darkMode ? '#fff' : '#ccc', 
-                                                    },
-                                                    '& input, & textarea': {
-                                                        color: darkMode ? '#fff' : '#000', 
-                                                    },
-                                                    '& .MuiInputLabel-root': {
-                                                        color: darkMode ? '#fff' : '#000', 
-                                                    }
-                                                },
-                                                color : darkMode ? 'white' : 'black'
-                                            }
-                                        }} 
-                                    />
+                                    <Box 
+    sx={{ 
+        position: 'absolute', 
+        bottom: 2, 
+        width: { xs: '100%', md: `calc(100% - ${menuDivWidth}px)` }, 
+        display: 'flex', 
+        flexDirection: 'column', 
+        alignItems: 'center' 
+    }}
+>
+    {/* Show selected message when replying */}
+    {parentMessageId && (
+        <Box
+            sx={{
+                backgroundColor: darkMode ? '#444' : '#f0f0f0',
+                padding: 1,
+                borderRadius: 2,
+                mb: 1,
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                width: '100%',
+                maxWidth: '600px',
+            }}
+        >
+            <Typography 
+                variant="body2" 
+                sx={{ fontStyle: 'italic', color: darkMode ? '#ccc' : '#555' }}
+            >
+                Replying to: {selectedMessage?.message || 'Message not available'}
+            </Typography>
+            <IconButton size="small" onClick={() => setParentMessageId(null)}>
+                <CloseIcon fontSize="small" />
+            </IconButton>
+        </Box>
+    )}
+
+    {/* Input field for typing messages */}
+    <Box 
+        sx={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            width: '100%' 
+        }}
+    >
+        <TextField 
+            sx={{ 
+                backgroundColor: darkMode ? '#333' : '#fff', 
+                justifyContent: 'center',
+            }} 
+            fullWidth 
+            multiline 
+            id='message' 
+            label='Type your message.' 
+            name='message' 
+            value={chatMessage} 
+            onChange={handleChange} 
+            InputProps={{
+                endAdornment: 
+                    <InputAdornment position='end'>
+                        <SendIcon 
+                            sx={{ 
+                                cursor: 'pointer' 
+                            }} 
+                            onClick={() => handleSendMessage(auth.token)} 
+                        />
+                        <input
+                            accept="image/*"
+                            style={{ 
+                                display: 'none' 
+                            }}
+                            id="icon-button-file"
+                            type="file"
+                            multiple
+                            onChange={handleImageChange}
+                            onClick={handleFileInputClick}
+                            ref={fileInputRef}
+                        />
+                        <label htmlFor="icon-button-file">
+                            <IconButton 
+                                color="inherit" 
+                                aria-label="upload picture" 
+                                component="span"
+                            >
+                                <PhotoCamera />
+                            </IconButton>
+                        </label>
+                    </InputAdornment>,
+                startAdornment: 
+                    <InputAdornment position='start'>
+                        <EmojiEmotionsOutlinedIcon 
+                            sx={{ 
+                                cursor: 'pointer' 
+                            }} 
+                            onClick={() => setOpenEmojis(prev => !prev)} 
+                        />
+                    </InputAdornment>,
+                sx: { 
+                    '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                            borderColor: darkMode ? '#fff' : '#ccc', 
+                        },
+                        '&:hover fieldset': {
+                            borderColor: darkMode ? '#fff' : '#ccc', 
+                        },
+                        '&.Mui-focused fieldset': {
+                            borderColor: darkMode ? '#fff' : '#ccc', 
+                        },
+                        '& input, & textarea': {
+                            color: darkMode ? '#fff' : '#000', 
+                        },
+                        '& .MuiInputLabel-root': {
+                            color: darkMode ? '#fff' : '#000', 
+                        }
+                    },
+                    color : darkMode ? 'white' : 'black'
+                }
+            }} 
+        />
+    </Box>
+</Box>
                                 </Box>
                             </Box>
                             {!isAtBottom && (

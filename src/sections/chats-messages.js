@@ -6,6 +6,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { format } from 'date-fns';
 import axios from 'axios';
 import { host } from 'src/utils/util';
+import { set } from 'nprogress';
 
 const ShowMessages = ({ message, user, receiver, handleMouseEnter, handleMouseLeave, handleMenuOpen, isHovered, handleDownloadImage, darkMode }) => {
     // Format message time
@@ -133,15 +134,28 @@ const ShowRepliedMessages = ({ message, user, receiver, handleMouseEnter, handle
   useEffect(() => {
       if (!message.parentId) return;
       axios.get(`${host}/chats/message/${message.parentId}`)
-          .then((res) => {
+          .then(async (res) => {
+             let parentMessage = res.data;
               if (res.data) {
-                  setParentMessage(res.data);
+                parentMessage =  await axios.get(`${host}/wholesale/auth/detail/${parentMessage?.sender}`)
+                  .then(res => {
+                       let senderName = res.data?.user?.username;
+                        if (parentMessage) {
+                            return {
+                                ...parentMessage,
+                                senderName: parentMessage.sender === user?.slug ? "You" : (senderName || parentMessage.sender),
+                            };
+                        }
+                        return parentMessage;
+                  })
               }
+              setParentMessage(parentMessage);
           })
           .catch((err) => {
               console.log(err);
           });
   }, []);
+
 
   if ((message.isSenderDeleted === 'Y' && message.sender === user?.slug) || 
       (message.isReceiverDeleted === 'Y' && message.receiver === user?.slug)) {
@@ -185,7 +199,7 @@ const ShowRepliedMessages = ({ message, user, receiver, handleMouseEnter, handle
                   }}
               >
                   <Typography variant="body2" sx={{ fontWeight: 'bold', marginBottom: '4px' }}>
-                      {parentMessage.sender === user?.slug ? "You" : parentMessage.sender}
+                      {parentMessage.senderName || parentMessage.sender}
                   </Typography>
                   <Typography 
                       dangerouslySetInnerHTML={{ __html: highlightText(parentMessage.message) }}
