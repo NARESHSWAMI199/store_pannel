@@ -8,6 +8,7 @@ import {
     Grid,
     IconButton,
     InputAdornment, Menu, MenuItem, MenuList,
+    Popover,
     Snackbar,
     Stack,
     TextField, Typography
@@ -110,6 +111,21 @@ function Page() {
     const [searchQuery, setSearchQuery] = useState('');
     const [parentMessageId, setParentMessageId] = useState(null);
 
+
+
+    // Existing state variables...
+    const [profileAnchorEl, setProfileAnchorEl] = useState(null); // State for profile popover
+    const isProfileOpen = Boolean(profileAnchorEl);
+
+        // Function to handle profile popover open
+        const handleProfileClick = (event) => {
+            setProfileAnchorEl(event.currentTarget);
+        };
+    
+        // Function to handle profile popover close
+        const handleProfileClose = () => {
+            setProfileAnchorEl(null);
+        };
 
     // Effect to load dark mode preference from localStorage
     useEffect(() => {
@@ -653,8 +669,64 @@ function Page() {
                                 >
                                     <SearchIcon />
                                 </IconButton>
+
+
+                            {/* User Avatar */}
+                            <IconButton onClick={handleProfileClick}>
+                                    <Avatar 
+                                        src={user?.avatar ? `${userImage}${user.slug}/${user.avatar}` : undefined} 
+                                        alt={user?.username || 'User'} 
+                                        sx={{ 
+                                            width: 36, 
+                                            height: 36, 
+                                            ml: 1 
+                                        }}
+                                    >
+                                        {user?.username ? user.username[0].toUpperCase() : '?'}
+                                    </Avatar>
+                                </IconButton>
+
                             </Paper>
                         </Stack>
+
+
+                        {/* Profile Popover */}
+                        <Popover
+                            open={isProfileOpen}
+                            anchorEl={profileAnchorEl}
+                            onClose={handleProfileClose}
+                            anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'right',
+                            }}
+                            transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'right',
+                            }}
+                        >
+                            <Box sx={{ p: 2, minWidth: 200 }}>
+                                <Typography variant="h6" sx={{ mb: 1 }}>
+                                    {user?.username || 'User'}
+                                </Typography>
+                                <Typography variant="body2" color="textSecondary">
+                                    Email: {user?.email || 'N/A'}
+                                </Typography>
+                                <Typography variant="body2" color="textSecondary">
+                                    Joined: {user?.createdAt ? format(new Date(user.createdAt), 'MMMM dd, yyyy') : 'N/A'}
+                                </Typography>
+                                <Button 
+                                    variant="contained" 
+                                    color="primary" 
+                                    sx={{ mt: 2 }} 
+                                    onClick={() => router.push('/account')}
+                                >
+                                    View Full Profile
+                                </Button>
+                            </Box>
+                        </Popover>
+
+
+
                         {/* Contacts */}
                         <Contacts
                             // Component to display contacts or chats
