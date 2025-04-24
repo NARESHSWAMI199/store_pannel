@@ -43,9 +43,7 @@ import { useRouter } from 'next/navigation';
 import ReactTimeAgo from 'react-time-ago';
 import Chats from 'src/components/Chats';
 import Contacts from 'src/components/Contacts';
-import {ShowMessages,ShowRepliedMessages} from 'src/sections/chats-messages';
-import { set } from 'nprogress';
-import { id } from 'date-fns/locale';
+import { ShowMessages, ShowRepliedMessages } from 'src/sections/chats-messages';
 
 
 TimeAgo.addLocale(en);
@@ -363,8 +361,11 @@ function Page() {
 
     // Function to reply to a message
     const handleReply = async () => {
-        const username = await fetchUsername(selectedMessage.sender, auth.token);
-        setParentMessageId(selectedMessage?.id)
+        if(selectedMessage?.id) {
+            setParentMessageId(selectedMessage?.id)
+        }else{
+            setParentMessageId(await getParentMessage(selectedMessage,auth.token));
+        }
         setChatMessage(``); // Clear the input field
         handleMenuClose();
         const inputField = document.getElementById('message');
@@ -1372,3 +1373,18 @@ const showNotification = async (message,token) => {
         });
     }
 };
+
+
+
+const getParentMessage = async (message,token) => {
+    axios.defaults.headers = { Authorization: token };  
+    let parentId =  await axios.post(`${host}/chats/parentId`,message)
+    .then(res => {
+        return res.data;
+    })
+    .catch(err => {
+        console.log(err.message)
+        return null;
+    })  
+    return parentId;
+}

@@ -5,6 +5,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import { Avatar, Badge, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, IconButton, InputAdornment, List, ListItem, ListItemAvatar, ListItemText, SvgIcon, Switch, TextField } from '@mui/material';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { useAuth } from 'src/hooks/use-auth';
 import { host } from 'src/utils/util';
 
 const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth, user, darkMode ,setContactUsers,setChatUsers,setSnackbarMessage,setSnackbarOpen}) => {
@@ -15,12 +16,14 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
     const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
     const [deleteChats, setDeleteChats] = useState(false);
     const [selectedContact, setSelectedContact] = useState(null);
+    const auth = useAuth()
 
     useEffect(() => {
         setContactList(contacts);
     }, [contacts]);
 
     const searchUsers = () =>{
+        axios.defaults.headers = { Authorization: auth?.token };  
         axios.post(`${host}/wholesale/auth/chat/users`,{
             searchKey : searchQuery
         })

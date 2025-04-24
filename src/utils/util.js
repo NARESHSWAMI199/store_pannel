@@ -8,7 +8,8 @@ export const updateObject = (state, updatedObject) => {
     }
 }
 
-const hostIp = "192.168.1.6"
+// const hostIp = "192.168.1.6"
+const hostIp = "localhost"
 const port = "8080"
 
 
