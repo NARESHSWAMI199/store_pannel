@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from 'src/hooks/use-auth';
 import { host } from 'src/utils/util';
 
-const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth, user, darkMode ,setContactUsers,setChatUsers,setSnackbarMessage,setSnackbarOpen}) => {
+const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth, user, darkMode ,setContactUsers,setChatUsers,setSnackbarMessage,setSnackbarOpen,onReceiverDeleted}) => {
     const [openDialog, setOpenDialog] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [userList, setUserList] = useState([]);
@@ -78,6 +78,7 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
             setChatUsers(prevList => prevList.filter(c => c.slug !== selectedContact.slug));
             setOpenConfirmDialog(false);
             setDeleteChats(false);
+            onReceiverDeleted();
         })
         .catch(err => {
             console.error('Error removing contact:', err);
@@ -97,6 +98,7 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
             setContactUsers(prevList => prevList.filter(c => c.slug !== selectedContact.slug));
             setOpenConfirmDialog(false);
             setDeleteChats(false);
+            onReceiverDeleted();
         })
         .catch(err => {
             console.error('Error removing contact:', err);

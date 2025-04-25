@@ -45,6 +45,7 @@ import ReactTimeAgo from 'react-time-ago';
 import Chats from 'src/components/Chats';
 import Contacts from 'src/components/Contacts';
 import { ShowMessages, ShowRepliedMessages } from 'src/sections/chats-messages';
+import { set } from 'nprogress';
 
 
 TimeAgo.addLocale(en);
@@ -598,6 +599,17 @@ function Page() {
         chat.username.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+
+    // Receiver Accepted or not status
+    const onChangeAcceptStatus = async (status) => {
+        setReceiver(prevReceiver => ({ ...prevReceiver, accepted: status }));
+    }
+
+    const handleUserDeleted = () =>{
+        setReceiver(null);
+    } 
+
+
     return (
         <Box 
             // Main container for the chat page
@@ -741,6 +753,7 @@ function Page() {
                             setChatUsers={setChatUsers}
                             setSnackbarMessage={setSnackbarMessage}
                             setSnackbarOpen={setSnackbarOpen}
+                            onReceiverDeleted={handleUserDeleted}
                         />
                     </Grid>
                 )}
@@ -829,6 +842,8 @@ function Page() {
                                 setOpenEmojis={setOpenEmojis}
                                 darkMode={darkMode}
                                 handleDarkModeToggle={handleDarkModeToggle}
+                                onChangeAcceptStatus = {onChangeAcceptStatus}
+                                activeTab={activeTab}
                             />
                             <Box 
                                 // Input area for typing and sending messages
@@ -936,91 +951,93 @@ function Page() {
     )}
 
     {/* Input field for typing messages */}
-    <Box 
-        sx={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center', 
-            width: '100%' 
-        }}
-    >
-        <TextField 
+    {(receiver.accepted === "A" || activeTab === 'contacts') && 
+        <Box 
             sx={{ 
-                backgroundColor: darkMode ? '#333' : '#fff', 
-                justifyContent: 'center',
-            }} 
-            fullWidth 
-            multiline 
-            id='message' 
-            label='Type your message.' 
-            name='message' 
-            value={chatMessage} 
-            onChange={handleChange} 
-            InputProps={{
-                endAdornment: 
-                    <InputAdornment position='end'>
-                        <SendIcon 
-                            sx={{ 
-                                cursor: 'pointer' 
-                            }} 
-                            onClick={() => handleSendMessage(auth.token)} 
-                        />
-                        <input
-                            accept="image/*"
-                            style={{ 
-                                display: 'none' 
-                            }}
-                            id="icon-button-file"
-                            type="file"
-                            multiple
-                            onChange={handleImageChange}
-                            onClick={handleFileInputClick}
-                            ref={fileInputRef}
-                        />
-                        <label htmlFor="icon-button-file">
-                            <IconButton 
-                                color="inherit" 
-                                aria-label="upload picture" 
-                                component="span"
-                            >
-                                <PhotoCamera />
-                            </IconButton>
-                        </label>
-                    </InputAdornment>,
-                startAdornment: 
-                    <InputAdornment position='start'>
-                        <EmojiEmotionsOutlinedIcon 
-                            sx={{ 
-                                cursor: 'pointer' 
-                            }} 
-                            onClick={() => setOpenEmojis(prev => !prev)} 
-                        />
-                    </InputAdornment>,
-                sx: { 
-                    '& .MuiOutlinedInput-root': {
-                        '& fieldset': {
-                            borderColor: darkMode ? '#fff' : '#ccc', 
+                display: 'flex', 
+                flexDirection: 'column', 
+                alignItems: 'center', 
+                width: '100%' 
+            }}
+        >
+            <TextField 
+                sx={{ 
+                    backgroundColor: darkMode ? '#333' : '#fff', 
+                    justifyContent: 'center',
+                }} 
+                fullWidth 
+                multiline 
+                id='message' 
+                label='Type your message.' 
+                name='message' 
+                value={chatMessage} 
+                onChange={handleChange} 
+                InputProps={{
+                    endAdornment: 
+                        <InputAdornment position='end'>
+                            <SendIcon 
+                                sx={{ 
+                                    cursor: 'pointer' 
+                                }} 
+                                onClick={() => handleSendMessage(auth.token)} 
+                            />
+                            <input
+                                accept="image/*"
+                                style={{ 
+                                    display: 'none' 
+                                }}
+                                id="icon-button-file"
+                                type="file"
+                                multiple
+                                onChange={handleImageChange}
+                                onClick={handleFileInputClick}
+                                ref={fileInputRef}
+                            />
+                            <label htmlFor="icon-button-file">
+                                <IconButton 
+                                    color="inherit" 
+                                    aria-label="upload picture" 
+                                    component="span"
+                                >
+                                    <PhotoCamera />
+                                </IconButton>
+                            </label>
+                        </InputAdornment>,
+                    startAdornment: 
+                        <InputAdornment position='start'>
+                            <EmojiEmotionsOutlinedIcon 
+                                sx={{ 
+                                    cursor: 'pointer' 
+                                }} 
+                                onClick={() => setOpenEmojis(prev => !prev)} 
+                            />
+                        </InputAdornment>,
+                    sx: { 
+                        '& .MuiOutlinedInput-root': {
+                            '& fieldset': {
+                                borderColor: darkMode ? '#fff' : '#ccc', 
+                            },
+                            '&:hover fieldset': {
+                                borderColor: darkMode ? '#fff' : '#ccc', 
+                            },
+                            '&.Mui-focused fieldset': {
+                                borderColor: darkMode ? '#fff' : '#ccc', 
+                            },
+                            '& input, & textarea': {
+                                color: darkMode ? '#fff' : '#000', 
+                            },
+                            '& .MuiInputLabel-root': {
+                                color: darkMode ? '#fff' : '#000', 
+                            }
                         },
-                        '&:hover fieldset': {
-                            borderColor: darkMode ? '#fff' : '#ccc', 
-                        },
-                        '&.Mui-focused fieldset': {
-                            borderColor: darkMode ? '#fff' : '#ccc', 
-                        },
-                        '& input, & textarea': {
-                            color: darkMode ? '#fff' : '#000', 
-                        },
-                        '& .MuiInputLabel-root': {
-                            color: darkMode ? '#fff' : '#000', 
-                        }
-                    },
-                    color : darkMode ? 'white' : 'black'
-                }
-            }} 
-        />
-    </Box>
+                        color : darkMode ? 'white' : 'black'
+                    }
+                }} 
+            />
+        </Box>
+    }
 </Box>
-                                </Box>
+                        </Box>
                             </Box>
                             {!isAtBottom && (
                                 <Box 

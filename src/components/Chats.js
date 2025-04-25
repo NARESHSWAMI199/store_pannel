@@ -9,7 +9,7 @@ import axios from 'axios';
 
 const Chats = (props) => {
 
-    const {pastMessages, messages, showMessage,showReplyMessage, chatDivRef, setOpenEmojis, darkMode, handleDarkModeToggle} = props
+    const {pastMessages,activeTab,messages, showMessage,showReplyMessage, chatDivRef, setOpenEmojis, darkMode, handleDarkModeToggle,onChangeAcceptStatus} = props
     const [receiver, setReceiver] = useState(props.receiver)
     const [accepted,setAccepted] = useState(props.receiver?.accepted)
     const [isDialogOpen, setIsDialogOpen] = useState(false); // State to manage dialog visibility
@@ -19,10 +19,14 @@ const Chats = (props) => {
     }, [props.receiver]);
 
     
+    useEffect(() => {
+        setAccepted(props.receiver?.accepted);
+    }, [props.receiver?.accepted]);
 
     // Function to handle status change
     const onChangeStatus = (status) =>{
         setAccepted(status)
+        onChangeAcceptStatus(status)
     }    
 
     // Function to toggle the dialog visibility
@@ -158,12 +162,12 @@ const Chats = (props) => {
             >
                 
                 {/* Accept component for pending status */}
-                {accepted === 'P'  &&
+                {(accepted === 'P' && activeTab !== 'contacts') &&
                      <Accept receiver={receiver} darkMode={darkMode} onChangeStatus={onChangeStatus} />
                 }
                 
                 {/* Display past messages */}
-                {accepted ===  "A" &&  Object.keys(pastMessages).map(date => (
+                {(accepted ===  "A" && activeTab !== 'contacts') &&  Object.keys(pastMessages).map(date => (
                     <React.Fragment key={date}>
                         <Box 
                             sx={{ 
