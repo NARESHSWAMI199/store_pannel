@@ -6,12 +6,14 @@ import DarkModeIcon from '@mui/icons-material/DarkMode'; // Import DarkMode icon
 import CloseIcon from '@mui/icons-material/Close';
 import Accept from 'src/components/Accept'
 import axios from 'axios';
+import { useAuth } from 'src/hooks/use-auth';
 
 const Chats = (props) => {
 
+    const auth = useAuth();
     const {pastMessages,activeTab,messages, showMessage,showReplyMessage, chatDivRef, setOpenEmojis, darkMode, handleDarkModeToggle,onChangeAcceptStatus} = props
     const [receiver, setReceiver] = useState(props.receiver)
-    const [accepted,setAccepted] = useState(props.receiver?.accepted)
+    const [accepted,setAccepted] = useState()
     const [isDialogOpen, setIsDialogOpen] = useState(false); // State to manage dialog visibility
 
     useEffect(() => {
@@ -20,8 +22,17 @@ const Chats = (props) => {
 
     
     useEffect(() => {
+
+        axios.defaults.headers = {
+            Authorization: auth.token
+        };
+        axios.get(`${host}/chat-users/is-accepted/${props.receiver?.slug}`)
+        .then(res => {
+            let response = res.data;
+            setAccepted(response);
+        })
         setAccepted(props.receiver?.accepted);
-    }, [props.receiver?.accepted]);
+    }, [props.receiver]);
 
     // Function to handle status change
     const onChangeStatus = (status) =>{
@@ -148,7 +159,6 @@ const Chats = (props) => {
                     flexDirection: 'column', 
                     mt: 3, 
                     mx: { xs: 2, lg: 15 }, 
-                    pb: 20, 
                     height: '85.1vh', 
                     overflowY: 'scroll', 
                     msOverflowStyle: 'none', 

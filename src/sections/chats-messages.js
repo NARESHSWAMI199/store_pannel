@@ -8,7 +8,7 @@ import axios from 'axios';
 import { host } from 'src/utils/util';
 import { set } from 'nprogress';
 
-const ShowMessages = ({ message, user, receiver, handleMouseEnter, handleMouseLeave, handleMenuOpen, isHovered, handleDownloadImage, darkMode }) => {
+const ShowMessages = ({ message, user, receiver,handleMouseEnter, handleMouseLeave, handleMenuOpen, isHovered, handleDownloadImage, darkMode }) => {
     // Format message time
     let time = format(message.createdAt || 0, "hh:mm a");
 
@@ -17,20 +17,6 @@ const ShowMessages = ({ message, user, receiver, handleMouseEnter, handleMouseLe
 
     // Handle deleted messages
     let displayMessage = message.message;
-
-    if((message.isSenderDeleted === 'Y' && message.sender === user?.slug)){
-        return null;
-    }else if(message.isReceiverDeleted === 'Y' && message.receiver === user?.slug){
-        return null;
-    }
-
-    if ((message.isSenderDeleted === 'H' && message.isReceiverDeleted === 'H')) {
-        displayMessage = "This message was deleted.";
-    } else if ((message.isSenderDeleted === 'H' && (message.isReceiverDeleted === 'N' || message.isReceiverDeleted === 'Y' )  && message.sender === user?.slug)) {
-        displayMessage = "Message was deleted";
-    } else if (((message.isSenderDeleted === 'N' || message.isSenderDeleted === 'Y' ) && message.isReceiverDeleted === 'H' && message.receiver === user?.slug)) {
-        displayMessage = "Message was deleted";
-    }
 
     // Hide images for deleted messages
     const shouldHideImages = (message.isSenderDeleted === 'H' && message.sender === user?.slug) || 
@@ -43,9 +29,9 @@ const ShowMessages = ({ message, user, receiver, handleMouseEnter, handleMouseLe
     };
 
     return (
-    //     (message.sender === user?.slug && message.receiver === receiver?.slug) ||
-    //     (message.sender === receiver?.slug && message.receiver === user?.slug)
-    // ) && (
+        (message.sender === user?.slug && message.receiver === receiver?.slug) ||
+        (message.sender === receiver?.slug && message.receiver === user?.slug)
+    ) && (
         <Box 
           key={message.id} 
           sx={{ display: 'flex', padding: '8px 16px' }}
@@ -118,7 +104,7 @@ const ShowMessages = ({ message, user, receiver, handleMouseEnter, handleMouseLe
 }
 
 
-const ShowRepliedMessages = ({ message, user, receiver, handleMouseEnter, handleMouseLeave, handleMenuOpen, isHovered, handleDownloadImage, darkMode }) => {
+const ShowRepliedMessages = ({ message, user,receiver, handleMouseEnter, handleMouseLeave, handleMenuOpen, isHovered, handleDownloadImage, darkMode }) => {
     // Format message time
     let time = format(message.createdAt || 0, "hh:mm a");
   
@@ -154,20 +140,7 @@ const ShowRepliedMessages = ({ message, user, receiver, handleMouseEnter, handle
                 console.log(err);
             });
     }, []);
-  
-  
-    if ((message.isSenderDeleted === 'Y' && message.sender === user?.slug) || 
-        (message.isReceiverDeleted === 'Y' && message.receiver === user?.slug)) {
-        return null;
-    }
-  
-    if ((message.isSenderDeleted === 'H' && message.isReceiverDeleted === 'H')) {
-        displayMessage = "This message was deleted.";
-    } else if ((message.isSenderDeleted === 'H' && message.sender === user?.slug) || 
-               (message.isReceiverDeleted === 'H' && message.receiver === user?.slug)) {
-        displayMessage = "Message was deleted";
-    }
-  
+    
     // Highlight URLs in the message
     const highlightText = (text) => {
         const urlRegex = /(https?:\/\/[^\s]+)/gi;
@@ -175,7 +148,9 @@ const ShowRepliedMessages = ({ message, user, receiver, handleMouseEnter, handle
     };
   
     return (
-
+            (message.sender === user?.slug && message.receiver === receiver?.slug) ||
+            (message.sender === receiver?.slug && message.receiver === user?.slug)
+        ) && (
         <Box sx={{ display: 'flex', padding: '8px 16px' }}>
         <Box 
             key={message.id} 

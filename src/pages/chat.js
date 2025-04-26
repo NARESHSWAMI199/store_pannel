@@ -46,6 +46,7 @@ import Chats from 'src/components/Chats';
 import Contacts from 'src/components/Contacts';
 import { ShowMessages, ShowRepliedMessages } from 'src/sections/chats-messages';
 import { set } from 'nprogress';
+import { sl } from 'date-fns/locale';
 
 
 TimeAgo.addLocale(en);
@@ -110,7 +111,6 @@ function Page() {
     const [showChatList, setShowChatList] = useState(true);
     const [darkMode, setDarkMode] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const [parentMessageId, setParentMessageId] = useState(null);
 
 
 
@@ -285,15 +285,21 @@ function Page() {
     }, [auth.token]);
 
     // Function to handle sending messages
-    const handleSendMessage = (token) => {
+    const handleSendMessage = async(token) => {
         if (chatMessage || selectedImages.length > 0) {
-            const messageBody = createMessageBody(chatMessage, user, receiver, selectedImages,parentMessageId);
+            const messageBody = createMessageBody(chatMessage, user, receiver, selectedImages,selectedMessage);
             sendMessage(client, token, messageBody,receiver,setSnackbarMessage,setSnackbarOpen);
-            setMessages(prev => [...prev, { ...messageBody, imagesUrls: selectedImages.map(file => URL.createObjectURL(file)) }]);
-            setChatMessage('');
+            // Getting message id from server
+            setTimeout(async () => {
+                messageBody.id = await getParentMessage(messageBody,auth.token,selectedMessage);
+                setMessages(prev => [...prev, { ...messageBody, imagesUrls: selectedImages.map(file => URL.createObjectURL(file)) }]);
+                setChatMessage('');
+                setActiveTab('chats');   
+                setChatUsers(prev => prev.find(user => user.slug === receiver.slug) ? [receiver ,...prev.filter(user => user.slug !== receiver.slug)] : [receiver,...prev]);
+            }, 300);
             setSelectedImages([]);
             setImagePreviews([]);
-            setParentMessageId(null);
+            setSelectedMessage(null);
         } else {
             console.log("Message: " + chatMessage);
         }
@@ -378,11 +384,6 @@ function Page() {
 
     // Function to reply to a message
     const handleReply = async () => {
-        if(selectedMessage?.id) {
-            setParentMessageId(selectedMessage?.id)
-        }else{
-            setParentMessageId(await getParentMessage(selectedMessage,auth.token));
-        }
         setChatMessage(``); // Clear the input field
         handleMenuClose();
         const inputField = document.getElementById('message');
@@ -591,13 +592,14 @@ function Page() {
     };
 
     // Filtered contacts and chats based on search query
-    const filteredContacts = contactUsers.filter(contact => 
-        contact.username.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredContacts = useCallback(() =>{
+        return contactUsers.filter(contact => contact.username.toLowerCase().includes(searchQuery.toLowerCase())   
+    )}, [searchQuery, contactUsers]);
 
-    const filteredChats = chatUsers.filter(chat => 
-        chat.username.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredChats = useCallback(() => {
+        console.log(chatUsers); 
+        return chatUsers.filter(chat => chat.username.toLowerCase().includes(searchQuery.toLowerCase())
+    )}, [searchQuery, chatUsers]);
 
 
     // Receiver Accepted or not status
@@ -742,7 +744,7 @@ function Page() {
                         {/* Contacts */}
                         <Contacts
                             // Component to display contacts or chats
-                            contacts={activeTab === 'chats' ? filteredChats : filteredContacts}
+                            contacts={activeTab === 'chats' ? filteredChats() : filteredContacts()}
                             activeTab={activeTab}
                             setActiveTab={setActiveTab}
                             setReceiver={setReceiver}
@@ -924,7 +926,7 @@ function Page() {
     }}
 >
     {/* Show selected message when replying */}
-    {parentMessageId && (
+    {selectedMessage?.id && (
         <Box
             sx={{
                 backgroundColor: darkMode ? '#444' : '#f0f0f0',
@@ -944,7 +946,7 @@ function Page() {
             >
                 Replying to: {selectedMessage?.message || 'Message not available'}
             </Typography>
-            <IconButton size="small" onClick={() => setParentMessageId(null)}>
+            <IconButton size="small" onClick={() => setSelectedMessage(null)}>
                 <CloseIcon fontSize="small" />
             </IconButton>
         </Box>
@@ -1254,7 +1256,7 @@ const createWebSocketClient = (user, setNewMessage, setMessages,setPastMessages,
             const deletedMessage = JSON.parse(data.body);
             setMessages(prevMessages => prevMessages.map(message => {
                 if (message.message === deletedMessage.message && message.createdAt === deletedMessage.createdAt) {
-                    return { ...message, isDeleted: 'Y', message: 'Message was deleted' };
+                    return { ...message, isDeleted: 'Y', message: 'Message was deleted',imagesUrls : []};
                 }
                 return message;
             }));
@@ -1263,7 +1265,7 @@ const createWebSocketClient = (user, setNewMessage, setMessages,setPastMessages,
                 Object.keys(updatedPastMessages).forEach(date => {
                     updatedPastMessages[date] = updatedPastMessages[date].map(message => {
                         if (message.message === deletedMessage.message && message.createdAt === deletedMessage.createdAt) {
-                            return { ...message, isDeleted: 'Y', message: 'Message was deleted' };
+                            return { ...message, isDeleted: 'Y', message: 'Message was deleted',imagesUrls : []};
                         }
                         return message;
                     });
@@ -1392,7 +1394,7 @@ const updateSeenMessages = (receiver, setChatUsers, token, router,setSnackbarMes
 };
 
 // Function to create message body
-const createMessageBody = (chatMessage, user, receiver, images,parentMessageId) => {
+const createMessageBody = (chatMessage, user, receiver, images,parentMessage) => {
     const messageBody = {
         type: 'chat',
         message: chatMessage,
@@ -1400,7 +1402,7 @@ const createMessageBody = (chatMessage, user, receiver, images,parentMessageId) 
         receiver: receiver?.slug,
         createdAt: new Date().getTime(),
         images : images,
-        parentId : parentMessageId
+        parentId : parentMessage?.id
     };
     return messageBody;
 };
