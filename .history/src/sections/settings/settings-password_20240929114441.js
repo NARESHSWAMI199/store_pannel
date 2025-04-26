@@ -40,7 +40,6 @@ export const SettingsPassword = (props) => {
       const formData = new FormData(form)
       let password = formData.get("password");
       let confirm = formData.get("confirm");
-      alert(password, confirm)
       props.handleSubmit(user.slug,password,confirm)
     },[])
 

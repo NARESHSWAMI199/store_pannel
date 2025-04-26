@@ -11,7 +11,7 @@ import { useAuth } from 'src/hooks/use-auth';
 const Chats = (props) => {
 
     const auth = useAuth();
-    const {pastMessages,activeTab,messages, showMessage,showReplyMessage, chatDivRef, setOpenEmojis, darkMode, handleDarkModeToggle,onChangeAcceptStatus} = props
+    const {pastMessages,activeTab,messages, showMessage,showReplyMessage, chatDivRef, setOpenEmojis, darkMode, handleDarkModeToggle,onChangeAcceptStatus,getInitials} = props
     const [receiver, setReceiver] = useState(props.receiver)
     const [accepted,setAccepted] = useState()
     const [isDialogOpen, setIsDialogOpen] = useState(false); // State to manage dialog visibility
@@ -30,8 +30,10 @@ const Chats = (props) => {
         .then(res => {
             let response = res.data;
             setAccepted(response);
+        }).catch(error =>{
+            console.error(`Error fetching accepted status for user ${props.receiver?.username}:`, error);
+            setAccepted(undefined) // Default to pending if error occurs
         })
-        setAccepted(props.receiver?.accepted);
     }, [props.receiver]);
 
     // Function to handle status change
@@ -172,12 +174,12 @@ const Chats = (props) => {
             >
                 
                 {/* Accept component for pending status */}
-                {(accepted === 'P' && activeTab !== 'contacts') &&
-                     <Accept receiver={receiver} darkMode={darkMode} onChangeStatus={onChangeStatus} />
+                {(accepted === 'P') &&
+                     <Accept receiver={receiver} darkMode={darkMode} onChangeStatus={onChangeStatus} getInitials={getInitials} />
                 }
                 
                 {/* Display past messages */}
-                {(accepted ===  "A" && activeTab !== 'contacts') &&  Object.keys(pastMessages).map(date => (
+                {(accepted ===  "A") &&  Object.keys(pastMessages).map(date => (
                     <React.Fragment key={date}>
                         <Box 
                             sx={{ 

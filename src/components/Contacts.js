@@ -5,6 +5,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import { Avatar, Badge, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel, IconButton, InputAdornment, List, ListItem, ListItemAvatar, ListItemText, SvgIcon, Switch, TextField } from '@mui/material';
 import axios from 'axios';
 import { constants } from 'buffer';
+import { is } from 'date-fns/locale';
 import { useEffect, useState } from 'react';
 import { useAuth } from 'src/hooks/use-auth';
 import { host } from 'src/utils/util';
@@ -47,13 +48,14 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
 
     const handleAddContact = (contact) => {
         axios.post(`${host}/contacts/add`, { contactSlug: contact.slug })
-            .then(response => {
+            .then(async (response) => {
                 console.log('Contact added successfully:', response.data);
-                setContactUsers(prevList => [...prevList, response.data?.contact]);
+                let newContact = response.data?.contact;
+                newContact = await isSenderAccepted(newContact,auth?.token);
+                setContactUsers(prevList => [...prevList, newContact]);
                 setUserList(prevList => prevList.map(user => 
                     user.slug === contact.slug ? { ...user, added: true } : user
                 ));
-                refreshContacts(); //TODO : make this dynamic
             })
             .catch(err => {
                 console.error('Error adding contact:', err);
@@ -113,6 +115,7 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
         setReceiver(contact);
         setOpenDialog(false);
     };
+
 
     return (
         <Box>
@@ -317,7 +320,7 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
                         }} 
                         sx={{ color: darkMode ? '#fff' : '#000' }}
                     >
-                        Cancel
+                        Close
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -346,5 +349,18 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
         </Box>
     );
 };
+
+const isSenderAccepted = async (receiver,token) => {
+    axios.defaults.headers = { Authorization: token };  
+    return await axios.get(`${host}/chat-users/is-accepted/${receiver.slug}`)
+    .then(res => {
+        receiver.accepted = res.data;
+        return receiver
+    })
+    .catch(err => {
+        receiver.accepted = undefined;
+        return receiver
+    })  
+}
 
 export default Contacts;

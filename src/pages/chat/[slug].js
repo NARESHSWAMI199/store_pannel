@@ -101,7 +101,7 @@ function Page() {
                 );
             })
             .catch((err) => {
-                alert(err.message);
+                console.log(err.message);
             });
     }, [slug, auth.token]);
 
@@ -132,7 +132,6 @@ function Page() {
 
             client.subscribe('/topic/status', (user) => {
                 const data = JSON.parse(user.body);
-                // alert(data.slug + " : "+data.online)
                 if (data.online) {
                     setUserStatus('Online');
                 }
@@ -164,7 +163,7 @@ function Page() {
                     window.removeEventListener('beforeunload', () => {});
                 })
                 .catch((err) => {
-                    alert(err);
+                    console.log(err);
                 });
         });
 

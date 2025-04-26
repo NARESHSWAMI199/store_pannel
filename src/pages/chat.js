@@ -597,7 +597,6 @@ function Page() {
     )}, [searchQuery, contactUsers]);
 
     const filteredChats = useCallback(() => {
-        console.log(chatUsers); 
         return chatUsers.filter(chat => chat.username.toLowerCase().includes(searchQuery.toLowerCase())
     )}, [searchQuery, chatUsers]);
 
@@ -846,6 +845,7 @@ function Page() {
                                 handleDarkModeToggle={handleDarkModeToggle}
                                 onChangeAcceptStatus = {onChangeAcceptStatus}
                                 activeTab={activeTab}
+                                getInitials={getInitials}
                             />
                             <Box 
                                 // Input area for typing and sending messages
@@ -953,7 +953,7 @@ function Page() {
     )}
 
     {/* Input field for typing messages */}
-    {(receiver.accepted === "A" || activeTab === 'contacts') && 
+    {(receiver?.accepted !== "P" || !receiver?.accepted) && 
         <Box 
             sx={{ 
                 display: 'flex', 
@@ -1238,6 +1238,7 @@ const createWebSocketClient = (user, setNewMessage, setMessages,setPastMessages,
 
         wsClient.subscribe(`/user/${user?.slug}/queue/private`, (data) => {
             const message = JSON.parse(data.body);
+            if(!receiver?.accepted || receiver?.accepted === "P") return;
             setNewMessage(message);
             setMessages(prevMessages => [...prevMessages, message]);
             showNotification(message,auth.token);

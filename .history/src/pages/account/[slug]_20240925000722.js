@@ -52,7 +52,6 @@ const Page = () => {
           ...updatedUser,
           storeSlug  : updatedUser.userType == "W" ? "only-profile" : null 
         }
-        alert('hello')
         await axios.post(host+"/admin/auth/update",data)
         .then(res => {
           setMessage(res.data.message)

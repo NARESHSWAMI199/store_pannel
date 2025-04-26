@@ -50,7 +50,6 @@ export const SettingsPassword = (props) => {
       let success = props.handleSubmit(user.slug,password)
 
       if(success) {
-        alert(success)
         form.reset()
         setValues({})
       } 

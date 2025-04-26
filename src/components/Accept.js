@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Image } from "antd";
 import Typography from '@mui/material/Typography';
 import { Box, Button, Stack, Avatar } from '@mui/material';
-import { host, toTitleCase, getInitials } from 'src/utils/util';
+import { host, toTitleCase } from 'src/utils/util';
 import axios from 'axios';
 import { useAuth } from 'src/hooks/use-auth';
 
@@ -58,7 +58,7 @@ const Accept = (props) => {
                     mb: 2,
                 }}
             >
-                {!receiver.avatar && getInitials(receiver.username)}
+                {!receiver.avatar && props.getInitials(receiver?.username)}
             </Avatar>
 
             {/* Username */}
