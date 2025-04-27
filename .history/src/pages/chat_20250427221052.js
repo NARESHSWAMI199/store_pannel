@@ -846,7 +846,6 @@ function Page() {
                                 onChangeAcceptStatus = {onChangeAcceptStatus}
                                 activeTab={activeTab}
                                 getInitials={getInitials}
-                                updateReceiver={setReceiver}
                             />
                             <Box 
                                 // Input area for typing and sending messages
@@ -953,10 +952,9 @@ function Page() {
         </Box>
     )}
 
-    {/* Receiver accepted status for testing purpose */}
-    {/* <Typography>
+    <Typography>
         {receiver.accepted}
-    </Typography> */}
+    </Typography>
 
     {/* Input field for typing messages */}
     {(receiver?.accepted !== "P" || !receiver?.accepted) && 

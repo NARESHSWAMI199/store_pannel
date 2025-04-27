@@ -51,6 +51,7 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
             .then(async (response) => {
                 console.log('Contact added successfully:', response.data);
                 let newContact = response.data?.contact;
+                newContact = await isSenderAccepted(newContact,auth?.token);
                 setContactUsers(prevList => [...prevList, newContact]);
                 setUserList(prevList => prevList.map(user => 
                     user.slug === contact.slug ? { ...user, added: true } : user
@@ -110,8 +111,7 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
         });
     };
 
-    const handleChat = async (contact) => {
-        contact = await isSenderAccepted(contact, auth?.token);
+    const handleChat = (contact) => {
         setReceiver(contact);
         setOpenDialog(false);
     };
@@ -144,10 +144,7 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
                     <ListItem 
                         key={index} 
                         button 
-                        onClick={async() => {
-                            contact = await isSenderAccepted(contact, auth?.token);
-                            setReceiver(contact)
-                        }}
+                        onClick={() => setReceiver(contact)}
                         sx={{
                             borderRadius: '8px',
                             margin: '8px 0',

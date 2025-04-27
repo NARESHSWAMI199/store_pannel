@@ -144,10 +144,10 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
                     <ListItem 
                         key={index} 
                         button 
-                        onClick={async() => {
-                            contact = await isSenderAccepted(contact, auth?.token);
+                        onClick={() => {
+                            contact = await isSenderAccepted(newContact, auth?.token);
                             setReceiver(contact)
-                        }}
+                        })
                         sx={{
                             borderRadius: '8px',
                             margin: '8px 0',

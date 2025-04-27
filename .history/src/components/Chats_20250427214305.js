@@ -7,12 +7,11 @@ import CloseIcon from '@mui/icons-material/Close';
 import Accept from 'src/components/Accept'
 import axios from 'axios';
 import { useAuth } from 'src/hooks/use-auth';
-import { tr } from 'date-fns/locale';
 
 const Chats = (props) => {
 
     const auth = useAuth();
-    const { pastMessages, activeTab, messages, showMessage, showReplyMessage, chatDivRef, setOpenEmojis, darkMode, handleDarkModeToggle, onChangeAcceptStatus, getInitials,updateReceiver} = props
+    const { pastMessages, activeTab, messages, showMessage, showReplyMessage, chatDivRef, setOpenEmojis, darkMode, handleDarkModeToggle, onChangeAcceptStatus, getInitials } = props
     const [receiver, setReceiver] = useState(props.receiver)
     const [accepted,setAccepted] = useState()
     const [isDialogOpen, setIsDialogOpen] = useState(false); // State to manage dialog visibility
@@ -60,14 +59,12 @@ const Chats = (props) => {
 
     // Function to block the user
     const handleBlockUser = async (receiver) => {
-        if(!receiver) return; // Check if receiver is defined
         try {
             axios.get(host+`/block/${receiver?.slug}`)
             .then(res => {
                 let response = res.data;
                 console.log(`User ${receiver?.username} has been blocked.`, response);
                 setReceiver({...receiver, blocked: true}); // Update receiver state to reflect blocking
-                updateReceiver({ ...receiver, blocked: true })
             }).catch(error =>{
                 console.error(`Error blocking user ${receiver?.username}:`, error);
             });
@@ -84,7 +81,6 @@ const Chats = (props) => {
                 let response = res.data;
                 console.log(`User ${receiver?.username} has been unblocked.`, response);
                 setReceiver({...receiver, blocked: false}); // Update receiver state to reflect unblocking
-                updateReceiver({ ...receiver, blocked: false })
             }).catch(error =>{
                 console.error(`Error unblocking user ${receiver?.username}:`, error);
             });
@@ -296,7 +292,7 @@ const Chats = (props) => {
                             variant="contained" 
                             color="error" 
                             sx={{ mt: 2 }} 
-                            onClick={()=>handleBlockUser(receiver)}
+                            onClick={()=>handleBlockUser(receiver?.slug)}
                         >
                             Block
                         </Button>

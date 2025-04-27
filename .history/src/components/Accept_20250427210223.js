@@ -27,7 +27,7 @@ const Accept = (props) => {
         });
     };
 
-    const { receiver, blockReceiver, darkMode } = props;
+    const { receiver, darkMode } = props;
 
     return (
         <Box
@@ -99,7 +99,7 @@ const Accept = (props) => {
                 <Button
                     variant="contained"
                     color="error"
-                    onClick={() => blockReceiver(receiver)}
+                    onClick={() => handleAppceptOrDecline("R")}
                     size="large"
                     sx={{
                         px: 4,
@@ -109,7 +109,7 @@ const Accept = (props) => {
                         boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.2)',
                     }}
                 >
-                    Block
+                    Decline
                 </Button>
             </Stack>
         </Box>

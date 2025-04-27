@@ -7,7 +7,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import Accept from 'src/components/Accept'
 import axios from 'axios';
 import { useAuth } from 'src/hooks/use-auth';
-import { tr } from 'date-fns/locale';
 
 const Chats = (props) => {
 
@@ -66,8 +65,8 @@ const Chats = (props) => {
             .then(res => {
                 let response = res.data;
                 console.log(`User ${receiver?.username} has been blocked.`, response);
-                setReceiver({...receiver, blocked: true}); // Update receiver state to reflect blocking
-                updateReceiver({ ...receiver, blocked: true })
+                setReceiver({...receiver, blocked: true});
+                updateReceiver({ ...receiver, blocked: true }) // Update receiver state to reflect blocking
             }).catch(error =>{
                 console.error(`Error blocking user ${receiver?.username}:`, error);
             });
@@ -84,7 +83,6 @@ const Chats = (props) => {
                 let response = res.data;
                 console.log(`User ${receiver?.username} has been unblocked.`, response);
                 setReceiver({...receiver, blocked: false}); // Update receiver state to reflect unblocking
-                updateReceiver({ ...receiver, blocked: false })
             }).catch(error =>{
                 console.error(`Error unblocking user ${receiver?.username}:`, error);
             });
@@ -178,7 +176,7 @@ const Chats = (props) => {
             >
                 
                 {/* Accept component for pending status */}
-                {(accepted === 'P') &&
+                {(accepted === 'P' && !receiver?.blocked) &&
                     <Accept receiver={receiver} darkMode={darkMode} onChangeStatus={onChangeStatus} getInitials={getInitials} blockReceiver={handleBlockUser} />
                 }
                 

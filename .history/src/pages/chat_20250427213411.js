@@ -45,8 +45,6 @@ import ReactTimeAgo from 'react-time-ago';
 import Chats from 'src/components/Chats';
 import Contacts from 'src/components/Contacts';
 import { ShowMessages, ShowRepliedMessages } from 'src/sections/chats-messages';
-import { set } from 'nprogress';
-import { sl } from 'date-fns/locale';
 
 
 TimeAgo.addLocale(en);
@@ -846,7 +844,7 @@ function Page() {
                                 onChangeAcceptStatus = {onChangeAcceptStatus}
                                 activeTab={activeTab}
                                 getInitials={getInitials}
-                                updateReceiver={setReceiver}
+                                blockReceiver={blockReceiver}
                             />
                             <Box 
                                 // Input area for typing and sending messages
@@ -952,11 +950,6 @@ function Page() {
             </IconButton>
         </Box>
     )}
-
-    {/* Receiver accepted status for testing purpose */}
-    {/* <Typography>
-        {receiver.accepted}
-    </Typography> */}
 
     {/* Input field for typing messages */}
     {(receiver?.accepted !== "P" || !receiver?.accepted) && 
@@ -1485,4 +1478,16 @@ const getParentMessage = async (message,token) => {
         return null;
     })  
     return parentId;
+}
+
+const blockReceiver = async (receiver,token) => {
+    axios.defaults.headers = { Authorization: token };
+    return axios.post(`${host}/chat/block`, { receiver: receiver.slug })
+        .then(res => {
+            return res.data;
+        })
+        .catch(err => {
+            console.log(err.message);
+            return null;
+        });
 }

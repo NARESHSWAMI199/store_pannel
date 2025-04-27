@@ -27,7 +27,7 @@ const Accept = (props) => {
         });
     };
 
-    const { receiver, blockReceiver, darkMode } = props;
+    const { receiver, darkMode } = props;
 
     return (
         <Box
@@ -99,7 +99,7 @@ const Accept = (props) => {
                 <Button
                     variant="contained"
                     color="error"
-                    onClick={() => blockReceiver(receiver)}
+                    onClick={() => props.blockReceiver(receiver.slug)}
                     size="large"
                     sx={{
                         px: 4,

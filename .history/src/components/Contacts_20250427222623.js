@@ -145,7 +145,7 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
                         key={index} 
                         button 
                         onClick={async() => {
-                            contact = await isSenderAccepted(contact, auth?.token);
+                            contact = await isSenderAccepted(newContact, auth?.token);
                             setReceiver(contact)
                         }}
                         sx={{

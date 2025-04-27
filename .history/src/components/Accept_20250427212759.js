@@ -99,7 +99,7 @@ const Accept = (props) => {
                 <Button
                     variant="contained"
                     color="error"
-                    onClick={() => blockReceiver(receiver)}
+                    onClick={() => blockReceiver(receiver.slug)}
                     size="large"
                     sx={{
                         px: 4,

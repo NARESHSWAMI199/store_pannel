@@ -45,8 +45,6 @@ import ReactTimeAgo from 'react-time-ago';
 import Chats from 'src/components/Chats';
 import Contacts from 'src/components/Contacts';
 import { ShowMessages, ShowRepliedMessages } from 'src/sections/chats-messages';
-import { set } from 'nprogress';
-import { sl } from 'date-fns/locale';
 
 
 TimeAgo.addLocale(en);
@@ -846,7 +844,6 @@ function Page() {
                                 onChangeAcceptStatus = {onChangeAcceptStatus}
                                 activeTab={activeTab}
                                 getInitials={getInitials}
-                                updateReceiver={setReceiver}
                             />
                             <Box 
                                 // Input area for typing and sending messages
@@ -953,13 +950,8 @@ function Page() {
         </Box>
     )}
 
-    {/* Receiver accepted status for testing purpose */}
-    {/* <Typography>
-        {receiver.accepted}
-    </Typography> */}
-
     {/* Input field for typing messages */}
-    {(receiver?.accepted !== "P" || !receiver?.accepted) && 
+    {(receiver?.accepted !== "P" || !receiver?.accepted) || receiver?.blocked &&
         <Box 
             sx={{ 
                 display: 'flex', 
