@@ -53,13 +53,12 @@ TimeAgo.addLocale(en);
 TimeAgo.addLocale(ru);
 
 // Helper function to fetch username by slug
-const fetchUsername = async (slug, token) => {
+const fetchUserBySlug = async (slug, token) => {
     try {
-        const response = await axios.get(`${host}/wholesale/auth/detail`, {
-            params: { slug },
+        const response = await axios.get(`${host}/wholesale/auth/detail/${slug}`, {
             headers: { Authorization: token }
         });
-        return response.data.user?.username;
+        return response.data.user
     } catch (error) {
         console.error('Error fetching username:', error);
         let err = !!err.response ? err.response.data?.message : err.message; 
@@ -153,7 +152,7 @@ function Page() {
 
     // Effect to initialize WebSocket client and handle connection lifecycle
     useEffect(() => {
-        const wsClient = createWebSocketClient(user, setNewMessage, setMessages,setPastMessages, setChatUsers, setIsPlaying,showNotification,auth,receiver);
+        const wsClient = createWebSocketClient(user, setNewMessage, setMessages,setPastMessages, setChatUsers, setIsPlaying,showNotification,auth);
         setClient(wsClient);
         wsClient.activate();
 
@@ -1230,7 +1229,7 @@ export default Page;
 
 // Helper functions
 // Function to create WebSocket client
-const createWebSocketClient = (user, setNewMessage, setMessages,setPastMessages, setChatUsers, setIsPlaying, showNotification,auth,receiver) => {
+const createWebSocketClient = (user, setNewMessage, setMessages,setPastMessages, setChatUsers, setIsPlaying, showNotification,auth) => {
     const wsClient = new Client({
         brokerURL: `${wbhost}/chat?${user?.slug}`,
         debug: function (str) {
@@ -1241,13 +1240,19 @@ const createWebSocketClient = (user, setNewMessage, setMessages,setPastMessages,
     wsClient.onConnect = (frame) => {
         console.log('Connected: ' + frame);
         wsClient.publish({ destination: `/app/chat/connect/${user?.slug}` });
-        wsClient.subscribe(`/user/${user?.slug}/queue/private`, (data) => {
+        wsClient.subscribe(`/user/${user?.slug}/queue/private`, async (data) => {
+
+            // Setting the message to the server
             const message = JSON.parse(data.body);
-            console.log("Connected to WebSocket server : " + JSON.stringify(receiver));
-            if(!receiver?.accepted || receiver?.accepted === "P") return;
             setNewMessage(message);
             setMessages(prevMessages => [...prevMessages, message]);
             showNotification(message,auth.token);
+
+            // Getting Sender details for show chat list if not present.
+            const receiver = await fetchUserBySlug(message.sender, auth.token);
+            setChatUsers(prevChatUsers => prevChatUsers.find(chatUser => chatUser.slug === message.sender) ? prevChatUsers : [receiver,...prevChatUsers]);
+            console.log(receiver, message ," : receiver details")
+            // Setting the notification count for chat users
             const visitedUser = [];
             setChatUsers(prevChatUsers => prevChatUsers.map(chatUser => {
                 if (chatUser.slug === message.sender && !message.seen && message.isSent==="S" && !visitedUser.includes(chatUser.slug)) {
@@ -1304,6 +1309,7 @@ const handleBeforeUnload = async (event,client) => {
 
 // Function to subscribe to "seen" messages
 const subscribeToSeenMessages = (client, user, setMessages) => {
+    alert("subscribeToSeenMessages")
     client.subscribe(`/user/${user?.slug}/queue/private/chat/seen`, (data) => {
         const seen = JSON.parse(data.body);
         setMessages(prevMessages => prevMessages.map(message => {
@@ -1463,7 +1469,8 @@ const updateUserLastSeen = async () => {
 
 // Function to show browser notification
 const showNotification = async (message,token) => {
-    const username = await fetchUsername(message.sender, token);
+    const user = await fetchUserBySlug(message.sender, token);
+    let username = user?.username;
     if (username && Notification.permission === "granted") {
         new Notification("New Message", {
             body: `${username}: ${message.message}`,
