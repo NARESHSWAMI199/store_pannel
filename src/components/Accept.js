@@ -47,7 +47,7 @@ const Accept = (props) => {
         >
             {/* Avatar */}
             <Avatar
-                src={receiver.avatar || ''}
+                src={receiver.avatarUrl || ''}
                 alt={receiver.username}
                 sx={{
                     height: 120,
@@ -58,7 +58,7 @@ const Accept = (props) => {
                     mb: 2,
                 }}
             >
-                {!receiver.avatar && props.getInitials(receiver?.username)}
+                {!receiver.avatarUrl && props.getInitials(receiver?.username)}
             </Avatar>
 
             {/* Username */}

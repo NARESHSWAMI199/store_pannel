@@ -118,7 +118,7 @@ const Chats = (props) => {
                         sx={{ 
                             mx: 1 
                         }} 
-                        src={receiver?.avatar} 
+                        src={receiver?.avatarUrl} 
                     />
                     <Box 
                         sx={{ 
@@ -260,7 +260,7 @@ const Chats = (props) => {
                     <Box sx={{ textAlign: 'center', mb: 2 }}>
                         <Avatar 
                             sx={{ width: 80, height: 80, mx: 'auto', mb: 2 }} 
-                            src={receiver?.avatar} 
+                            src={receiver?.avatarUrl} 
                         />
                         <Typography variant="h6">{receiver?.username}</Typography>
                         <Typography variant="body2" sx={{ color: darkMode ? '#ccc' : '#666' }}>

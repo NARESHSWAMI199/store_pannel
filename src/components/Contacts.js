@@ -112,6 +112,7 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
 
     const handleChat = async (contact) => {
         contact = await isSenderAccepted(contact, auth?.token);
+        contact = await isReceiverBlocked(contact, auth?.token);
         setReceiver(contact);
         setOpenDialog(false);
     };
@@ -146,6 +147,7 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
                         button 
                         onClick={async() => {
                             contact = await isSenderAccepted(contact, auth?.token);
+                            contact = await isReceiverBlocked(contact, auth?.token);
                             setReceiver(contact)
                         }}
                         sx={{
@@ -165,7 +167,7 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
                                 badgeContent={contact?.chatNotification} 
                                 invisible={contact?.chatNotification === 0}
                             >
-                                <Avatar src={contact?.avatar} />
+                                <Avatar src={contact?.avatarUrl} />
                             </Badge>
                         </ListItemAvatar>
                         {/* Contact details */}
@@ -274,7 +276,7 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
                             <ListItem key={index} 
                                 sx={{ display: 'flex', justifyContent: 'space-between' }}>
                                 <ListItemAvatar>
-                                    <Avatar src={user.avatar} />
+                                    <Avatar src={user.avatarUrl} />
                                 </ListItemAvatar>
                                 <ListItemText primary={user.username} />
                                 <Box sx={{ display: 'flex', gap: 1 }}>
@@ -365,5 +367,22 @@ const isSenderAccepted = async (receiver,token) => {
         return receiver
     })  
 }
+
+
+
+const isReceiverBlocked = async (receiver,token) => {
+    axios.defaults.headers = { Authorization: token };  
+    return await axios.get(`${host}/is-blocked/${receiver.slug}`)
+    .then(res => {
+        receiver.blocked = res.data;
+        return receiver
+    })
+    .catch(err => {
+        receiver.blocked = undefined;
+        return receiver
+    })  
+}
+
+
 
 export default Contacts;

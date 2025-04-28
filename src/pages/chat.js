@@ -153,7 +153,7 @@ function Page() {
 
     // Effect to initialize WebSocket client and handle connection lifecycle
     useEffect(() => {
-        const wsClient = createWebSocketClient(user, setNewMessage, setMessages,setPastMessages, setChatUsers, setIsPlaying,showNotification,auth);
+        const wsClient = createWebSocketClient(user, setNewMessage, setMessages,setPastMessages, setChatUsers, setIsPlaying,showNotification,auth,receiver);
         setClient(wsClient);
         wsClient.activate();
 
@@ -687,7 +687,7 @@ function Page() {
                             {/* User Avatar */}
                             <IconButton onClick={handleProfileClick}>
                                     <Avatar 
-                                        src={user?.avatar ? `${userImage}${user.slug}/${user.avatar}` : undefined} 
+                                        src={user?.avatarUrl ? `${userImage}${user.slug}/${user?.avatarUrl}` : undefined} 
                                         alt={user?.username || 'User'} 
                                         sx={{ 
                                             width: 36, 
@@ -790,10 +790,10 @@ function Page() {
                                 >
                                     <ArrowBackIcon />
                                 </IconButton>
-                                {receiver.avatar ? (
+                                {receiver.avatarUrl ? (
                                     <Avatar 
                                         // Avatar for receiver
-                                        src={`${userImage}${receiver.slug}/${receiver.avatar}`} 
+                                        src={`${userImage}${receiver.slug}/${receiver?.avatarUrl}`} 
                                         sx={{ 
                                             ml: 2 
                                         }} 
@@ -1230,7 +1230,7 @@ export default Page;
 
 // Helper functions
 // Function to create WebSocket client
-const createWebSocketClient = (user, setNewMessage, setMessages,setPastMessages, setChatUsers, setIsPlaying, showNotification,auth) => {
+const createWebSocketClient = (user, setNewMessage, setMessages,setPastMessages, setChatUsers, setIsPlaying, showNotification,auth,receiver) => {
     const wsClient = new Client({
         brokerURL: `${wbhost}/chat?${user?.slug}`,
         debug: function (str) {
@@ -1241,9 +1241,9 @@ const createWebSocketClient = (user, setNewMessage, setMessages,setPastMessages,
     wsClient.onConnect = (frame) => {
         console.log('Connected: ' + frame);
         wsClient.publish({ destination: `/app/chat/connect/${user?.slug}` });
-
         wsClient.subscribe(`/user/${user?.slug}/queue/private`, (data) => {
             const message = JSON.parse(data.body);
+            console.log("Connected to WebSocket server : " + JSON.stringify(receiver));
             if(!receiver?.accepted || receiver?.accepted === "P") return;
             setNewMessage(message);
             setMessages(prevMessages => [...prevMessages, message]);
@@ -1467,7 +1467,7 @@ const showNotification = async (message,token) => {
     if (username && Notification.permission === "granted") {
         new Notification("New Message", {
             body: `${username}: ${message.message}`,
-            icon: `${userImage}${message.sender}/${message.avatar}`
+            icon: `${userImage}${message.sender}/${message.avatarUrl}`
         });
     }
 };
