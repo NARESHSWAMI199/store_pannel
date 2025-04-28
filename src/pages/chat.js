@@ -206,7 +206,7 @@ function Page() {
     // Effect to update seen messages when receiver or new message changes
     useEffect(() => {
         if (receiver) {
-            updateSeenMessages(receiver, setChatUsers, auth.token, router,setSnackbarMessage,setSnackbarOpen);
+            updateSeenMessages(receiver, setChatUsers,setContactUsers,auth.token, router,setSnackbarMessage,setSnackbarOpen);
         }
     }, [receiver, newMessage]);
 
@@ -1309,7 +1309,6 @@ const handleBeforeUnload = async (event,client) => {
 
 // Function to subscribe to "seen" messages
 const subscribeToSeenMessages = (client, user, setMessages) => {
-    alert("subscribeToSeenMessages")
     client.subscribe(`/user/${user?.slug}/queue/private/chat/seen`, (data) => {
         const seen = JSON.parse(data.body);
         setMessages(prevMessages => prevMessages.map(message => {
@@ -1387,15 +1386,24 @@ const fetchChatUsers = (setChatUsers, token,router,setSnackbarMessage,setSnackba
 };
 
 // Function to update seen messages
-const updateSeenMessages = (receiver, setChatUsers, token, router,setSnackbarMessage,setSnackbarOpen) => {
+const updateSeenMessages = (receiver, setChatUsers, setContactUsers,token, router,setSnackbarMessage,setSnackbarOpen) => {
     axios.defaults.headers = { Authorization: token };
     axios.post(`${host}/chat/seen`, { sender: receiver?.slug })
         .then(res => {
+            // Update chat users' seen status
             setChatUsers(prevChatUsers => prevChatUsers.map(chatUser => {
                 if (chatUser.slug === receiver.slug) {
                     chatUser.chatNotification = 0;
                 }
                 return chatUser;
+            }));
+
+            // Update contact users' seen status
+            setContactUsers(prevContactUsers => prevContactUsers.map(contactUser => {
+                if (contactUser.slug === receiver.slug) {
+                    contactUser.chatNotification = 0;
+                }
+                return contactUser;
             }));
         })
         .catch(err => {
