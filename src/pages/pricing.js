@@ -34,31 +34,32 @@ function Pricing() {
     },[])
 
 
-    const redirectForPayment = (slug) =>{
-        const redirect = async() => {
-            axios.defaults.headers = {
-                Authorization: auth.token
-            }
-            
-            await axios.get(host+"/pg/pay/"+slug)
-            .then(res => {
-                window.open(res.data.url);
-            })
-            .catch(err => {
-                setMessage(!!err.response ? err.response.data.message : err.message)
-                setFlag("error")
-                setOpen(true)
-            });
+    const redirectForPayment = (slug,pg) =>{
+        axios.defaults.headers = {
+            Authorization: auth.token
         }
 
+        const redirect = async() => {
+            if(pg === "phonepe"){
+                await axios.get(host+"/pg/pay/"+slug)
+                .then(res => {
+                    window.open(res.data.url);
+                })
+                .catch(err => {
+                    setMessage(!!err.response ? err.response.data.message : err.message)
+                    setFlag("error")
+                    setOpen(true)
+                });
+            }else {
+                window.location.href = host+"/cashfree/pay/"+slug+"/"+encodeURIComponent(auth.token.replace("Bearer ", ""))
+            }
+        }
         /* Before payment we will check user must be logged in. */
         if(!!auth.token){
             redirect();
         }else{
             router.push("/auth/register")
         }
-
-  
     }
 
 
@@ -135,8 +136,8 @@ function Pricing() {
                                                 <Button 
                                                     variant="contained" 
                                                     type='button' 
-                                                    onClick={(e)=>redirectForPayment(plan.slug)} 
-                                                    >Get Trial Plan
+                                                    onClick={(e)=>redirectForPayment(plan.slug,"cashfree")} 
+                                                    >Get Now.
                                                 </Button>
                                         </Box>
                                     </Box>
