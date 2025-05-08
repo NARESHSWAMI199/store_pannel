@@ -55,7 +55,7 @@ export const OverviewBox = (props) => {
               {props.title}
             </Typography>
             <Typography variant="h4">
-              {value?.all}
+              {value.all}
             </Typography>
           </Stack>
           <Avatar
@@ -113,7 +113,7 @@ export const OverviewBox = (props) => {
                   fontWeight:'bold'
                 }}
               >
-                {value?.inStock}
+                {value.inStock}
               </Typography>
               <Typography
                 color='text.secondary'
@@ -143,7 +143,7 @@ export const OverviewBox = (props) => {
                   fontWeight:'bold'
                 }}
               >
-                {value?.active}
+                {value.active}
               </Typography>
               <Typography
                 color='text.secondary'
@@ -173,7 +173,7 @@ export const OverviewBox = (props) => {
                   fontWeight:'bold'
                 }}
               >
-                {value?.outStock}
+                {value.outStock}
               </Typography>
               <Typography
                 color='text.secondary'
@@ -202,7 +202,7 @@ export const OverviewBox = (props) => {
                   fontWeight:'bold'
                 }}
               >
-                {value?.deactive}
+                {value.deactive}
               </Typography>
               <Typography
                 color='text.secondary'

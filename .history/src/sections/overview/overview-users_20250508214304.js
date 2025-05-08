@@ -202,7 +202,7 @@ export const OverviewBox = (props) => {
                   fontWeight:'bold'
                 }}
               >
-                {value?.deactive}
+                {value.deactive}
               </Typography>
               <Typography
                 color='text.secondary'

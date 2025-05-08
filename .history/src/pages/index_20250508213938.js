@@ -244,8 +244,8 @@ useEffect(() => {
           >
             <StockTraffic
               chartSeries={[
-                getPercentage(dashboardData.inStock?.all, dashboardData.items?.all), 
-                getPercentage(dashboardData.outStock?.all, dashboardData.items?.all), 
+                getPercentage(dashboardData.inStock.all, dashboardData.items.all), 
+                getPercentage(dashboardData.outStock.all, dashboardData.items.all), 
               ]}
               title = "ITEMS STOCK DETAIL"
               labels={['In stock', 'Out of stock']}

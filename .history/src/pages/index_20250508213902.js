@@ -228,8 +228,8 @@ useEffect(() => {
           >
             <OverviewTraffic
               chartSeries={[
-                getPercentage(dashboardData.newItems?.all, dashboardData.items?.all), 
-                getPercentage(dashboardData.oldItems?.all, dashboardData.items?.all), 
+                getPercentage(dashboardData.newItems?.all, dashboardData.items.all), 
+                getPercentage(dashboardData.oldItems?.all, dashboardData.items.all), 
               ]}
               title = "ITEM LABELS DETAIL"
               labels={['New Items', 'Old Items']}
@@ -244,8 +244,8 @@ useEffect(() => {
           >
             <StockTraffic
               chartSeries={[
-                getPercentage(dashboardData.inStock?.all, dashboardData.items?.all), 
-                getPercentage(dashboardData.outStock?.all, dashboardData.items?.all), 
+                getPercentage(dashboardData.inStock.all, dashboardData.items.all), 
+                getPercentage(dashboardData.outStock.all, dashboardData.items.all), 
               ]}
               title = "ITEMS STOCK DETAIL"
               labels={['In stock', 'Out of stock']}
