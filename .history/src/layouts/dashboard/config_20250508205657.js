@@ -134,17 +134,6 @@ export const items = (user) =>{
         </SvgIcon>
       )
     },
-
-    {
-      title: 'My Plans',
-      path: '/plans',
-      show: true,
-      icon: (
-        <SvgIcon fontSize="small">
-          <AccountBalanceWalletIcon />
-        </SvgIcon>
-      )
-    },
   
     {
       title: 'Settings',
@@ -153,6 +142,17 @@ export const items = (user) =>{
       icon: (
         <SvgIcon fontSize="small">
           <CogIcon />
+        </SvgIcon>
+      )
+    },
+
+    {
+      title: 'My Plans',
+      path: '/plans',
+      show: true,
+      icon: (
+        <SvgIcon fontSize="small">
+          <AccountBalanceWalletIcon />
         </SvgIcon>
       )
     },

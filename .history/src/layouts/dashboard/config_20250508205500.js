@@ -11,7 +11,6 @@ import StoreIcon from '@mui/icons-material/Store';
 import { SvgIcon } from '@mui/material';
 import WallpaperIcon from '@mui/icons-material/Wallpaper';
 import ChatIcon from '@mui/icons-material/Chat';
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 
 export const items = (user) =>{
 
@@ -134,22 +133,22 @@ export const items = (user) =>{
         </SvgIcon>
       )
     },
-
-    {
-      title: 'My Plans',
-      path: '/plans',
-      show: true,
-      icon: (
-        <SvgIcon fontSize="small">
-          <AccountBalanceWalletIcon />
-        </SvgIcon>
-      )
-    },
   
     {
       title: 'Settings',
       path: '/settings',
       show : true,
+      icon: (
+        <SvgIcon fontSize="small">
+          <CogIcon />
+        </SvgIcon>
+      )
+    },
+
+    {
+      title: 'My Plans',
+      path: '/plans',
+      show: true,
       icon: (
         <SvgIcon fontSize="small">
           <CogIcon />
