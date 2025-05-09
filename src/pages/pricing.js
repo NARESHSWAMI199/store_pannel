@@ -74,7 +74,7 @@ function Pricing() {
               <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                 <CardContent>
                   <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
-                    {projectName} {plan.name}
+                   {plan.name}
                   </Typography>
                   <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                     {plan.months} Months Plan
