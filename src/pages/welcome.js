@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, Box, Typography, Button, Card, CardContent } from '@mui/material';
+import { Grid, Box, Typography, Button, Card, CardContent, Snackbar, Alert } from '@mui/material';
 import { ArrowRightAltOutlined } from '@mui/icons-material';
 import Link from 'next/link';
 import axios from 'axios';
@@ -7,9 +7,16 @@ import bg from 'public/assets/bg2.png';
 import HomeNavbar from 'src/sections/top-nav';
 import Typewriter from 'src/components/Typewriter';
 import { host } from 'src/utils/util';
+import { useAuth } from 'src/hooks/use-auth';
+import { useRouter } from 'next/navigation';
 
 function Page() {
   const [plans, setPlans] = useState([]);
+  const auth = useAuth();
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  const [flag, setFlag] = useState("warning");
 
   // Fetch plans from the backend
   useEffect(() => {
@@ -22,6 +29,40 @@ function Page() {
         console.error('Failed to fetch plans:', err);
       });
   }, []);
+
+
+    const redirectForPayment = (slug, pg) => {
+      axios.defaults.headers = {
+        Authorization: auth.token
+      }
+  
+      const redirect = async () => {
+        if (pg === "phonepe") {
+          await axios.get(host + "/pg/pay/" + slug)
+            .then(res => {
+              window.open(res.data.url);
+            })
+            .catch(err => {
+              setMessage(!!err.response ? err.response.data.message : err.message)
+              setFlag("error")
+              setOpen(true)
+            });
+        } else {
+          window.location.href = host + "/cashfree/pay/" + slug + "/" + encodeURIComponent(auth.token.replace("Bearer ", ""))
+        }
+      }
+      if (!!auth.token) {
+        redirect();
+      } else {
+        router.push("/auth/register")
+      }
+    }
+
+    const handleClose = () => {
+        setOpen(false)
+    };
+  
+
 
   return (
     <Box>
@@ -112,8 +153,8 @@ function Page() {
                     <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 2 }}>
                       ₹ {plan.price}
                     </Typography>
-                    <Button variant="contained" sx={{ mt: 2 }}>
-                      Sign Up
+                    <Button variant="contained" sx={{ mt: 2 }} onClick={() => redirectForPayment(plan.slug, "cashfree")}>
+                      {!!auth?.token ? "Get Now" : "Sign Up"}
                     </Button>
                   </CardContent>
                 </Card>
@@ -139,6 +180,7 @@ function Page() {
               color: 'black',
               borderRadius: 20,
             }}
+            onClick={() => router.push("/auth/register")}
           >
             Sign Up Now
           </Button>
@@ -151,6 +193,15 @@ function Page() {
           </Typography>
         </Grid>
       </Grid>
+          <Snackbar anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+              open={open}
+              onClose={handleClose}
+              key={'bottom' + 'left'}
+            >
+              <Alert onClose={handleClose} severity={flag} sx={{ width: '100%' }}>
+                {message}
+              </Alert>
+            </Snackbar>
     </Box>
   );
 }

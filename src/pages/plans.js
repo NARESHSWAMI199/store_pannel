@@ -14,6 +14,7 @@ import { host,dataNotFoundImage} from 'src/utils/util';
 import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 
 function Plans() {
 
@@ -273,10 +274,17 @@ function Plans() {
   )
 }
 
-Plans.getLayout = (page) =>(
-  <HomeNavbar>
-  {page}
-</HomeNavbar>
-)
+// Plans.getLayout = (page) =>(
+//   <HomeNavbar>
+//   {page}
+// </HomeNavbar>
+// )
+
+
+Plans.getLayout = (page) => (
+  <DashboardLayout>
+      {page}
+  </DashboardLayout>
+);
 
 export default Plans
