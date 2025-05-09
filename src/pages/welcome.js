@@ -6,6 +6,7 @@ import logo from 'public/assets/logos/logo.png'
 import { useEffect, useRef, useState } from 'react'
 import { useAuth } from 'src/hooks/use-auth'
 import HomeNavbar from 'src/sections/top-nav'
+import Typewriter from 'src/components/Typewriter'
 function Page() {     
 
 const auth = useAuth()
@@ -69,7 +70,9 @@ const auth = useAuth()
                     fontSize : '24px'
                 }}
             >
-                Grow your bussinus with swami sales.
+                {/* Grow your bussinus with swami sales. */}
+   
+                <Typewriter text="Grow your business with smart sales" />
             </Typography>
             <Typography 
                 variant='p'

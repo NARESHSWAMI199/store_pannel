@@ -27,7 +27,7 @@ function HomeNavbar(props) {
   const router = useRouter()
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
-  const [pages,setPages] = React.useState(['Products','Pricing','Blog'])
+  const [pages,setPages] = React.useState(['Pricing'])
   const {children} = props
 // const settings = ['Profile', 'Account', 'Dashboard',"Register", 'Login'];
 
