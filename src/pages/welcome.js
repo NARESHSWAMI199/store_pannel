@@ -1,130 +1,158 @@
-import { ArrowRightAltOutlined } from '@mui/icons-material'
-import { Avatar, Box, Button, Grid, SvgIcon, Typography } from '@mui/material'
-import Link from 'next/link'
-import bg from 'public/assets/bg2.png'
-import logo from 'public/assets/logos/logo.png'
-import { useEffect, useRef, useState } from 'react'
-import { useAuth } from 'src/hooks/use-auth'
-import HomeNavbar from 'src/sections/top-nav'
-import Typewriter from 'src/components/Typewriter'
-function Page() {     
+import React, { useState, useEffect } from 'react';
+import { Grid, Box, Typography, Button, Card, CardContent } from '@mui/material';
+import { ArrowRightAltOutlined } from '@mui/icons-material';
+import Link from 'next/link';
+import axios from 'axios';
+import bg from 'public/assets/bg2.png';
+import HomeNavbar from 'src/sections/top-nav';
+import Typewriter from 'src/components/Typewriter';
+import { host } from 'src/utils/util';
 
-const auth = useAuth()
+function Page() {
+  const [plans, setPlans] = useState([]);
+
+  // Fetch plans from the backend
+  useEffect(() => {
+    axios
+      .get(`${host}/wholesale/plan/all`)
+      .then((res) => {
+        setPlans(res.data); // Assuming the API returns an array of plans
+      })
+      .catch((err) => {
+        console.error('Failed to fetch plans:', err);
+      });
+  }, []);
+
   return (
-    <Grid 
-        container 
-        sx={{
-            justifyContent : 'center',
-            alignItems : 'center',
-            display : 'flex'
-        }}
-    >
-        <Box 
-            sx={{
-                display : 'flex' , 
-                flexDirection : 'column',
-                justifyContent : 'center',
-                alignItems : 'center'
-            }}
+    <Box>
+      <HomeNavbar bg={bg.src} />
+      <Grid container sx={{ display: 'flex', flexDirection: 'column' }}>
+        {/* Hero Section */}
+        <Grid
+          item
+          sx={{
+            backgroundImage: `url(${bg.src})`,
+            backgroundSize: 'cover',
+            height: '100vh',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            position: 'relative',
+          }}
         >
-            <Box 
-                sx={{
-                    display :'flex',
-                    alignItems : 'center',
-                    justifyContent :'center',
-                    height : 150,
-                    width : 150,
-                    background : 'white',
-                    borderRadius : 50,
-                    boxShadow : 1
-                }}
-            > 
-                <Avatar  
-                    sx={{
-                        height : 100,
-                        width : 150,
-                        objectFit :'contain',
-                    }} 
-                    src={logo.src} 
-                /> 
-            </Box>
-            <Typography 
-                variant='h1'
-                sx={{
-                    fontFamily : 'Georgia, serif',
-                    fontSize : '4vw',
-                    textAlign : 'center',
-                    fontWeight : 'light',
-                    color : '#ffffff',
-                    mt : 2
-                }}
+          <Box
+            sx={{
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              width: '100%',
+              height: '30%',
+              background: 'linear-gradient(to top, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0))',
+              backdropFilter: 'blur(10px)',
+              zIndex: 0,
+            }}
+          />
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              zIndex: 1,
+            }}
+          >
+            <Typography
+              variant="h1"
+              sx={{ fontSize: '4vw', textAlign: 'center', fontWeight: 'light', color: '#ffffff', mt: 2 }}
             >
-                WELCOME TO <br/>
-                <span style={{  fontSize : '120px',}}> SWAMI SALES </span>
+              WELCOME TO <br />
+              <span style={{ fontSize: '120px' }}>SWAMI SALES</span>
             </Typography>
-
-            <Typography 
-                variant='h3'
+            <Typography variant="h3" sx={{ fontFamily: 'serif', fontSize: '24px', mb: 4 }}>
+              <Typewriter text="Grow your business with smart sales." />
+            </Typography>
+            <Link href="/auth/register" style={{ textDecoration: 'none' }}>
+              <Button
+                variant="contained"
                 sx={{
-                    fontFamily : 'serif',
-                    fontSize : '24px'
+                  height: 60,
+                  width: 300,
+                  fontWeight: 'bold',
+                  fontSize: 18,
+                  background: 'white',
+                  color: 'black',
+                  borderRadius: 20,
                 }}
-            >
-                {/* Grow your bussinus with swami sales. */}
-   
-                <Typewriter text="Grow your business with smart sales" />
-            </Typography>
-            <Typography 
-                variant='p'
-                sx={{
-                    fontFamily : 'serif'
-                }}
-            > 
-                {"Hey ! It's time to switch online."}
-            </Typography>
-            <Link 
-                href={{
-                    pathname :  !!auth.token ? "/pricing" : "/auth/register"
-                }} 
-                style={{
-                    height : 60,
-                    width: 300,
-                    fontWeight : 'bold',
-                    fontSize : 18,
-                    marginTop : 25,
-                    background : 'white',
-                    color : 'black',
-                    position : 'relative',
-                    borderRadius : 20,
-                    textDecoration : 'none',
-                    display : 'flex',
-                    justifyContent : 'center',
-                    alignItems : 'center',
-                    boxShadow: '0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)',
-                }} 
-            > 
-                <Box 
-                    sx={{
-                        display : 'flex',
-                        justifyContent : 'center',
-                        alignItems : 'center',
-                    }}
-                >
-                    Register Now / Try Now
-                    <ArrowRightAltOutlined sx={{fontWeight : 'bold', mx : 1}}/>
+              >
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  Register Now / Try Now
+                  <ArrowRightAltOutlined sx={{ fontWeight: 'bold', mx: 1 }} />
                 </Box>
+              </Button>
             </Link>
-        </Box>
-    </Grid>
-  )
+          </Box>
+        </Grid>
+
+        {/* Plans Section */}
+        <Grid item sx={{ padding: 5 }}>
+          <Typography variant="h2" sx={{ fontWeight: 'bold', mb: 2 }}>
+            Our Plans
+          </Typography>
+          <Grid container spacing={2}>
+            {plans.map((plan, index) => (
+              <Grid item key={index} xs={12} sm={4}>
+                <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                  <CardContent>
+                    <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
+                      {plan.name}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                      {plan.months} Months Plan
+                    </Typography>
+                    <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 2 }}>
+                      ₹ {plan.price}
+                    </Typography>
+                    <Button variant="contained" sx={{ mt: 2 }}>
+                      Sign Up
+                    </Button>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        </Grid>
+
+        {/* Call-to-Action Section */}
+        <Grid item sx={{ padding: 5, backgroundColor: '#333', color: '#fff' }}>
+          <Typography variant="h2" sx={{ fontWeight: 'bold', mb: 2 }}>
+            Get Started Today!
+          </Typography>
+          <Button
+            variant="contained"
+            sx={{
+              height: 60,
+              width: 300,
+              fontWeight: 'bold',
+              fontSize: 18,
+              marginTop: 5,
+              background: 'white',
+              color: 'black',
+              borderRadius: 20,
+            }}
+          >
+            Sign Up Now
+          </Button>
+        </Grid>
+
+        {/* Footer Section */}
+        <Grid item sx={{ padding: 5, backgroundColor: '#333', color: '#fff' }}>
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            2025 Swami Sales. All rights reserved.
+          </Typography>
+        </Grid>
+      </Grid>
+    </Box>
+  );
 }
 
-Page.getLayout = (page) => (
-    <HomeNavbar bg={bg}>
-        {page}
-    </HomeNavbar>
-)
-
-
-export default Page
-
+export default Page;
