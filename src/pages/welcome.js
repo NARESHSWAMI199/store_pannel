@@ -135,8 +135,9 @@ function Page() {
         </Grid>
 
         {/* Plans Section */}
+        {plans?.lenght &&
         <Grid item sx={{ padding: 5 }}>
-          <Typography variant="h2" sx={{ fontWeight: 'bold', mb: 2 }}>
+         <Typography variant="h2" sx={{ fontWeight: 'bold', mb: 2 }}>
             Our Plans
           </Typography>
           <Grid container spacing={2}>
@@ -162,6 +163,7 @@ function Page() {
             ))}
           </Grid>
         </Grid>
+        }
 
         {/* Call-to-Action Section */}
         <Grid item sx={{ padding: 5, backgroundColor: '#333', color: '#fff' }}>

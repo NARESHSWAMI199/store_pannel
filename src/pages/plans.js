@@ -1,4 +1,4 @@
-import { Alert, Badge, Box, Button, Grid, Snackbar, SvgIcon, Typography } from '@mui/material';
+import { Alert, Badge, Box, Button, Container, Grid, Snackbar, SvgIcon, Typography } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -100,9 +100,8 @@ function Plans() {
           justifyContent: 'center',
         }}
       >
-        <Grid
-          md={10}
-          xs={12}
+        <Container
+          maxWidth="xl"
           sx={{
             borderRadius: 2,
             p: 5,
@@ -141,7 +140,7 @@ function Plans() {
               </Typography>
 
               {/* Buttons for Expired or Active Plans */}
-              {current > recentPlan.expiryDate ? (
+              {current > recentPlan.expiryDate && (
                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                   <Button
                     sx={{ mb: 2, width: 'fit-content' }}
@@ -170,21 +169,24 @@ function Plans() {
                     Explore More Plans
                   </Button>
                 </Box>
-              ) : (
-                <Button
-                  sx={{ mb: 2, width: 'fit-content' }}
-                  variant="contained"
-                  color="primary"
-                  onClick={(e) => router.push('/')}
-                  startIcon={
-                    <SvgIcon>
-                      <ArrowForwardIcon size="small" />
-                    </SvgIcon>
-                  }
-                >
-                  Go to Dashboard
-                </Button>
-              )}
+              ) 
+              //:
+              //  (
+              //   <Button
+              //     sx={{ mb: 2, width: 'fit-content' }}
+              //     variant="contained"
+              //     color="primary"
+              //     onClick={(e) => router.push('/')}
+              //     startIcon={
+              //       <SvgIcon>
+              //         <ArrowForwardIcon size="small" />
+              //       </SvgIcon>
+              //     }
+              //   >
+              //     Go to Dashboard
+              //   </Button>
+              // )
+              }
 
               <Box sx={{ display: 'flex', justifyContent: 'space-around', mt: 4 }}>
                 <Box sx={{ textAlign: 'center' }}>
@@ -279,7 +281,7 @@ function Plans() {
               </Table>
             </TableContainer>
           </Grid>
-        </Grid>
+        </Container>
       </Grid>
 
       {/* Snackbar for Notifications */}
