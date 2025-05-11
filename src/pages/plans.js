@@ -94,6 +94,13 @@ function Plans() {
 
   return (
     <>
+    <Box
+      component="main"
+      sx={{
+        flexGrow: 1,
+        py: 8
+      }}
+    >
       <Grid
         container
         sx={{
@@ -129,7 +136,7 @@ function Plans() {
 
             <Box sx={{ p: 2, textAlign: 'center' }}>
               <Typography variant="h4" sx={{ fontWeight: 'light', fontSize: 22, mb: 2 }}>
-                Recent Plans
+                Current Plan
               </Typography>
 
               <Typography variant="h4" sx={{ fontWeight: 'bold', fontSize: 24, mb: 1 }}>
@@ -283,6 +290,7 @@ function Plans() {
           </Grid>
         </Container>
       </Grid>
+    
 
       {/* Snackbar for Notifications */}
       <Snackbar
@@ -295,6 +303,7 @@ function Plans() {
           {message}
         </Alert>
       </Snackbar>
+      </Box>
     </>
   );
 }
