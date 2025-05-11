@@ -9,7 +9,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import axios from 'axios';
 import { useAuth } from 'src/hooks/use-auth';
-import { host, dataNotFoundImage } from 'src/utils/util';
+import { host, dataNotFoundImage, ruppeeIcon } from 'src/utils/util';
 import { format } from 'date-fns';
 import { redirect, useRouter } from 'next/navigation';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
@@ -140,7 +140,7 @@ function Plans() {
               </Typography>
 
               <Typography variant="h4" sx={{ fontWeight: 'bold', fontSize: 24, mb: 1 }}>
-                {recentPlan.servicePlan?.price > 0 ? '₹ ' + recentPlan.servicePlan?.price : 'Free'}
+                {recentPlan.servicePlan?.price > 0 ? ruppeeIcon + recentPlan.servicePlan?.price : 'Free'}
                 <Typography variant="caption" sx={{ color: '#6c757d', fontSize: 14 }}>
                   {" "+recentPlan.servicePlan?.months} month's plan
                 </Typography>

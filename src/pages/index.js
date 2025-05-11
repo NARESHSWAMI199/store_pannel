@@ -6,25 +6,21 @@ import {OverviewBox } from 'src/sections/overview/overview-users';
 import { OverviewLatestItems } from 'src/sections/overview/overview-latest-items';
 import { OverviewItems } from 'src/sections/overview/overview-sales';
 import { OverviewTraffic } from 'src/sections/overview/overview-traffic';
-import { useCallback, useEffect, useState } from 'react';
+import { use, useCallback, useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from 'src/hooks/use-auth';
 import { host, suId } from 'src/utils/util';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { StockTraffic } from 'src/sections/overview/stock-traffic';
 import Link from 'next/link';
+import CongratulationDialog from 'src/components/CongratulationCard';
 
-
-
-
-
-const now = new Date();
 
 const Page = (props) =>  {
 
 const [currentYearDataMonths, setCurrentYearDataMonths] = useState([])
 const [lastYearDataMonths, setLastYearDataMonths] = useState([])
-  const [years,setYears] = useState([])
+const [years,setYears] = useState([])
 const [dashboardData,setDashboardData] = useState({
   items : {},
   newItems : {},
@@ -37,6 +33,33 @@ const currentYear = new Date().getFullYear();
 const auth = useAuth()
 const user = auth.user
 const router = useRouter();
+const [CongratulationOpen, setCongratulationOpen] = useState(false);
+
+const searchParams = useSearchParams();
+const congratulation = searchParams.get('congratulation');
+const [activePlan , setActivePlan] = useState(null);
+
+useEffect(() => {
+  if (!!congratulation) {
+    axios.defaults.headers = {
+      Authorization: auth.token
+    };
+    axios.get(`${host}/wholesale/plan/detail/${congratulation}`)
+      .then(res => {
+        const plan = res.data;
+      if (plan) {
+        setCongratulationOpen(true);
+        setActivePlan(plan);
+      }}
+    ).catch(err => {
+        console.log(err);
+        setCongratulationOpen(false);
+      });
+  } else {
+    setCongratulationOpen(false);
+  }
+}, [congratulation]);
+
 
 useEffect(() => {
   axios.defaults.headers = {
@@ -344,6 +367,7 @@ useEffect(() => {
         </Grid>
       </Container>
     </Box>
+    <CongratulationDialog open={CongratulationOpen} onClose={()=>setCongratulationOpen(false)} activePlan={activePlan} />
   </>
   
   );

@@ -35,6 +35,7 @@ export const toTitleCase = (str) => {
 
 
   export const suId = 0;
+  export const ruppeeIcon = "₹ "
 
   export const projectName = "Swami Sales"
 
