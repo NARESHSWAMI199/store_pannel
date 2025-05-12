@@ -4,7 +4,16 @@ import CelebrationIcon from '@mui/icons-material/Celebration';
 import Confetti from 'react-confetti';
 import { ruppeeIcon } from 'src/utils/util';
 
-const CongratulationDialog = ({ open, onClose,activePlan }) => {
+const CongratulationDialog = ({ open, onClose, activePlan }) => {
+
+  // Calculate the validTill date
+  const calculateValidTill = (months) => {
+    const currentDate = new Date();
+    currentDate.setMonth(currentDate.getMonth() + months);
+    return currentDate.toLocaleDateString(); // Format as DD/MM/YYYY or MM/DD/YYYY based on locale
+  };
+
+
   return (
     <Dialog
       open={open}
@@ -27,7 +36,10 @@ const CongratulationDialog = ({ open, onClose,activePlan }) => {
           🎉 Congratulations! 🎉
         </Typography>
         <Typography variant="body1" color="text.secondary">
-          You have successfully purchased the <strong>{activePlan?.name}</strong> plan. price of <strong>{ruppeeIcon + activePlan?.price}</strong>.
+          You have successfully purchased the <strong>{activePlan?.name}</strong> plan. Price of <strong>{ruppeeIcon + activePlan?.price}</strong>.
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+          Valid till: <strong>{calculateValidTill(activePlan?.months || 0)}</strong>
         </Typography>
       </DialogContent>
       <DialogActions sx={{ justifyContent: 'center' }}>
