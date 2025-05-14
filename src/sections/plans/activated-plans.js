@@ -74,7 +74,7 @@ import {
                  
          
                      <TableCell align="center">
-                            {plan.price === 0 ? (
+                            {plan.servicePlan?.price === 0 ? (
                               <Badge badgeContent={'Free'} color="success" />
                             ) : (
                               plan.servicePlan?.price
