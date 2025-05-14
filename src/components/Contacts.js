@@ -1,3 +1,4 @@
+import { ArrowBack } from '@mui/icons-material';
 import AddIcon from '@mui/icons-material/Add';
 import ChatIcon from '@mui/icons-material/Chat';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -6,6 +7,7 @@ import { Avatar, Badge, Box, Button, Dialog, DialogActions, DialogContent, Dialo
 import axios from 'axios';
 import { constants } from 'buffer';
 import { is } from 'date-fns/locale';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useAuth } from 'src/hooks/use-auth';
 import { host } from 'src/utils/util';
@@ -19,6 +21,7 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
     const [deleteChats, setDeleteChats] = useState(false);
     const [selectedContact, setSelectedContact] = useState(null);
     const auth = useAuth()
+    const router = useRouter();
 
     useEffect(() => {
         setContactList(contacts);
@@ -119,173 +122,190 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
 
 
     return (
-        <Box>
-            {/* Tabs for switching between chats and contacts */}
-            <Box sx={{ display: 'flex', mx: 2 }}>
-                <Button 
-                    variant='outlined' 
-                    color='inherit' 
-                    onClick={() => setActiveTab("chats")} 
-                    sx={{ border: activeTab === 'chats' ? 1 : 0, flex: 1 }}
-                >
-                    Chats
-                </Button>
-                <Button 
-                    variant='outlined' 
-                    color='inherit' 
-                    onClick={() => setActiveTab("contacts")} 
-                    sx={{ border: activeTab === 'contacts' ? 1 : 0, flex: 1 }}
-                >
-                    Contacts
-                </Button>
-            </Box>
-            {/* Contacts list */}
-            <List>
-                {(activeTab === 'chats' ? contactList.filter(contact => contact.slug !== user.slug) : contactList).map((contact, index) => (
-                    <ListItem 
-                        key={index} 
-                        button 
-                        onClick={async() => {
-                            contact = await isSenderAccepted(contact, auth?.token);
-                            contact = await isReceiverBlocked(contact, auth?.token);
-                            setReceiver(contact)
-                        }}
-                        sx={{
-                            borderRadius: '8px',
-                            margin: '8px 0',
-                            padding: '8px',
-                            '&:hover': {
-                                backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-                            },
-                            backgroundColor: activeTab === 'chats' ? (darkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)') : 'transparent',
-                        }}
+        <Box  sx={{ display : 'flex', flexDirection : 'column', width: menuDivWidth, height: '100%', overflowY: 'auto', padding: 2 }}>
+            <Box sx={{flex : 0.8 }}>
+                {/* Tabs for switching between chats and contacts */}
+                <Box sx={{ display: 'flex', mx: 2}}>
+                    <Button 
+                        variant='outlined' 
+                        color='inherit' 
+                        onClick={() => setActiveTab("chats")} 
+                        sx={{ border: activeTab === 'chats' ? 1 : 0, flex: 1 }}
                     >
-                        {/* Contact avatar */}
-                        <ListItemAvatar>
-                            <Badge 
-                                color="secondary" 
-                                badgeContent={contact?.chatNotification} 
-                                invisible={contact?.chatNotification === 0}
-                            >
-                                <Avatar src={contact?.avatarUrl} />
-                            </Badge>
-                        </ListItemAvatar>
-                        {/* Contact details */}
-                        <ListItemText 
-                            primary={contact?.username} 
-                            secondary={contact?.isOnline ? "Online" : `Last seen at ${new Date(contact.lastSeen).toLocaleTimeString()}`} 
-                        />
-                        <IconButton 
-                            color="error" 
-                            onClick={(e) => {
-                                e.stopPropagation(); // Prevent triggering the parent onClick
-                                handleRemoveContact(contact);
+                        Chats
+                    </Button>
+                    <Button 
+                        variant='outlined' 
+                        color='inherit' 
+                        onClick={() => setActiveTab("contacts")} 
+                        sx={{ border: activeTab === 'contacts' ? 1 : 0, flex: 1 }}
+                    >
+                        Contacts
+                    </Button>
+                </Box>
+                {/* Contacts list */}
+                <List>
+                    {(activeTab === 'chats' ? contactList.filter(contact => contact.slug !== user.slug) : contactList).map((contact, index) => (
+                        <ListItem 
+                            key={index} 
+                            button 
+                            onClick={async() => {
+                                contact = await isSenderAccepted(contact, auth?.token);
+                                contact = await isReceiverBlocked(contact, auth?.token);
+                                setReceiver(contact)
                             }}
                             sx={{
+                                borderRadius: '8px',
+                                margin: '8px 0',
+                                padding: '8px',
                                 '&:hover': {
-                                    backgroundColor: darkMode ? 'rgba(255, 0, 0, 0.1)' : 'rgba(255, 0, 0, 0.1)',
-                                }
+                                    backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+                                },
+                                backgroundColor: activeTab === 'chats' ? (darkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)') : 'transparent',
                             }}
                         >
-                            <DeleteIcon />
-                        </IconButton>
-                    </ListItem>
-                ))}
-            </List>
-            {activeTab === 'contacts' &&
-                <Button 
-                    color='inherit' 
-                    size='large' 
-                    sx={{ m: 2 }} 
-                    startIcon={<SvgIcon><AddIcon /></SvgIcon>} 
-                    onClick={() => setOpenDialog(true)}
-                >
-                    Add new contact
-                </Button>
-            }
-            {/* Dialog for adding new contact */}
-            <Dialog 
-                open={openDialog} 
-                onClose={() => setOpenDialog(false)} 
-                fullWidth 
-                maxWidth="sm"
-                PaperProps={{
-                    sx: {
-                        backgroundColor: darkMode ? '#333' : '#fff',
-                        color: darkMode ? '#fff' : '#000',
-                        border : '20px solid #444',
-                        borderRadius : 4
-                    }
-                }}
-            >
-                <DialogTitle sx={{ backgroundColor: darkMode ? '#333' : '#fff', color: darkMode ? '#fff' : '#000' }}>Add New Contact</DialogTitle>
-                <DialogContent 
-                sx={{ 
-                        backgroundColor: darkMode ? '#333' : '#fff', 
-                        color: darkMode ? '#fff' : '#000',
-                    }}>
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        label="Search Users"
-                        type="text"
-                        fullWidth
-                        value={searchQuery}
-                        onChange={handleSearchChange}
-                        sx={{ backgroundColor: darkMode ? '#333' : '#fff', color: darkMode ? '#fff' : '#000' }}
-                        InputProps={{
-                            sx: {
-                                '& .MuiOutlinedInput-root': {
-                                    '& fieldset': {
-                                        borderColor: darkMode ? '#fff' : '#ccc',
-                                    },
-                                    '&:hover fieldset': {
-                                        borderColor: darkMode ? '#fff' : '#ccc',
-                                    },
-                                    '&.Mui-focused fieldset': {
-                                        borderColor: darkMode ? '#fff' : '#ccc',
-                                    },
-                                    '& input': {
-                                        color: darkMode ? '#fff' : '#000',
-                                    },
-                                    '& .MuiInputLabel-root': {
-                                        color: darkMode ? '#fff' : '#000',
-                                    }
-                                },
-                                color : darkMode ? 'white' : 'black'
-                            }
-                        ,
-                        endAdornment: 
-                        <InputAdornment position='end'>
+                            {/* Contact avatar */}
+                            <ListItemAvatar>
+                                <Badge 
+                                    color="secondary" 
+                                    badgeContent={contact?.chatNotification} 
+                                    invisible={contact?.chatNotification === 0}
+                                >
+                                    <Avatar src={contact?.avatarUrl} />
+                                </Badge>
+                            </ListItemAvatar>
+                            {/* Contact details */}
+                            <ListItemText 
+                                primary={contact?.username} 
+                                secondary={contact?.isOnline ? "Online" : `Last seen at ${new Date(contact.lastSeen).toLocaleTimeString()}`} 
+                            />
                             <IconButton 
-                                onClick={searchUsers}
-                                color="inherit" 
-                                aria-label="upload picture" 
-                                component="span"
+                                color="error" 
+                                onClick={(e) => {
+                                    e.stopPropagation(); // Prevent triggering the parent onClick
+                                    handleRemoveContact(contact);
+                                }}
+                                sx={{
+                                    '&:hover': {
+                                        backgroundColor: darkMode ? 'rgba(255, 0, 0, 0.1)' : 'rgba(255, 0, 0, 0.1)',
+                                    }
+                                }}
                             >
-                                <SearchIcon />
+                                <DeleteIcon />
                             </IconButton>
-                        </InputAdornment>
+                        </ListItem>
+                    ))}
+                </List>
+                {activeTab === 'contacts' &&
+                    <Button 
+                        color='inherit' 
+                        size='large' 
+                        sx={{ m: 2 }} 
+                        startIcon={<SvgIcon><AddIcon /></SvgIcon>} 
+                        onClick={() => setOpenDialog(true)}
+                    >
+                        Add new contact
+                    </Button>
+                }
+
+                {/* Dialog for adding new contact */}
+                <Dialog 
+                    open={openDialog} 
+                    onClose={() => setOpenDialog(false)} 
+                    fullWidth 
+                    maxWidth="sm"
+                    PaperProps={{
+                        sx: {
+                            backgroundColor: darkMode ? '#333' : '#fff',
+                            color: darkMode ? '#fff' : '#000',
+                            border : '20px solid #444',
+                            borderRadius : 4
                         }
-                    
-                    }
-                    />
-                    {/* List of users found by search */}
-                    <List>
-                        {userList.map((user, index) => (
-                            <ListItem key={index} 
-                                sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                <ListItemAvatar>
-                                    <Avatar src={user.avatarUrl} />
-                                </ListItemAvatar>
-                                <ListItemText primary={user.username} />
-                                <Box sx={{ display: 'flex', gap: 1 }}>
-                                    {!contacts.some(contact => contact.slug === user.slug) && (
+                    }}
+                >
+                    <DialogTitle sx={{ backgroundColor: darkMode ? '#333' : '#fff', color: darkMode ? '#fff' : '#000' }}>Add New Contact</DialogTitle>
+                    <DialogContent 
+                    sx={{ 
+                            backgroundColor: darkMode ? '#333' : '#fff', 
+                            color: darkMode ? '#fff' : '#000',
+                        }}>
+                        <TextField
+                            autoFocus
+                            margin="dense"
+                            label="Search Users"
+                            type="text"
+                            fullWidth
+                            value={searchQuery}
+                            onChange={handleSearchChange}
+                            sx={{ backgroundColor: darkMode ? '#333' : '#fff', color: darkMode ? '#fff' : '#000' }}
+                            InputProps={{
+                                sx: {
+                                    '& .MuiOutlinedInput-root': {
+                                        '& fieldset': {
+                                            borderColor: darkMode ? '#fff' : '#ccc',
+                                        },
+                                        '&:hover fieldset': {
+                                            borderColor: darkMode ? '#fff' : '#ccc',
+                                        },
+                                        '&.Mui-focused fieldset': {
+                                            borderColor: darkMode ? '#fff' : '#ccc',
+                                        },
+                                        '& input': {
+                                            color: darkMode ? '#fff' : '#000',
+                                        },
+                                        '& .MuiInputLabel-root': {
+                                            color: darkMode ? '#fff' : '#000',
+                                        }
+                                    },
+                                    color : darkMode ? 'white' : 'black'
+                                }
+                            ,
+                            endAdornment: 
+                            <InputAdornment position='end'>
+                                <IconButton 
+                                    onClick={searchUsers}
+                                    color="inherit" 
+                                    aria-label="upload picture" 
+                                    component="span"
+                                >
+                                    <SearchIcon />
+                                </IconButton>
+                            </InputAdornment>
+                            }
+                        
+                        }
+                        />
+                        {/* List of users found by search */}
+                        <List>
+                            {userList.map((user, index) => (
+                                <ListItem key={index} 
+                                    sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                    <ListItemAvatar>
+                                        <Avatar src={user.avatarUrl} />
+                                    </ListItemAvatar>
+                                    <ListItemText primary={user.username} />
+                                    <Box sx={{ display: 'flex', gap: 1 }}>
+                                        {!contacts.some(contact => contact.slug === user.slug) && (
+                                            <Button 
+                                                color="inherit" 
+                                                onClick={() => handleAddContact(user)}
+                                                startIcon={<AddIcon />}
+                                                disabled={user.added} // Disable button if already added
+                                                sx={{
+                                                    boxShadow: 1,
+                                                    '&:hover': {
+                                                        boxShadow: 3,
+                                                        backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+                                                    }
+                                                }}
+                                            >
+                                                {user.added ? "Added" : "Add"}
+                                            </Button>
+                                        )}
                                         <Button 
                                             color="inherit" 
-                                            onClick={() => handleAddContact(user)}
-                                            startIcon={<AddIcon />}
-                                            disabled={user.added} // Disable button if already added
+                                            onClick={() => handleChat(user)}
+                                            startIcon={<ChatIcon />}
                                             sx={{
                                                 boxShadow: 1,
                                                 '&:hover': {
@@ -294,63 +314,71 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
                                                 }
                                             }}
                                         >
-                                            {user.added ? "Added" : "Add"}
+                                            Chat
                                         </Button>
-                                    )}
-                                    <Button 
-                                        color="inherit" 
-                                        onClick={() => handleChat(user)}
-                                        startIcon={<ChatIcon />}
-                                        sx={{
-                                            boxShadow: 1,
-                                            '&:hover': {
-                                                boxShadow: 3,
-                                                backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-                                            }
-                                        }}
-                                    >
-                                        Chat
-                                    </Button>
-                                </Box>
-                            </ListItem>
-                        ))}
-                    </List>
-                </DialogContent>
-                <DialogActions 
-                    sx={{ backgroundColor: darkMode ? '#333' : '#fff', color: darkMode ? '#fff' : '#000' }}
-                >
-                    <Button 
-                        onClick={() => {
-                            setOpenDialog(false);
-                        }} 
-                        sx={{ color: darkMode ? '#fff' : '#000' }}
+                                    </Box>
+                                </ListItem>
+                            ))}
+                        </List>
+                    </DialogContent>
+                    <DialogActions 
+                        sx={{ backgroundColor: darkMode ? '#333' : '#fff', color: darkMode ? '#fff' : '#000' }}
                     >
-                        Close
-                    </Button>
-                </DialogActions>
-            </Dialog>
-            {/* Confirmation dialog for removing contact */}
-            <Dialog open={openConfirmDialog} onClose={() => setOpenConfirmDialog(false)}>
-                <DialogTitle>Confirm Remove Contact</DialogTitle>
-                <DialogContent>
-                    Are you sure you want to remove this contact?
-                    <FormControlLabel
-                        control={<Switch checked={deleteChats} onChange={(e) => setDeleteChats(e.target.checked)} />}
-                        label="Delete chats as well"
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpenConfirmDialog(false)}>Cancel</Button>
-                    <Button color="error" onClick={ ()=>{
-                        if(activeTab === 'contacts'){
-                            confirmRemoveContact()
+                        <Button 
+                            onClick={() => {
+                                setOpenDialog(false);
+                            }} 
+                            sx={{ color: darkMode ? '#fff' : '#000' }}
+                        >
+                            Close
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+                {/* Confirmation dialog for removing contact */}
+                <Dialog open={openConfirmDialog} onClose={() => setOpenConfirmDialog(false)}>
+                    <DialogTitle>Confirm Remove Contact</DialogTitle>
+                    <DialogContent>
+                        Are you sure you want to remove this contact?
+                        <FormControlLabel
+                            control={<Switch checked={deleteChats} onChange={(e) => setDeleteChats(e.target.checked)} />}
+                            label="Delete chats as well"
+                        />
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={() => setOpenConfirmDialog(false)}>Cancel</Button>
+                        <Button color="error" onClick={ ()=>{
+                            if(activeTab === 'contacts'){
+                                confirmRemoveContact()
+                            }
+                            if(activeTab === 'chats'){
+                                confirmRemoveChatUser()
+                            }
+                        }}>Remove</Button>
+                    </DialogActions>
+                </Dialog>
+            </Box>
+            {/* Go to Dashboard */}
+            <Box sx={{flex : 0.2, display : 'flex', justifyContent : 'center', alignItems : 'center'}}>
+                <Button 
+                    sx={{ 
+                        width : '90%', 
+                        backgroundColor : darkMode ? '#333' : '#6366F1', 
+                        color : '#fff',
+                        '&:hover': {
+                            backgroundColor: darkMode ? '#444' : '#f0f0f0',
+                            color: darkMode ? '#fff' : '#000',
                         }
-                        if(activeTab === 'chats'){
-                            confirmRemoveChatUser()
-                        }
-                    }}>Remove</Button>
-                </DialogActions>
-            </Dialog>
+                    }}
+                    variant='contained'
+                    color='primary'
+                    size='large' 
+                    onClick={() => router.push("/")}
+                    startIcon={<SvgIcon><ArrowBack /></SvgIcon>}
+                >
+                    Go to Dashboard
+                </Button>
+            </Box>
+
         </Box>
     );
 };

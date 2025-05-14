@@ -33,7 +33,7 @@ export const AuthGuard = (props) => {
         router
           .replace({
             pathname: '/welcome',
-            query: router.asPath !== '/' ? { continueUrl: router.asPath } : undefined
+            //query: router.asPath !== '/' ? { continueUrl: router.asPath } : undefined
           })
           .catch(console.error);
       }else if(auth?.store == null){
@@ -41,7 +41,7 @@ export const AuthGuard = (props) => {
         router
           .replace({
             pathname: '/createstore',
-            query: router.asPath !== '/' ? { continueUrl: router.asPath } : undefined
+            //query: router.asPath !== '/' ? { continueUrl: router.asPath } : undefined
           })
           .catch(console.error);
       }

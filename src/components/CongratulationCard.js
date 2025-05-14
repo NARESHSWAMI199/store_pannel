@@ -38,9 +38,6 @@ const CongratulationDialog = ({ open, onClose, activePlan }) => {
         <Typography variant="body1" color="text.secondary">
           You have successfully purchased the <strong>{activePlan?.name}</strong> plan. Price of <strong>{ruppeeIcon + activePlan?.price}</strong>.
         </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          Valid till: <strong>{calculateValidTill(activePlan?.months || 0)}</strong>
-        </Typography>
       </DialogContent>
       <DialogActions sx={{ justifyContent: 'center' }}>
         <Button variant="contained" onClick={onClose}>

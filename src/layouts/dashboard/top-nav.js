@@ -16,13 +16,16 @@ import { alpha } from '@mui/material/styles';
 import { usePopover } from 'src/hooks/use-popover';
 import { AccountPopover } from './account-popover';
 import { useAuth } from 'src/hooks/use-auth';
-import { host, userImage } from 'src/utils/util';
+import { host, ruppeeIcon, userImage } from 'src/utils/util';
 import { ArrowButtons } from '../arrow-button';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import CustomModal from 'src/sections/modal';
 import AlignItemsList from 'src/sections/list-item';
 import DrawerRight from 'src/sections/drawer';
+import { AccountBalanceOutlined, AccountBalanceWalletSharp, WalletOutlined, WalletSharp, WalletTwoTone } from '@mui/icons-material';
+import Link from 'next/link';
+import { fontSize } from '@mui/system';
 
 const SIDE_NAV_WIDTH = 280;
 const TOP_NAV_HEIGHT = 64;
@@ -159,14 +162,17 @@ const viewMore = () =>{
           <Stack
             alignItems="center"
             direction="row"
-            spacing={2}
+            spacing={1}
           >
-            <Tooltip title="Contacts">
+            <Tooltip title="My Plans">
               <IconButton>
                 <SvgIcon fontSize="small">
-                  <UsersIcon />
-                </SvgIcon>z
+                  <Link href="/plans">
+                    <AccountBalanceWalletSharp />
+                  </Link>
+                </SvgIcon> 
               </IconButton>
+              <span style={{fontSize: '12px'}}>My Plans</span>
             </Tooltip>
             <Tooltip title="Notifications">
             <DrawerRight 
@@ -190,6 +196,7 @@ const viewMore = () =>{
                   </SvgIcon>
                 </Badge>
               </IconButton>
+              <span style={{fontSize: '12px'}}>Notifications</span>
             </Tooltip>
             <Avatar
               onClick={accountPopover.handleOpen}
