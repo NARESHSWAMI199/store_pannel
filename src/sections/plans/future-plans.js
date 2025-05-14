@@ -1,10 +1,8 @@
 import {
-    Avatar,
     Badge,
     Box,
+    Button,
     Card,
-    Rating,
-    Stack,
     Table,
     TableBody,
     TableCell,
@@ -12,17 +10,16 @@ import {
     TablePagination,
     TableRow,
     Typography
-  } from '@mui/material';
-  import { format } from 'date-fns';
-  import PropTypes from 'prop-types';
-  import { useEffect, useState } from 'react';
-  import { getInitials } from 'src/utils/get-initials';
-  import { rowsPerPageOptions, toTitleCase, userImage } from 'src/utils/util';
+} from '@mui/material';
+import { format } from 'date-fns';
+import PropTypes from 'prop-types';
+import { useEffect, useState } from 'react';
+import { rowsPerPageOptions, toTitleCase } from 'src/utils/util';
   
-  export const ActivatedPlans = (props) => {
+  export const FuturePlans = (props) => {
     const {
       count = 0,
-  
+      onActivate,
       onPageChange = () => {},
       onRowsPerPageChange,
       page = 0,
@@ -51,14 +48,12 @@ import {
                     <TableCell align="center">Amount</TableCell>
                     <TableCell align="center">Months</TableCell>
                     <TableCell align="center">Purchased At</TableCell>
-                    <TableCell align="center">Expired At</TableCell>
-                    <TableCell align="center">Status</TableCell>
+                    <TableCell align="center">Activate</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {plans.length > 0 ?  plans.map((plan,index) => {
-                  const createdAt = format(parseInt(plan.createdAt), 'dd/MM/yyyy');
-                  const expiryDate = format(parseInt(plan.expiryDate), 'dd/MM/yyyy');
+                  const createdAt = format(plan.createdAt ? parseInt(plan.createdAt) : 0, 'dd/MM/yyyy');
                   return (
                     <TableRow
                       hover
@@ -86,13 +81,18 @@ import {
                       </TableCell>
 
                         <TableCell align="center">{createdAt}</TableCell>
-                          <TableCell align="center">{expiryDate}</TableCell>
+
                           <TableCell align="center">
-                            {plan.expiryDate > current ? (
-                              <Badge badgeContent={'Active'} color="success" />
-                            ) : (
-                              <Badge badgeContent={'Expired'} color="error" />
-                            )}
+                            <Button
+                              variant="contained"
+                              color="success"
+                              size="small"
+                              onClick={() => {
+                                onActivate(plan);
+                              }}
+                            >
+                              Activate
+                            </Button>
                           </TableCell>
 
                   </TableRow>
@@ -123,7 +123,7 @@ import {
     );
   };
   
-  ActivatedPlans.propTypes = {
+  FuturePlans.propTypes = {
     count: PropTypes.number,
     items: PropTypes.array,
     onDeselectAll: PropTypes.func,

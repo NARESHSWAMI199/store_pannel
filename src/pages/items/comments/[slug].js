@@ -259,7 +259,7 @@ useEffect( ()=>{
                                       </div>
                                       <div style={{display:'flex'}}>
                                           <span style={{ color:'red',fontSize : 14}}>
-                                            {(Math.round((item.discount) * 100) / 100).toFixed(2)}
+                                            {" - "+(Math.round((item.discount) * 100) / 100).toFixed(2)}
                                             </span>
                                           <CurrencyRupee sx={{ padding: 0.3, mr: 1 }}/>
                                           <Discount sx={{ padding: 0.3, mr: 1 }}/>

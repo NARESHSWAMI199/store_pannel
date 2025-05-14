@@ -9,8 +9,10 @@ import { useAuth } from 'src/hooks/use-auth';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { host, ruppeeIcon } from 'src/utils/util';
 import {ActivatedPlans} from 'src/sections/plans/activated-plans';
+import {FuturePlans} from 'src/sections/plans/future-plans';
 import EventIcon from '@mui/icons-material/Event';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -44,6 +46,7 @@ function Plans() {
     expiryDate: null,
   });
   const [userPlans, setUserPlans] = useState([]);
+  const [futurePlans,setFuturePlans] = useState([]);
   const auth = useAuth();
   const current = new Date().getTime();
   const [value, setValue] = useState(0);
@@ -67,6 +70,30 @@ function Plans() {
         setOpen(true);
       });
   }, []);
+
+
+
+
+
+  
+  useEffect(() => {
+    axios.defaults.headers = {
+      Authorization: auth.token,
+    };
+    axios
+      .post(`${host}/future/plans/`, {})
+      .then((res) => {
+        const data = res.data.content;
+        setFuturePlans(data);
+      })
+      .catch((err) => {
+        setMessage(!!err.response ? err.response.data.message : err.message);
+        setFlag('error');
+        setOpen(true);
+      });
+  }, []);
+
+
 
   const formattedDate = (millis) => {
     if (!!millis) {
@@ -278,8 +305,8 @@ function Plans() {
               />
             </TabPanel>
             <TabPanel value={value} index={1}>
-                <ActivatedPlans plans={userPlans}
-                  count={userPlans.length}
+                <FuturePlans plans={futurePlans}
+                  count={futurePlans.length}
               />
             </TabPanel>
           </Grid>
