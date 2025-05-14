@@ -15,342 +15,344 @@ import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 
 
 function TabPanel(props) {
-  const { children, value, index, ...other } = props;
+const { children, value, index, ...other } = props;
 
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`full-width-tabpanel-${index}`}
-      aria-labelledby={`full-width-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          {children}
-        </Box>
-      )}
-    </div>
-  );
+return (
+  <div
+    role="tabpanel"
+    hidden={value !== index}
+    id={`full-width-tabpanel-${index}`}
+    aria-labelledby={`full-width-tab-${index}`}
+    {...other}
+  >
+    {value === index && (
+      <Box sx={{ p: 3 }}>
+        {children}
+      </Box>
+    )}
+  </div>
+);
 }
 function Plans() {
-  const [open, setOpen] = useState(false);
-  const [message, setMessage] = useState('');
-  const [flag, setFlag] = useState('warning');
-  const router = useRouter();
-  const [recentPlan, setRecentPlan] = useState({
-    status: false,
-    price: 0,
-    months: 0,
-    createdAt: null,
-    expiryDate: null,
-  });
-  const [userPlans, setUserPlans] = useState([]);
-  const [futurePlans,setFuturePlans] = useState([]);
-  const auth = useAuth();
-  const current = new Date().getTime();
-  const [value, setValue] = useState(0);
-  const [reload, setReload] = useState(false);
+const [open, setOpen] = useState(false);
+const [message, setMessage] = useState('');
+const [flag, setFlag] = useState('warning');
+const router = useRouter();
+const [recentPlan, setRecentPlan] = useState({
+  status: false,
+  price: 0,
+  months: 0,
+  createdAt: null,
+  expiryDate: null,
+});
+const [userPlans, setUserPlans] = useState([]);
+const [futurePlans,setFuturePlans] = useState([]);
+const auth = useAuth();
+const current = new Date().getTime();
+const [value, setValue] = useState(0);
+const [reload, setReload] = useState(false);
 
-  useEffect(() => {
-    axios.defaults.headers = {
-      Authorization: auth.token,
-    };
-    axios
-      .post(`${host}/wholesale/plan/my-plans`, {})
-      .then((res) => {
-        const data = res.data.content;
-        setUserPlans(data);
-        if (data.length > 0) {
-          setRecentPlan(data[0]);
-        }
-      })
-      .catch((err) => {
-        setMessage(!!err.response ? err.response.data.message : err.message);
-        setFlag('error');
-        setOpen(true);
-      });
-  }, [reload]);
-
-
-
-
-
-  
-  useEffect(() => {
-    axios.defaults.headers = {
-      Authorization: auth.token,
-    };
-    axios
-      .post(`${host}/future/plans/`, {})
-      .then((res) => {
-        const data = res.data.content;
-        setFuturePlans(data);
-      })
-      .catch((err) => {
-        setMessage(!!err.response ? err.response.data.message : err.message);
-        setFlag('error');
-        setOpen(true);
-      });
-  }, []);
-
-
-
-  const formattedDate = (millis) => {
-    if (!!millis) {
-      return format(millis, 'dd/MM/yyyy');
-    } else {
-      return '-';
-    }
+useEffect(() => {
+  axios.defaults.headers = {
+    Authorization: auth.token,
   };
-
-  /** for snackbar close */
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-    const redirectForPayment = (slug, pg) => {
-      axios.defaults.headers = {
-        Authorization: auth.token
+  axios
+    .post(`${host}/wholesale/plan/my-plans`, {})
+    .then((res) => {
+      const data = res.data.content;
+      setUserPlans(data);
+      if (data.length > 0) {
+        setRecentPlan(data[0]);
       }
-  
-      const redirect = async () => {
-        if (pg === "phonepe") {
-          await axios.get(host + "/pg/pay/" + slug)
-            .then(res => {
-              window.open(res.data.url);
-            })
-            .catch(err => {
-              setMessage(!!err.response ? err.response.data.message : err.message)
-              setFlag("error")
-              setOpen(true)
-            });
-        } else {
-          window.location.href = host + "/cashfree/pay/" + slug + "/" + encodeURIComponent(auth.token.replace("Bearer ", ""))
-        }
-      }
-      if (!!auth.token) {
-        redirect();
-      } else {
-        router.push("/auth/register")
-      }
-    }
-
-
-  function a11yProps(index) {
-    return {
-      id: `full-width-tab-${index}`,
-      'aria-controls': `full-width-tabpanel-${index}`,
-    };
-  }
-  const handleChange = (event,newValue) => {
-    setValue(newValue)
-  }
-  
-  const onActivate = (plan) =>{
-    axios.defaults.headers = {
-      Authorization: auth.token
-    }
-    axios.post(host + "/future/plans/activate", {
-      slug: plan.servicePlan?.slug,
     })
-      .then(res => {
-        setMessage(res.data.message)
-        setFlag("success")
-        setOpen(true)
-        setFuturePlans(futurePlans.filter((item) => item.id !== plan.id))
-        setReload(!reload)
-      })
-      .catch(err => {
-        setMessage(!!err.response ? err.response.data.message : err.message)
-        setFlag("error")
-        setOpen(true)
-      });
+    .catch((err) => {
+      setMessage(!!err.response ? err.response.data.message : err.message);
+      setFlag('error');
+      setOpen(true);
+    });
+}, [reload]);
+
+
+
+
+
+
+useEffect(() => {
+  axios.defaults.headers = {
+    Authorization: auth.token,
+  };
+  axios
+    .post(`${host}/future/plans/`, {})
+    .then((res) => {
+      const data = res.data.content;
+      setFuturePlans(data);
+    })
+    .catch((err) => {
+      setMessage(!!err.response ? err.response.data.message : err.message);
+      setFlag('error');
+      setOpen(true);
+    });
+}, []);
+
+
+
+const formattedDate = (millis) => {
+  if (!!millis) {
+    return format(millis, 'dd/MM/yyyy');
+  } else {
+    return '-';
   }
+};
+
+/** for snackbar close */
+const handleClose = () => {
+  setOpen(false);
+};
 
 
-  return (
-    <>
-    <Box
-      component="main"
+
+//** for payment redirection */
+const redirectForPayment = (slug, pg) => {
+  axios.defaults.headers = {
+    Authorization: auth.token
+  }
+  const redirect = async () => {
+    if (pg === "phonepe") {
+      await axios.get(host + "/pg/pay/" + slug)
+        .then(res => {
+          window.open(res.data.url);
+        })
+        .catch(err => {
+          setMessage(!!err.response ? err.response.data.message : err.message)
+          setFlag("error")
+          setOpen(true)
+        });
+    } else {
+      window.location.href = host + "/cashfree/pay/" + slug + "/" + encodeURIComponent(auth.token.replace("Bearer ", ""))
+    }
+  }
+  if (!!auth.token) {
+    redirect();
+  } else {
+    router.push("/auth/register")
+  }
+}
+
+
+function a11yProps(index) {
+  return {
+    id: `full-width-tab-${index}`,
+    'aria-controls': `full-width-tabpanel-${index}`,
+  };
+}
+const handleChange = (event,newValue) => {
+  setValue(newValue)
+}
+
+const onActivate = (plan) =>{
+  axios.defaults.headers = {
+    Authorization: auth.token
+  }
+  axios.post(host + "/future/plans/activate", {
+    slug: plan.servicePlan?.slug,
+  })
+    .then(res => {
+      setMessage(res.data.message)
+      setFlag("success")
+      setOpen(true)
+      setFuturePlans(futurePlans.filter((item) => item.id !== plan.id))
+      setReload(!reload)
+    })
+    .catch(err => {
+      setMessage(!!err.response ? err.response.data.message : err.message)
+      setFlag("error")
+      setOpen(true)
+    });
+}
+
+
+return (
+  <>
+  <Box
+    component="main"
+    sx={{
+      flexGrow: 1,
+      py: 8
+    }}
+  >
+    <Grid
+      container
       sx={{
-        flexGrow: 1,
-        py: 8
+        justifyContent: 'center',
       }}
     >
-      <Grid
-        container
+      <Container
+        maxWidth="xxl"
         sx={{
-          justifyContent: 'center',
+          borderRadius: 2,
+          p: 5,
         }}
       >
-        <Container
-          maxWidth="xxl"
+        {/* Recent Plan Section */}
+        <Grid
+          xs={12}
+          md={4}
+          lg={4}
+          xl={4}
           sx={{
+            boxShadow: 3,
             borderRadius: 2,
-            p: 5,
+            m: 5,
+            p: 2,
           }}
         >
-          {/* Recent Plan Section */}
-         <Grid
-            xs={12}
-            md={4}
-            lg={4}
-            xl={4}
-            sx={{
-              boxShadow: 3,
-              borderRadius: 2,
-              m: 5,
-              p: 2,
-            }}
-          >
-            <Box sx={{ px: 5, mb: 2 }}>
-              <Badge
-                badgeContent={current <= recentPlan.expiryDate ? 'Active' : 'Expired'}
-                color={current <= recentPlan.expiryDate ? 'success' : 'error'}
-              />
-            </Box>
+          <Box sx={{ px: 5, mb: 2 }}>
+            <Badge
+              badgeContent={current <= recentPlan.expiryDate ? 'Active' : 'Expired'}
+              color={current <= recentPlan.expiryDate ? 'success' : 'error'}
+            />
+          </Box>
 
-            <Box sx={{ p: 2, textAlign: 'center' }}>
-              <Typography variant="h4" sx={{ fontWeight: 'light', fontSize: 22, mb: 2 }}>
-                Current Plan
+          <Box sx={{ p: 2, textAlign: 'center' }}>
+            <Typography variant="h4" sx={{ fontWeight: 'light', fontSize: 22, mb: 2 }}>
+              Current Plan
+            </Typography>
+
+            <Typography variant="h4" sx={{ fontWeight: 'bold', fontSize: 24, mb: 1 }}>
+              {recentPlan.servicePlan?.price > 0 ? ruppeeIcon + recentPlan.servicePlan?.price : 'Free'}
+              <Typography variant="caption" sx={{ color: '#6c757d', fontSize: 14 }}>
+                {" "+recentPlan.servicePlan?.months} month's plan
               </Typography>
+            </Typography>
 
-              <Typography variant="h4" sx={{ fontWeight: 'bold', fontSize: 24, mb: 1 }}>
-                {recentPlan.servicePlan?.price > 0 ? ruppeeIcon + recentPlan.servicePlan?.price : 'Free'}
-                <Typography variant="caption" sx={{ color: '#6c757d', fontSize: 14 }}>
-                  {" "+recentPlan.servicePlan?.months} month's plan
-                </Typography>
-              </Typography>
-
-              {/* Buttons for Expired or Active Plans */}
-              {current > recentPlan.expiryDate ? (
-                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <Button
-                    sx={{ mb: 2, width: 'fit-content' }}
-                    variant="contained"
-                    color="primary"
-                    onClick={(e) => redirectForPayment(recentPlan.servicePlan?.slug, 'cashfree')}
-                    startIcon={
-                      <SvgIcon>
-                        <Autorenew size="small" />
-                      </SvgIcon>
-                    }
-                  >
-                    Renew Plan
-                  </Button>
-                  <Button
-                    sx={{ mb: 2, width: 'fit-content' }}
-                    variant="outlined"
-                    color="secondary"
-                    onClick={(e) => router.push('/pricing')}
-                    startIcon={
-                      <SvgIcon>
-                        <More size="small" />
-                      </SvgIcon>
-                    }
-                  >
-                    Explore More Plans
-                  </Button>
-                </Box>
-              ) 
-              :
-               (
+            {/* Buttons for Expired or Active Plans */}
+            {current > recentPlan.expiryDate ? (
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <Button
-                  sx={{ mt: 1.5, width: 'fit-content' }}
+                  sx={{ mb: 2, width: 'fit-content' }}
                   variant="contained"
                   color="primary"
-                  onClick={(e) => router.push('/pricing')}
+                  onClick={(e) => redirectForPayment(recentPlan.servicePlan?.slug, 'cashfree')}
                   startIcon={
                     <SvgIcon>
-                      <ArrowForwardIcon size="small" />
+                      <Autorenew size="small" />
                     </SvgIcon>
                   }
                 >
-                  Add Future Plans
+                  Renew Plan
                 </Button>
-              )
-              }
+                <Button
+                  sx={{ mb: 2, width: 'fit-content' }}
+                  variant="outlined"
+                  color="secondary"
+                  onClick={(e) => router.push('/pricing')}
+                  startIcon={
+                    <SvgIcon>
+                      <More size="small" />
+                    </SvgIcon>
+                  }
+                >
+                  Explore More Plans
+                </Button>
+              </Box>
+            ) 
+            :
+              (
+              <Button
+                sx={{ mt: 1.5, width: 'fit-content' }}
+                variant="contained"
+                color="primary"
+                onClick={(e) => router.push('/pricing')}
+                startIcon={
+                  <SvgIcon>
+                    <ArrowForwardIcon size="small" />
+                  </SvgIcon>
+                }
+              >
+                Add Future Plans
+              </Button>
+            )
+            }
 
-              <Box sx={{ display: 'flex', justifyContent: 'space-around', mt: 4 }}>
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="body2" sx={{ fontWeight: 'light', fontSize: 14 }}>
-                    Created Date
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: '#6c757d', fontSize: 12 }}>
-                    {formattedDate(recentPlan.createdAt)}
-                  </Typography>
-                </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-around', mt: 4 }}>
+              <Box sx={{ textAlign: 'center' }}>
+                <Typography variant="body2" sx={{ fontWeight: 'light', fontSize: 14 }}>
+                  Created Date
+                </Typography>
+                <Typography variant="caption" sx={{ color: '#6c757d', fontSize: 12 }}>
+                  {formattedDate(recentPlan.createdAt)}
+                </Typography>
+              </Box>
 
-                <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="body2" sx={{ fontWeight: 'light', fontSize: 14 }}>
-                    Expiry Date
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: '#6c757d', fontSize: 12 }}>
-                    {formattedDate(recentPlan.expiryDate)}
-                  </Typography>
-                </Box>
+              <Box sx={{ textAlign: 'center' }}>
+                <Typography variant="body2" sx={{ fontWeight: 'light', fontSize: 14 }}>
+                  Expiry Date
+                </Typography>
+                <Typography variant="caption" sx={{ color: '#6c757d', fontSize: 12 }}>
+                  {formattedDate(recentPlan.expiryDate)}
+                </Typography>
               </Box>
             </Box>
-          </Grid>
-
-          <Grid
-            xs={12}
-            md={12}
-            sx={{
-              p: 2,
-            }}
-          >
-            
-          {/* Tabs */}
-          <Box
-            sx={{
-              display : 'flex',
-              justifyContent : 'center',
-              alignItems : 'center',
-              mt : 5
-            }}
-          >
-              <Tabs  
-                  value={value}
-                  onChange={handleChange}
-                  aria-label="icon tabs example"
-                >
-                <Tab icon={<EventIcon />} aria-label="Activated plans" {...a11yProps(0)}  label="Used plans" />
-                <Tab icon={<AccountBalanceWalletIcon />} aria-label="Future plans"  {...a11yProps(1)} label= "Future plans"  />
-              </Tabs>
           </Box>
+        </Grid>
 
-          <TabPanel value={value} index={0}>
-              <ActivatedPlans plans={userPlans}
-                  count={userPlans.length}
-              />
-            </TabPanel>
-            <TabPanel value={value} index={1}>
-                <FuturePlans plans={futurePlans}
-                  count={futurePlans.length}
-                  onActivate={onActivate}
-              />
-            </TabPanel>
-          </Grid>
-        </Container>
-      </Grid>
-    
+        <Grid
+          xs={12}
+          md={12}
+          sx={{
+            p: 2,
+          }}
+        >
+          
+        {/* Tabs */}
+        <Box
+          sx={{
+            display : 'flex',
+            justifyContent : 'center',
+            alignItems : 'center',
+            mt : 5
+          }}
+        >
+            <Tabs  
+                value={value}
+                onChange={handleChange}
+                aria-label="icon tabs example"
+              >
+              <Tab icon={<EventIcon />} aria-label="Activated plans" {...a11yProps(0)}  label="Used plans" />
+              <Tab icon={<AccountBalanceWalletIcon />} aria-label="Future plans"  {...a11yProps(1)} label= "Future plans"  />
+            </Tabs>
+        </Box>
 
-      {/* Snackbar for Notifications */}
-      <Snackbar
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-        open={open}
-        onClose={handleClose}
-        key={'top' + 'right'}
-      >
-        <Alert onClose={handleClose} severity={flag} sx={{ width: '100%' }}>
-          {message}
-        </Alert>
-      </Snackbar>
-      </Box>
-    </>
-  );
+        <TabPanel value={value} index={0}>
+            <ActivatedPlans plans={userPlans}
+                count={userPlans.length}
+            />
+          </TabPanel>
+          <TabPanel value={value} index={1}>
+              <FuturePlans plans={futurePlans}
+                count={futurePlans.length}
+                onActivate={onActivate}
+            />
+          </TabPanel>
+        </Grid>
+      </Container>
+    </Grid>
+  
+
+    {/* Snackbar for Notifications */}
+    <Snackbar
+      anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      open={open}
+      onClose={handleClose}
+      key={'top' + 'right'}
+    >
+      <Alert onClose={handleClose} severity={flag} sx={{ width: '100%' }}>
+        {message}
+      </Alert>
+    </Snackbar>
+    </Box>
+  </>
+);
 }
 
 Plans.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
