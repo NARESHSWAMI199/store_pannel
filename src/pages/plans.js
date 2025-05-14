@@ -50,6 +50,7 @@ function Plans() {
   const auth = useAuth();
   const current = new Date().getTime();
   const [value, setValue] = useState(0);
+  const [reload, setReload] = useState(false);
 
   useEffect(() => {
     axios.defaults.headers = {
@@ -69,7 +70,7 @@ function Plans() {
         setFlag('error');
         setOpen(true);
       });
-  }, []);
+  }, [reload]);
 
 
 
@@ -144,7 +145,28 @@ function Plans() {
   }
   const handleChange = (event,newValue) => {
     setValue(newValue)
-  } 
+  }
+  
+  const onActivate = (plan) =>{
+    axios.defaults.headers = {
+      Authorization: auth.token
+    }
+    axios.post(host + "/future/plans/activate", {
+      slug: plan.servicePlan?.slug,
+    })
+      .then(res => {
+        setMessage(res.data.message)
+        setFlag("success")
+        setOpen(true)
+        setFuturePlans(futurePlans.filter((item) => item.id !== plan.id))
+        setReload(!reload)
+      })
+      .catch(err => {
+        setMessage(!!err.response ? err.response.data.message : err.message)
+        setFlag("error")
+        setOpen(true)
+      });
+  }
 
 
   return (
@@ -307,6 +329,7 @@ function Plans() {
             <TabPanel value={value} index={1}>
                 <FuturePlans plans={futurePlans}
                   count={futurePlans.length}
+                  onActivate={onActivate}
               />
             </TabPanel>
           </Grid>
