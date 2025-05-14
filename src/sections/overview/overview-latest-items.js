@@ -37,11 +37,11 @@ export const OverviewLatestItems = (props) => {
             >
               <ListItemAvatar>
                 {
-                  product.avtar
+                  product.avtars 
                     ? (
                       <Box
                         component="img"
-                        src={itemImage+product.slug+"/"+product.avtar}
+                        src={itemImage+product.slug+"/"+product.avtars.split(",")[0]}
                         sx={{
                           borderRadius: 1,
                           height: 48,

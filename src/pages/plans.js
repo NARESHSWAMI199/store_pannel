@@ -1,21 +1,36 @@
-import { Alert, Badge, Box, Button, Container, Grid, Snackbar, SvgIcon, Typography } from '@mui/material';
-import React, { useEffect, useRef, useState } from 'react';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-import axios from 'axios';
-import { useAuth } from 'src/hooks/use-auth';
-import { host, dataNotFoundImage, ruppeeIcon } from 'src/utils/util';
-import { format } from 'date-fns';
-import { redirect, useRouter } from 'next/navigation';
+import { Autorenew, More } from '@mui/icons-material';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { Alert, Badge, Box, Button, Container, Grid, Snackbar, SvgIcon, Tab, Tabs,Typography } from '@mui/material';
+import axios from 'axios';
+import { format } from 'date-fns';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useAuth } from 'src/hooks/use-auth';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
-import { Autorenew, More, RefreshOutlined, RepeatOneTwoTone } from '@mui/icons-material';
+import { host, ruppeeIcon } from 'src/utils/util';
+import {ActivatedPlans} from 'src/sections/plans/activated-plans';
+import EventIcon from '@mui/icons-material/Event';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`full-width-tabpanel-${index}`}
+      aria-labelledby={`full-width-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 3 }}>
+          {children}
+        </Box>
+      )}
+    </div>
+  );
+}
 function Plans() {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState('');
@@ -31,6 +46,7 @@ function Plans() {
   const [userPlans, setUserPlans] = useState([]);
   const auth = useAuth();
   const current = new Date().getTime();
+  const [value, setValue] = useState(0);
 
   useEffect(() => {
     axios.defaults.headers = {
@@ -92,6 +108,18 @@ function Plans() {
       }
     }
 
+
+  function a11yProps(index) {
+    return {
+      id: `full-width-tab-${index}`,
+      'aria-controls': `full-width-tabpanel-${index}`,
+    };
+  }
+  const handleChange = (event,newValue) => {
+    setValue(newValue)
+  } 
+
+
   return (
     <>
     <Box
@@ -108,7 +136,7 @@ function Plans() {
         }}
       >
         <Container
-          maxWidth="xl"
+          maxWidth="xxl"
           sx={{
             borderRadius: 2,
             p: 5,
@@ -147,7 +175,7 @@ function Plans() {
               </Typography>
 
               {/* Buttons for Expired or Active Plans */}
-              {current > recentPlan.expiryDate && (
+              {current > recentPlan.expiryDate ? (
                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                   <Button
                     sx={{ mb: 2, width: 'fit-content' }}
@@ -177,22 +205,22 @@ function Plans() {
                   </Button>
                 </Box>
               ) 
-              //:
-              //  (
-              //   <Button
-              //     sx={{ mb: 2, width: 'fit-content' }}
-              //     variant="contained"
-              //     color="primary"
-              //     onClick={(e) => router.push('/')}
-              //     startIcon={
-              //       <SvgIcon>
-              //         <ArrowForwardIcon size="small" />
-              //       </SvgIcon>
-              //     }
-              //   >
-              //     Go to Dashboard
-              //   </Button>
-              // )
+              :
+               (
+                <Button
+                  sx={{ mt: 1.5, width: 'fit-content' }}
+                  variant="contained"
+                  color="primary"
+                  onClick={(e) => router.push('/pricing')}
+                  startIcon={
+                    <SvgIcon>
+                      <ArrowForwardIcon size="small" />
+                    </SvgIcon>
+                  }
+                >
+                  Add Future Plans
+                </Button>
+              )
               }
 
               <Box sx={{ display: 'flex', justifyContent: 'space-around', mt: 4 }}>
@@ -216,7 +244,7 @@ function Plans() {
               </Box>
             </Box>
           </Grid>
-          {/* User Plans Table */}
+
           <Grid
             xs={12}
             md={12}
@@ -224,69 +252,36 @@ function Plans() {
               p: 2,
             }}
           >
-            <TableContainer component={Paper}>
-              <Table aria-label="simple table">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Plan Name</TableCell>
-                    <TableCell align="center">Amount</TableCell>
-                    <TableCell align="center">Months</TableCell>
-                    <TableCell align="center">Purchased At</TableCell>
-                    <TableCell align="center">Expired At</TableCell>
-                    <TableCell align="center">Status</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {userPlans.length > 0 ? (
-                    userPlans.map((plan, i) => {
-                      const createdAt = format(!!plan.createdAt ? plan.createdAt : 0, 'dd/MM/yyyy');
-                      const expiryDate = format(!!plan.expiryDate ? plan.expiryDate : 0, 'dd/MM/yyyy');
-                      return (
-                        <TableRow key={i} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                          <TableCell component="th" scope="row">
-                            {plan.servicePlan?.name}
-                          </TableCell>
-                          <TableCell align="center">
-                            {plan.price === 0 ? (
-                              <Badge badgeContent={'Free'} color="success" />
-                            ) : (
-                              plan.servicePlan?.price
-                            )}
-                          </TableCell>
-                          <TableCell align="center">{plan.servicePlan?.months}</TableCell>
-                          <TableCell align="center">{createdAt}</TableCell>
-                          <TableCell align="center">{expiryDate}</TableCell>
-                          <TableCell align="center">
-                            {plan.expiryDate > current ? (
-                              <Badge badgeContent={'Active'} color="success" />
-                            ) : (
-                              <Badge badgeContent={'Expired'} color="error" />
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={6}>
-                        <Box
-                          sx={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            p: 5,
-                          }}
-                        >
-                          <img src={dataNotFoundImage} height={120} alt="data not found." />
-                          <Typography variant="span">Data not found.</Typography>
-                        </Box>
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
+            
+          {/* Tabs */}
+          <Box
+            sx={{
+              display : 'flex',
+              justifyContent : 'center',
+              alignItems : 'center',
+              mt : 5
+            }}
+          >
+              <Tabs  
+                  value={value}
+                  onChange={handleChange}
+                  aria-label="icon tabs example"
+                >
+                <Tab icon={<EventIcon />} aria-label="Activated plans" {...a11yProps(0)}  label="Used plans" />
+                <Tab icon={<AccountBalanceWalletIcon />} aria-label="Future plans"  {...a11yProps(1)} label= "Future plans"  />
+              </Tabs>
+          </Box>
+
+          <TabPanel value={value} index={0}>
+              <ActivatedPlans plans={userPlans}
+                  count={userPlans.length}
+              />
+            </TabPanel>
+            <TabPanel value={value} index={1}>
+                <ActivatedPlans plans={userPlans}
+                  count={userPlans.length}
+              />
+            </TabPanel>
           </Grid>
         </Container>
       </Grid>
