@@ -135,7 +135,7 @@ function Page() {
         </Grid>
 
         {/* Plans Section */}
-        {plans?.lenght &&
+        {plans?.length &&
         <Grid item sx={{ padding: 5 }}>
          <Typography variant="h2" sx={{ fontWeight: 'bold', mb: 2 }}>
             Our Plans
