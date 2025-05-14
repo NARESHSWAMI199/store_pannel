@@ -150,6 +150,8 @@ const handleChange = (event,newValue) => {
 }
 
 const onActivate = (plan) =>{
+  if (!plan) return
+  
   axios.defaults.headers = {
     Authorization: auth.token
   }

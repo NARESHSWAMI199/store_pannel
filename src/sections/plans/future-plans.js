@@ -3,6 +3,11 @@ import {
     Box,
     Button,
     Card,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
     Table,
     TableBody,
     TableCell,
@@ -26,7 +31,23 @@ import { rowsPerPageOptions, toTitleCase } from 'src/utils/util';
       rowsPerPage = 0,
     } = props;
     const [plans,setPlans] = useState(props.plans)
-    const current = new Date().getTime();
+    // Add state for the confirmation dialog
+    const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+    const [selectedPlan, setSelectedPlan] = useState(null); // To store the plan to be activated
+
+
+      // Function to handle opening the confirmation dialog
+      const handleConfirmDialogOpen = (plan) => {
+        setSelectedPlan(plan);
+        setConfirmDialogOpen(true);
+      };
+
+      // Function to handle closing the confirmation dialog
+      const handleConfirmDialogClose = () => {
+        setConfirmDialogOpen(false);
+        setSelectedPlan(null);
+      };
+
 
     useEffect(()=>{
       if(!!props.plans){
@@ -88,7 +109,7 @@ import { rowsPerPageOptions, toTitleCase } from 'src/utils/util';
                               color="success"
                               size="small"
                               onClick={() => {
-                                onActivate(plan);
+                                handleConfirmDialogOpen(plan);
                               }}
                             >
                               Activate
@@ -117,6 +138,35 @@ import { rowsPerPageOptions, toTitleCase } from 'src/utils/util';
           rowsPerPageOptions={rowsPerPageOptions}
         />
       </Card>
+
+
+
+      <Dialog
+        open={confirmDialogOpen}
+        onClose={handleConfirmDialogClose}
+        aria-labelledby="confirm-dialog-title"
+        aria-describedby="confirm-dialog-description"
+      >
+        <DialogTitle id="confirm-dialog-title">Confirm Activation</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="confirm-dialog-description">
+            Do you want to set this plan as your active plan? If you activate this plan, it will replace your current active plan.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleConfirmDialogClose} color="secondary">
+            Cancel
+          </Button>
+          <Button onClick={()=>{
+            onActivate(selectedPlan)
+            handleConfirmDialogClose(); // Close the dialog after activation
+          }
+          } color="primary" autoFocus>
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       </>
   
   
