@@ -44,6 +44,7 @@ export const TopNav = (props) => {
     pageNumber : 0,
     size : 50
   })
+  const [wallet,setWallet] = useState([])
 
   useEffect(() => {
     const getData = async () => {
@@ -71,11 +72,24 @@ export const TopNav = (props) => {
             })
     }
     getData();
-
- 
-
 }, [data])
 
+
+
+useEffect(() => {
+  const getData = async () => {
+    axios.defaults.headers = {
+        Authorization: auth.token
+    }
+    await axios.get(host + "/wholesale/wallet/", )
+    .then(res => {
+        const data = res.data;
+        setWallet(data);
+    })
+    .catch(err => {console.log(err)})
+   }
+  getData();
+}, [])
 
 const onClose = ()=>{
   setOpen(false)
@@ -165,14 +179,14 @@ const viewMore = () =>{
             spacing={2}
           >
             <Tooltip title="My Plans">
-              <IconButton>
-                <SvgIcon fontSize="small">
-                  <Link href="/plans">
-                    <AccountBalanceWalletSharp />
-                  </Link>
-                </SvgIcon> 
-              </IconButton>
-              <span style={{fontSize: '12px'}}>My Plans</span>
+              <Link href="/wallet">
+                <IconButton>
+                  <SvgIcon fontSize="small">
+                      <AccountBalanceWalletSharp />
+                  </SvgIcon> 
+                </IconButton>
+              </Link>
+              <span style={{fontSize: '12px',color : 'green', fontWeight : 'bold'}}>{ruppeeIcon}{!!wallet && !!wallet?.amount ? wallet?.amount : 0}</span>
             </Tooltip>
             <Tooltip title="Notifications">
             <DrawerRight 
