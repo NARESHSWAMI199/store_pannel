@@ -29,14 +29,13 @@ import {
       rowsPerPage = 0,
     } = props;
     const [transactions,setTransactions] = useState(props.transactions)
-    const current = new Date().getTime();
+ 
 
     useEffect(()=>{
-      if(!!props.plans){
-        console.log("props.plans.length : "+JSON.stringify(props.plans) )
-        setPlans(props.plans)
+      if(!!props.transactions){
+        setTransactions(props.transactions)
       }
-    },[props.plans])
+    },[props.transactions])
   
   
     return ( <>
@@ -47,51 +46,44 @@ import {
                 <TableRow>
                   <TableCell padding="checkbox">
                   </TableCell>
-                    <TableCell>Plan Name</TableCell>
+                    <TableCell>Payment Id</TableCell>
                     <TableCell align="center">Amount</TableCell>
-                    <TableCell align="center">Months</TableCell>
-                    <TableCell align="center">Purchased At</TableCell>
-                    <TableCell align="center">Expired At</TableCell>
+                    <TableCell align="center">Action</TableCell>
+                    <TableCell align="center">Created At</TableCell>
                     <TableCell align="center">Status</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {plans.length > 0 ?  plans.map((plan,index) => {
-                  const createdAt = format(parseInt(plan.createdAt), 'dd/MM/yyyy');
-                  const expiryDate = format(parseInt(plan.expiryDate), 'dd/MM/yyyy');
+                {transactions.length > 0 ?  transactions.map((transaction,index) => {
+                  const createdAt = format(parseInt(transaction.createdAt), 'dd/MM/yyyy');
                   return (
                     <TableRow
                       hover
-                      key={plan.id}
+                      key={transaction.id}
                     >
                       <TableCell padding="checkbox">
                       </TableCell>
                       <TableCell>
                         <Typography variant="subtitle2">
-                            {toTitleCase(plan.servicePlan?.name)}
+                            {toTitleCase(transaction.servicePlan?.name)}
                         </Typography>
                       </TableCell>
                  
          
                      <TableCell align="center">
-                            {plan.servicePlan?.price === 0 ? (
+                            {transaction.servicePlan?.price === 0 ? (
                               <Badge badgeContent={'Free'} color="success" />
                             ) : (
-                              plan.servicePlan?.price
+                              transaction.servicePlan?.price
                             )}
                     </TableCell>
                 
-                      <TableCell align="center">
-                          {plan.servicePlan?.months}
-                      </TableCell>
-
                         <TableCell align="center">{createdAt}</TableCell>
-                          <TableCell align="center">{expiryDate}</TableCell>
                           <TableCell align="center">
-                            {plan.expiryDate > current ? (
-                              <Badge badgeContent={'Active'} color="success" />
+                            {transaction.status === "S" ? (
+                              <Badge badgeContent={'Sucess'} color="success" />
                             ) : (
-                              <Badge badgeContent={'Expired'} color="error" />
+                              <Badge badgeContent={'Failed'} color="error" />
                             )}
                           </TableCell>
 

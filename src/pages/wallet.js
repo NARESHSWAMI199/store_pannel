@@ -5,6 +5,7 @@ import { useCallback, useState } from "react";
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import {host} from 'src/utils/util';
 import { useAuth } from 'src/hooks/use-auth';
+import { WalletTransactions } from "src/sections/wallet/wallet-transaction";
 const Page = () => {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
@@ -75,6 +76,18 @@ const Page = () => {
                 </CardActions>
               </Card>
             </form>
+
+          <Box>
+            <Card sx={{ mt: 3 }}>
+              <CardHeader title="Wallet Transactions" />
+              <CardContent>
+                <Box sx={{ minWidth: 800 }}>
+                  <WalletTransactions  transactions={[]} />
+                </Box>
+              </CardContent>
+            </Card>
+          </Box>
+
           </Grid>
           <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'right' }} open={open} onClose={handleClose} key={'top' + 'right'}>
             <Alert onClose={handleClose} severity={flag} sx={{ width: '100%' }}>
