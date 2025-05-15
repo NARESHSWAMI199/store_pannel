@@ -12,7 +12,10 @@ import { SvgIcon } from '@mui/material';
 import WallpaperIcon from '@mui/icons-material/Wallpaper';
 import ChatIcon from '@mui/icons-material/Chat';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-
+import { Add } from '@mui/icons-material';
+import FiberNewIcon from '@mui/icons-material/FiberNew';
+import RemoveShoppingCartIcon from '@mui/icons-material/RemoveShoppingCart';
+import Inventory2Icon from '@mui/icons-material/Inventory2';
 export const items = (user) =>{
 
   return [
@@ -32,7 +35,7 @@ export const items = (user) =>{
       show : true,
       icon: (
         <SvgIcon fontSize="small">
-          <UsersIcon />
+          <FiberNewIcon sx={{ color: 'gold' }} />
         </SvgIcon>
       )
     },
@@ -53,7 +56,7 @@ export const items = (user) =>{
       show : true,
       icon: (
         <SvgIcon fontSize="small">
-          <BadgeIcon />
+          <Inventory2Icon />
         </SvgIcon>
       )
     },
@@ -65,10 +68,32 @@ export const items = (user) =>{
       show : true,
       icon: (
         <SvgIcon fontSize="small">
-          <AdminPanelSettingsIcon />
+          <RemoveShoppingCartIcon />
         </SvgIcon>
       )
     },
+    {
+      title: 'Blocked Items',
+      path: '/blocked',
+      show : true,
+      icon: (
+        <SvgIcon fontSize="small">
+          <BlockIcon />
+        </SvgIcon>
+      )
+    },
+
+        {
+      title: 'Add Item',
+      path: '/items/create',
+      show : true,
+      icon: (
+        <SvgIcon fontSize="small">
+          <Add/>
+        </SvgIcon>
+      )
+    },
+  
     {
       title: 'Profile',
       path: '/account',
@@ -90,17 +115,6 @@ export const items = (user) =>{
         </SvgIcon>
       )
     },
-  
-    {
-      title: 'Add Item',
-      path: '/items/create',
-      show : true,
-      icon: (
-        <SvgIcon fontSize="small">
-          <PersonAddAltIcon />
-        </SvgIcon>
-      )
-    },
     
     {
       title: 'Remove Background',
@@ -113,17 +127,6 @@ export const items = (user) =>{
       )
     },
       
-    {
-      title: 'Blocked Items',
-      path: '/blocked',
-      show : true,
-      icon: (
-        <SvgIcon fontSize="small">
-          <BlockIcon />
-        </SvgIcon>
-      )
-    },
-  
     {
       title: 'Chats',
       path: '/chat',

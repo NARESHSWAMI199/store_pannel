@@ -230,6 +230,7 @@ return (
             {/* Buttons for Expired or Active Plans */}
             {current > recentPlan.expiryDate ? (
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                {recentPlan.servicePlan?.price > 0 && 
                 <Button
                   sx={{ mb: 2, width: 'fit-content' }}
                   variant="contained"
@@ -243,6 +244,7 @@ return (
                 >
                   Renew Plan
                 </Button>
+      }
                 <Button
                   sx={{ mb: 2, width: 'fit-content' }}
                   variant="outlined"
