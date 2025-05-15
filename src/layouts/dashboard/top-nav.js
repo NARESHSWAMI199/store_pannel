@@ -162,7 +162,7 @@ const viewMore = () =>{
           <Stack
             alignItems="center"
             direction="row"
-            spacing={1}
+            spacing={2}
           >
             <Tooltip title="My Plans">
               <IconButton>
