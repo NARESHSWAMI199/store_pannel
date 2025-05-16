@@ -22,7 +22,6 @@ import {
 import { format } from 'date-fns';
 import PropTypes from 'prop-types';
 
-import { CopyOutlined } from '@ant-design/icons';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import Button from '@mui/material/Button';
@@ -35,8 +34,8 @@ import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { Image } from 'antd';
 import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
-import { Scrollbar } from 'src/components/scrollbar';
+import { useEffect, useState } from 'react';
+import CopyButton from 'src/components/CopyButton';
 import { getInitials } from 'src/utils/get-initials';
 import { itemImage, toTitleCase } from 'src/utils/util';
 
@@ -58,53 +57,9 @@ export const BlockedItems = (props) => {
   const selectedSome = (selected.length > 0) && (selected.length < items.length);
   const selectedAll = (items.length > 0) && (selected.length === items.length);
   const [confirm,setConfirm] = useState(false)
-  const [slug,setSlug] = useState(null)
-  const [rowIndex,setRowIndex] = useState(-1)
-  const [status,setStatus] = useState('')
   const [action,setAction] = useState('')
-  const [isCopied, setIsCopied] = useState(false);
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
-
-  async function copyTextToClipboard(text) {
-    if ('clipboard' in navigator) {
-      return await navigator.clipboard.writeText(text);
-    } else {
-      return document.execCommand('copy', true, text);
-    }
-  }
-
-  const handleCopyClick = (slug) => {
-    // Asynchronously call copyTextToClipboard
-      copyTextToClipboard(slug)
-      .then(() => {
-        // If successful, update the isCopied state value
-        setItems((items).filter(customer => {
-         if(customer.slug == slug){
-          customer.isCopied = true
-          setIsCopied(true);
-         }
-         return customer
-      }))
-        setTimeout(() => {
-          setItems((items).filter(customer => {
-            if(customer.slug == slug){
-             customer.isCopied = false
-             setIsCopied(false);
-            }
-            return customer
-         }))
-        }, 1500);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }
-
-
-
-
-
 
 
 
@@ -231,17 +186,11 @@ export const BlockedItems = (props) => {
                     </TableCell>
                
        
-                    <TableCell sx={{color:'text.secondary'}}>
-                     <span style={{color:'green'}}>{item.slug} </span> 
-                      {!!item.isCopied && item.isCopied && isCopied ? 
-                        <Badge 
-                          color="primary"  
-                          badgeContent="copied" 
-                          style={{marginBottom:'35px'}} 
-                        /> 
-                        : <></>}
-                      <CopyOutlined onClick={() => { handleCopyClick(item.slug) }} />
+                    <TableCell sx={{ color: 'text.secondary' }}>
+                      <span style={{ color: 'green' }}>{item.slug} </span>
+                      <CopyButton text={item.slug} />
                     </TableCell>
+
 
                     <TableCell align='center'>
                         {item.label === "O" && 

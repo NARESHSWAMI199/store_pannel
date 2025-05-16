@@ -20,7 +20,7 @@ import { format } from 'date-fns';
 import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import { rowsPerPageOptions, toTitleCase } from 'src/utils/util';
-  
+import CopyButton from 'src/components/CopyButton';  
   export const FuturePlans = (props) => {
     const {
       count = 0,
@@ -66,10 +66,11 @@ import { rowsPerPageOptions, toTitleCase } from 'src/utils/util';
                   <TableCell padding="checkbox">
                   </TableCell>
                     <TableCell>Plan Name</TableCell>
+                    <TableCell width={'20%'}>Pland Id</TableCell>
                     <TableCell align="center">Amount</TableCell>
                     <TableCell align="center">Months</TableCell>
                     <TableCell align="center">Purchased At</TableCell>
-                    <TableCell align="center">Activate</TableCell>
+                    <TableCell align="right">Activate</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -78,15 +79,20 @@ import { rowsPerPageOptions, toTitleCase } from 'src/utils/util';
                   return (
                     <TableRow
                       hover
-                      key={plan.id}
+                      key={plan?.slug}
                     >
                       <TableCell padding="checkbox">
                       </TableCell>
                       <TableCell>
                         <Typography variant="subtitle2">
-                            {toTitleCase(plan.servicePlan?.name)}
+                            {toTitleCase(plan?.servicePlan?.name)}
                         </Typography>
                       </TableCell>
+
+                    <TableCell sx={{ color: 'text.secondary' }}>
+                      <span style={{ color: 'green' }}>{plan?.slug} </span>
+                      <CopyButton text={plan?.slug} />
+                    </TableCell>
                  
          
                      <TableCell align="center">
@@ -98,12 +104,12 @@ import { rowsPerPageOptions, toTitleCase } from 'src/utils/util';
                     </TableCell>
                 
                       <TableCell align="center">
-                          {plan.servicePlan?.months}
+                          {plan?.servicePlan?.months}
                       </TableCell>
 
                         <TableCell align="center">{createdAt}</TableCell>
 
-                          <TableCell align="center">
+                          <TableCell align="right">
                             <Button
                               variant="contained"
                               color="success"
