@@ -182,7 +182,7 @@ const viewMore = () =>{
               <Link href="/wallet">
                 <IconButton>
                   <SvgIcon fontSize="small">
-                      <AccountBalanceWalletSharp />
+                      <AccountBalanceWalletSharp style={{color : 'red'}} />
                   </SvgIcon> 
                 </IconButton>
               </Link>

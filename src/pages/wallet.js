@@ -1,7 +1,7 @@
 import { Box, Button, Card, CardActions, CardContent, CardHeader, Divider, TextField, Unstable_Grid2 as Grid, Snackbar, Alert, Container, Stack } from "@mui/material";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import {host} from 'src/utils/util';
 import { useAuth } from 'src/hooks/use-auth';
@@ -14,6 +14,7 @@ const Page = () => {
   const [values, setValues] = useState({
     amount: "",
   });
+  const [transactions, setTransactions] = useState([]);
 
 
 
@@ -23,6 +24,28 @@ const Page = () => {
       [event.target.name]: event.target.value
     }));
   }, []);
+
+
+
+
+  useEffect(() => {
+    axios.defaults.headers = {
+      Authorization: auth.token
+    } 
+    axios.get(host + "/wholesale/wallet")
+      .then(res => {
+        const data = res.data.content;
+        setTransactions(data);
+      })
+      .catch(err => {
+        console.log(err);
+        setMessage(!!err.response ? err.response?.data.message : err.message);
+        setFlag("error");
+        setOpen(true);
+      });
+  },[]);
+
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -82,7 +105,7 @@ const Page = () => {
               <CardHeader title="Wallet Transactions" />
               <CardContent>
                 <Box sx={{ minWidth: 800 }}>
-                  <WalletTransactions  transactions={[]} />
+                  <WalletTransactions  transactions={transactions} />
                 </Box>
               </CardContent>
             </Card>
