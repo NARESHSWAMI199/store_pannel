@@ -121,7 +121,6 @@ const Page = () => {
                           type="number"
                           InputProps={{
                             startAdornment: <InputAdornment position="start">₹</InputAdornment>,
-                            max : 4,
                           }}
                           sx={{ mb: 3 }}
                         />

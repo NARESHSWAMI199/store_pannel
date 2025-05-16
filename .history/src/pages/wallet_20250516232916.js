@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardActions, CardContent, CardHeader, Divider, TextField, Unstable_Grid2 as Grid, Snackbar, Alert, Container, Stack, InputAdornment } from "@mui/material";
+import { Box, Button, Card, CardActions, CardContent, CardHeader, Divider, TextField, Unstable_Grid2 as Grid, Snackbar, Alert, Container, Stack } from "@mui/material";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -116,14 +116,8 @@ const Page = () => {
                           onChange={handleChange}
                           required
                           value={values.amount}
-                          
                           InputLabelProps={{ shrink: true }}
                           type="number"
-                          InputProps={{
-                            startAdornment: <InputAdornment position="start">₹</InputAdornment>,
-                            max : 4,
-                          }}
-                          sx={{ mb: 3 }}
                         />
                       </Grid>
                     </Grid>

@@ -68,13 +68,10 @@ import CopyButton from 'src/components/CopyButton';
                       <TableCell>
                         <Stack
                           alignItems="center"
-                          direction="row"
-                          spacing={1}
-                        >
-                          <Typography variant="subtitle2" sx={{color : 'green'}}>
-                              {toTitleCase(transaction?.slug)}
-                          </Typography>
-                          <CopyButton text={transaction?.slug} />
+                        <Typography variant="subtitle2" sx={{color : 'green'}}>
+                            {toTitleCase(transaction?.slug)}
+                        </Typography>
+                        <CopyButton text={transaction?.slug} />
                         </Stack>
                       </TableCell>
                  

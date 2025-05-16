@@ -69,7 +69,7 @@ import CopyButton from 'src/components/CopyButton';
                         <Stack
                           alignItems="center"
                           direction="row"
-                          spacing={1}
+                          spacing={2}
                         >
                           <Typography variant="subtitle2" sx={{color : 'green'}}>
                               {toTitleCase(transaction?.slug)}

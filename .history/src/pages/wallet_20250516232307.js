@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardActions, CardContent, CardHeader, Divider, TextField, Unstable_Grid2 as Grid, Snackbar, Alert, Container, Stack, InputAdornment } from "@mui/material";
+import { Box, Button, Card, CardActions, CardContent, CardHeader, Divider, TextField, Unstable_Grid2 as Grid, Snackbar, Alert, Container, Stack } from "@mui/material";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -27,7 +27,7 @@ const Page = () => {
 
    const [data, setData] = useState({
           pageNumber: page,
-          size: !!rowsPerPage ? parseInt(rowsPerPage) : rowsPerPageOptions[0]
+          size: !!rowsPerPage ? parseInt(1) : rowsPerPageOptions[0]
       })
         
 
@@ -39,7 +39,7 @@ const Page = () => {
   }, []);
 
 
- 
+
 
   useEffect(() => {
     axios.defaults.headers = {
@@ -57,7 +57,7 @@ const Page = () => {
         setFlag("error");
         setOpen(true);
       });
-  },[data,rowsPerPage, page]);
+  },[]);
 
 
 
@@ -116,14 +116,8 @@ const Page = () => {
                           onChange={handleChange}
                           required
                           value={values.amount}
-                          
                           InputLabelProps={{ shrink: true }}
                           type="number"
-                          InputProps={{
-                            startAdornment: <InputAdornment position="start">₹</InputAdornment>,
-                            max : 4,
-                          }}
-                          sx={{ mb: 3 }}
                         />
                       </Grid>
                     </Grid>

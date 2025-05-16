@@ -14,12 +14,10 @@ import {
     Typography
   } from '@mui/material';
   import { format } from 'date-fns';
-import { ru } from 'date-fns/locale';
   import PropTypes from 'prop-types';
   import { useEffect, useState } from 'react';
-import CopyButton from 'src/components/CopyButton';
   import { getInitials } from 'src/utils/get-initials';
-  import { rowsPerPageOptions, ruppeeIcon, toTitleCase, userImage } from 'src/utils/util';
+  import { rowsPerPageOptions, toTitleCase, userImage } from 'src/utils/util';
   
   export const WalletTransactions = (props) => {
     const {
@@ -50,7 +48,7 @@ import CopyButton from 'src/components/CopyButton';
                   </TableCell>
                     <TableCell>Payment Id</TableCell>
                     <TableCell align="center">Amount</TableCell>
-                    <TableCell align="center">Payment Type</TableCell>
+                    <TableCell align="center">Action</TableCell>
                     <TableCell align="center">Created At</TableCell>
                     <TableCell align="center">Status</TableCell>
                 </TableRow>
@@ -66,34 +64,21 @@ import CopyButton from 'src/components/CopyButton';
                       <TableCell padding="checkbox">
                       </TableCell>
                       <TableCell>
-                        <Stack
-                          alignItems="center"
-                          direction="row"
-                          spacing={1}
-                        >
-                          <Typography variant="subtitle2" sx={{color : 'green'}}>
-                              {toTitleCase(transaction?.slug)}
-                          </Typography>
-                          <CopyButton text={transaction?.slug} />
-                        </Stack>
+                        <Typography variant="subtitle2">
+                            {toTitleCase(transaction.servicePlan?.name)}
+                        </Typography>
                       </TableCell>
                  
          
                      <TableCell align="center">
-                        <Typography variant="subtitle2" sx={{ fontWeight : 'bold', color: transaction?.transactionType === "CR" ? "green" : "red"}}>
-                          {transaction?.transactionType === "CR" ? "+" : "-"}
-                        {transaction.amount} {ruppeeIcon}
-                        </Typography>
+                            {transaction.servicePlan?.price === 0 ? (
+                              <Badge badgeContent={'Free'} color="success" />
+                            ) : (
+                              transaction.servicePlan?.price
+                            )}
                     </TableCell>
-
-                      <TableCell align="center">
-                        {transaction.status === "CR" ? (
-                          <Badge badgeContent={'Credit'} color="success" />
-                        ) : (
-                          <Badge badgeContent={'Debit'} color="error" />
-                        )}
-                      </TableCell>
                 
+                        <TableCell align="center">{createdAt}</TableCell>
                           <TableCell align="center">
                             {transaction.status === "S" ? (
                               <Badge badgeContent={'Sucess'} color="success" />
@@ -101,8 +86,6 @@ import CopyButton from 'src/components/CopyButton';
                               <Badge badgeContent={'Failed'} color="error" />
                             )}
                           </TableCell>
-                      <TableCell align="center">{createdAt}</TableCell>
-
 
                   </TableRow>
                 )})

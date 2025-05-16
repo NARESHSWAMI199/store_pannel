@@ -1,13 +1,11 @@
-import { Box, Button, Card, CardActions, CardContent, CardHeader, Divider, TextField, Unstable_Grid2 as Grid, Snackbar, Alert, Container, Stack, InputAdornment } from "@mui/material";
+import { Box, Button, Card, CardActions, CardContent, CardHeader, Divider, TextField, Unstable_Grid2 as Grid, Snackbar, Alert, Container, Stack } from "@mui/material";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
-import {host, rowsPerPageOptions} from 'src/utils/util';
+import {host} from 'src/utils/util';
 import { useAuth } from 'src/hooks/use-auth';
 import { WalletTransactions } from "src/sections/wallet/wallet-transaction";
-import { useSelection } from "src/hooks/use-selection";
-
 const Page = () => {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
@@ -18,18 +16,7 @@ const Page = () => {
   });
   const [transactions, setTransactions] = useState([]);
 
-  const paginations = auth.paginations
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(paginations?.WALLETTRANSACTIONS?.rowsNumber);
-  const itemsSelection = useSelection();
-  const [totalElements, setTotalElements] = useState(0)
 
-
-   const [data, setData] = useState({
-          pageNumber: page,
-          size: !!rowsPerPage ? parseInt(rowsPerPage) : rowsPerPageOptions[0]
-      })
-        
 
   const handleChange = useCallback((event) => {
     setValues((prevState) => ({
@@ -39,17 +26,16 @@ const Page = () => {
   }, []);
 
 
- 
+
 
   useEffect(() => {
     axios.defaults.headers = {
       Authorization: auth.token
     } 
-    axios.post(host + "/wholesale/wallet/transactions/all",data)
+    axios.get(host + "/wholesale/wallet")
       .then(res => {
         const data = res.data.content;
         setTransactions(data);
-        setTotalElements(res.data.totalElements);
       })
       .catch(err => {
         console.log(err);
@@ -57,7 +43,7 @@ const Page = () => {
         setFlag("error");
         setOpen(true);
       });
-  },[data,rowsPerPage, page]);
+  },[]);
 
 
 
@@ -79,24 +65,6 @@ const Page = () => {
     setOpen(false);
   });
 
-
-  const handlePageChange = useCallback(
-    (event, value) => {
-      setPage(value);
-      setData({ ...data, pageNumber: value })
-    },
-    []
-  );
-
-  const handleRowsPerPageChange = useCallback(
-    (event) => {
-      setRowsPerPage(event.target.value);
-    },
-    []
-  );
-
-
-
   return (
     <Box component="main" sx={{ flexGrow: 1, py: 8 }}>
       <Container maxWidth="xl">
@@ -116,14 +84,8 @@ const Page = () => {
                           onChange={handleChange}
                           required
                           value={values.amount}
-                          
                           InputLabelProps={{ shrink: true }}
                           type="number"
-                          InputProps={{
-                            startAdornment: <InputAdornment position="start">₹</InputAdornment>,
-                            max : 4,
-                          }}
-                          sx={{ mb: 3 }}
                         />
                       </Grid>
                     </Grid>
@@ -143,15 +105,7 @@ const Page = () => {
               <CardHeader title="Wallet Transactions" />
               <CardContent>
                 <Box sx={{ minWidth: 800 }}>
-                  <WalletTransactions  
-                      transactions={transactions}
-                      count={totalElements}
-                      onPageChange={handlePageChange}
-                      onRowsPerPageChange={handleRowsPerPageChange}
-                      page={page}
-                      rowsPerPage={rowsPerPage}
-                      selected={itemsSelection.selected}
-                  />
+                  <WalletTransactions  transactions={transactions} />
                 </Box>
               </CardContent>
             </Card>

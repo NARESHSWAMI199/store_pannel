@@ -50,8 +50,9 @@ import CopyButton from 'src/components/CopyButton';
                   </TableCell>
                     <TableCell>Payment Id</TableCell>
                     <TableCell align="center">Amount</TableCell>
-                    <TableCell align="center">Payment Type</TableCell>
                     <TableCell align="center">Created At</TableCell>
+                <TableCell align="center">Payment Type</TableCell>
+
                     <TableCell align="center">Status</TableCell>
                 </TableRow>
               </TableHead>
@@ -66,16 +67,10 @@ import CopyButton from 'src/components/CopyButton';
                       <TableCell padding="checkbox">
                       </TableCell>
                       <TableCell>
-                        <Stack
-                          alignItems="center"
-                          direction="row"
-                          spacing={1}
-                        >
-                          <Typography variant="subtitle2" sx={{color : 'green'}}>
-                              {toTitleCase(transaction?.slug)}
-                          </Typography>
-                          <CopyButton text={transaction?.slug} />
-                        </Stack>
+                        <Typography variant="subtitle2">
+                            {toTitleCase(transaction?.slug)}
+                            <CopyButton text={transaction?.slug}/>
+                        </Typography>
                       </TableCell>
                  
          
@@ -86,6 +81,7 @@ import CopyButton from 'src/components/CopyButton';
                         </Typography>
                     </TableCell>
 
+                      <TableCell align="center">{createdAt}</TableCell>
                       <TableCell align="center">
                         {transaction.status === "CR" ? (
                           <Badge badgeContent={'Credit'} color="success" />
@@ -94,6 +90,7 @@ import CopyButton from 'src/components/CopyButton';
                         )}
                       </TableCell>
                 
+                        <TableCell align="center">{createdAt}</TableCell>
                           <TableCell align="center">
                             {transaction.status === "S" ? (
                               <Badge badgeContent={'Sucess'} color="success" />
@@ -101,8 +98,6 @@ import CopyButton from 'src/components/CopyButton';
                               <Badge badgeContent={'Failed'} color="error" />
                             )}
                           </TableCell>
-                      <TableCell align="center">{createdAt}</TableCell>
-
 
                   </TableRow>
                 )})
