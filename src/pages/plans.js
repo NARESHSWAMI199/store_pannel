@@ -156,7 +156,7 @@ const onActivate = (plan) =>{
     Authorization: auth.token
   }
   axios.post(host + "/future/plans/activate", {
-    slug: plan.servicePlan?.slug,
+    slug: plan?.slug,
   })
     .then(res => {
       setMessage(res.data.message)
