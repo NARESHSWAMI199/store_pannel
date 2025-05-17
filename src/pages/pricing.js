@@ -1,12 +1,12 @@
-import { CheckCircleOutline } from '@mui/icons-material'
-import { Alert, Box, Button, Card, CardContent, Grid, Link, Snackbar, Typography } from '@mui/material'
+import { Alert, Button, Card, CardContent, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Snackbar, Typography } from '@mui/material'
 import axios from 'axios'
 import { useRouter } from 'next/navigation'
 import bg from 'public/assets/bg.png'
 import { useEffect, useState } from 'react'
 import { useAuth } from 'src/hooks/use-auth'
 import HomeNavbar from 'src/sections/top-nav'
-import { host, projectName } from 'src/utils/util'
+import { host } from 'src/utils/util'
+import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 
 function Pricing() {
   const [plans, setPlans] = useState([])
@@ -16,6 +16,8 @@ function Pricing() {
   const [message, setMessage] = useState("")
   const [flag, setFlag] = useState("warning")
   const router = useRouter();
+  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
 
   useEffect(() => {
     axios(host + "/wholesale/plan/all")
@@ -25,6 +27,7 @@ function Pricing() {
       .catch(err => {
         console.log(err)
         setMessage(!!err.response ? err.response.data.message : err.message)
+        
         setFlag("error")
         setOpen(true)
       })
@@ -36,20 +39,32 @@ function Pricing() {
     }
 
     const redirect = async () => {
-      if (pg === "phonepe") {
-        await axios.get(host + "/pg/pay/" + slug)
-          .then(res => {
-            window.open(res.data.url);
-          })
-          .catch(err => {
-            setMessage(!!err.response ? err.response.data.message : err.message)
-            setFlag("error")
+      if (pg === "wallet") {
+        axios.get(host + "/wholesale/wallet/pay/" + slug)
+        .then(res => {
+            setMessage(res.data.message)
+            setFlag("success")
             setOpen(true)
-          });
+            router.push(`/wallet/?congratulation=${slug}`)
+        }).catch(err => {
+          setMessage(!!err.response ? err.response.data.message : err.message)
+          setFlag("error")
+          setOpen(true)
+        });
+      } else if (pg === "phonepe") {
+            await axios.get(host + "/pg/pay/" + slug)
+              .then(res => {
+                window.open(res.data.url);
+              })
+              .catch(err => {
+                setMessage(!!err.response ? err.response.data.message : err.message)
+                setFlag("error")
+                setOpen(true)
+              });
       } else {
         window.location.href = host + "/cashfree/pay/" + slug + "/" + encodeURIComponent(auth.token.replace("Bearer ", ""))
       }
-    }
+      }
     if (!!auth.token) {
       redirect();
     } else {
@@ -63,7 +78,6 @@ function Pricing() {
 
   return (
     <>
-      <HomeNavbar bg={bg.src} />
       <Grid container sx={{ padding: 5 }}>
         <Typography variant="h2" sx={{ fontWeight: 'bold', mb: 2, textAlign: 'center' }}>
           Our Plans
@@ -82,7 +96,14 @@ function Pricing() {
                   <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 2 }}>
                     ₹ {plan.price}
                   </Typography>
-                  <Button variant="contained" sx={{ mt: 2 }} onClick={(e) => redirectForPayment(plan.slug, "cashfree")}>
+                  <Button
+                    variant="contained"
+                    sx={{ mt: 2 }}
+                    onClick={() => {
+                      setSelectedPlan(plan);
+                      setPaymentDialogOpen(true);
+                    }}
+                  >
                     Get Now
                   </Button>
                 </CardContent>
@@ -91,23 +112,53 @@ function Pricing() {
           ))}
         </Grid>
       </Grid>
-      <Snackbar anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+      <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         open={open}
         onClose={handleClose}
-        key={'bottom' + 'left'}
+        key={'top' + 'right'}
       >
         <Alert onClose={handleClose} severity={flag} sx={{ width: '100%' }}>
           {message}
         </Alert>
       </Snackbar>
+
+
+
+
+<Dialog open={paymentDialogOpen} onClose={() => setPaymentDialogOpen(false)}>
+  <DialogTitle>Select Payment Method</DialogTitle>
+  <DialogContent>
+    <Button
+      fullWidth
+      sx={{ mb: 1 }}
+      variant="outlined"
+      onClick={() => {
+        setPaymentDialogOpen(false);
+        redirectForPayment(selectedPlan.slug, "wallet");
+      }}
+    >
+      Pay with Wallet
+    </Button>
+    <Button
+      fullWidth
+      variant="outlined"
+      onClick={() => {
+        setPaymentDialogOpen(false);
+        redirectForPayment(selectedPlan.slug, "cashfree");
+      }}
+    >
+      Pay with Cashfree
+    </Button>
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={() => setPaymentDialogOpen(false)}>Cancel</Button>
+  </DialogActions>
+</Dialog>
+
+
     </>
   )
 }
 
-Pricing.getLayout = (page) => (
-  <HomeNavbar bg={bg}>
-    {page}
-  </HomeNavbar>
-)
-
+Pricing.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
 export default Pricing

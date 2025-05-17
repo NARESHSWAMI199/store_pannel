@@ -89,7 +89,7 @@ useEffect(() => {
     .catch(err => {console.log(err)})
    }
   getData();
-}, [])
+}, [props.walletUpdate])
 
 const onClose = ()=>{
   setOpen(false)

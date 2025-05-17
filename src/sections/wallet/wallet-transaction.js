@@ -87,7 +87,7 @@ import CopyButton from 'src/components/CopyButton';
                     </TableCell>
 
                       <TableCell align="center">
-                        {transaction.status === "CR" ? (
+                        {transaction.transactionType === "CR" ? (
                           <Badge badgeContent={'Credit'} color="success" />
                         ) : (
                           <Badge badgeContent={'Debit'} color="error" />
