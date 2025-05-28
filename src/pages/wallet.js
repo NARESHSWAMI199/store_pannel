@@ -22,7 +22,6 @@ const Page = () => {
   const paginations = auth.paginations
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(paginations?.WALLETTRANSACTIONS?.rowsNumber);
-  const itemsSelection = useSelection();
   const [totalElements, setTotalElements] = useState(0)
   const [CongratulationOpen, setCongratulationOpen] = useState(false);
   const searchParams = useSearchParams();
