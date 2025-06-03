@@ -337,6 +337,26 @@ export const ItemsTable = (props) => {
 
                 );
               })}
+
+              {items.length === 0  && 
+                <TableRow>
+                  <TableCell
+                    colSpan={10}
+                    sx={{
+                      textAlign: 'center',
+                      py: 3
+                    }}
+                  >
+                    <Typography
+                      color="text.secondary"
+                      variant="body1"
+                    >
+                      No items found
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              }
+
             </TableBody>
           </Table>
         </Box>

@@ -35,6 +35,8 @@ const MultipleImageInput = (props) => {
         })
       }
       setFileList(allAvatars)
+    }else{
+      setFileList([])
     }
   },[props.avtars,props.totalImage])
 

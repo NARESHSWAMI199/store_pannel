@@ -178,7 +178,8 @@ const CreateItem = () => {
                     setMessage(res.data.message)
                     setFlag("success")
                     form.reset();
-                    setValues({})
+                    setValues({description : ''})
+                    setAvtars([])
                     setOpen(true)
                 }).catch(err => {
                     setMessage(!!err.response ? err.response.data.message : err.message)
@@ -414,7 +415,7 @@ const CreateItem = () => {
                                         </FormControl>
                                     </Grid>
 
-
+                                    {/* Description */}
                                     <Grid
                                         xs={12}
                                         md={6}
