@@ -1,23 +1,20 @@
 import {
-    Avatar,
-    Badge,
-    Box,
-    Card,
-    Rating,
-    Stack,
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TablePagination,
-    TableRow,
-    Typography
-  } from '@mui/material';
-  import { format } from 'date-fns';
-  import PropTypes from 'prop-types';
-  import { useEffect, useState } from 'react';
-  import { getInitials } from 'src/utils/get-initials';
-  import { rowsPerPageOptions, toTitleCase, userImage } from 'src/utils/util';
+  Badge,
+  Box,
+  Card,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TablePagination,
+  TableRow,
+  Typography
+} from '@mui/material';
+import { Button } from 'antd';
+import { format } from 'date-fns';
+import PropTypes from 'prop-types';
+import { useEffect, useState } from 'react';
+import { rowsPerPageOptions, toTitleCase } from 'src/utils/util';
   
   export const ActivatedPlans = (props) => {
     const {
@@ -37,6 +34,12 @@ import {
         setPlans(props.plans)
       }
     },[props.plans])
+
+    const handleActivatePlan = (slug) => {
+      if (props.onActivate) { 
+        props.onActivate(slug);
+      }
+    };
   
   
     return ( <>
@@ -53,6 +56,7 @@ import {
                     <TableCell align="center">Purchased At</TableCell>
                     <TableCell align="center">Expired At</TableCell>
                     <TableCell align="center">Status</TableCell>
+                    <TableCell align="center">Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -88,18 +92,31 @@ import {
                         <TableCell align="center">{createdAt}</TableCell>
                           <TableCell align="center">{expiryDate}</TableCell>
                           <TableCell align="center">
-                            {plan.expiryDate > current ? (
+                            {!plan.expired ? (
                               <Badge badgeContent={'Active'} color="success" />
                             ) : (
                               <Badge badgeContent={'Expired'} color="error" />
                             )}
                           </TableCell>
 
+                          <TableCell align ="center">
+                            {!plan.expired ?
+                            <Button variant="contained" color='primary' onClick={(e)=>{handleActivatePlan(plan.slug)}} > 
+                              Activate
+                            </Button>
+                            :
+                            <Button variant="contained" color='primary' disabled>
+                              Expired 
+                            </Button>
+
+                      }
+                          </TableCell>
+
                   </TableRow>
                 )})
               :
               <TableRow>
-                <TableCell colSpan={6} align="center">
+                <TableCell colSpan={7} align="center">
                   No Item Reviews Found
                 </TableCell>
               </TableRow>

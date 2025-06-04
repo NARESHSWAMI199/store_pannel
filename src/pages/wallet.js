@@ -175,7 +175,6 @@ const Page = () => {
                       onRowsPerPageChange={handleRowsPerPageChange}
                       page={page}
                       rowsPerPage={rowsPerPage}
-                      selected={itemsSelection.selected}
                   />
                 </Box>
               </CardContent>

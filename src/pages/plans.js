@@ -12,6 +12,7 @@ import {ActivatedPlans} from 'src/sections/plans/activated-plans';
 import {FuturePlans} from 'src/sections/plans/future-plans';
 import EventIcon from '@mui/icons-material/Event';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import { on } from 'events';
 
 
 function TabPanel(props) {
@@ -172,6 +173,21 @@ const onActivate = (plan) =>{
     });
 }
 
+const activateCurrentPlan = (planSlug) => {
+  axios.defaults.headers = {
+    Authorization: auth.token
+  }
+  axios.post(`${host}/wholesale/plan/activate/${planSlug}`).then(res => {
+    setMessage(res.data.message);
+    setFlag("success");
+    setOpen(true);
+  }).catch(err => {
+    setMessage(!!err.response ? err.response.data.message : err.message);
+    setFlag("error");
+    setOpen(true);
+  });
+}
+
 
 return (
   <>
@@ -330,6 +346,7 @@ return (
         <TabPanel value={value} index={0}>
             <ActivatedPlans plans={userPlans}
                 count={userPlans.length}
+                onActivate={activateCurrentPlan}
             />
           </TabPanel>
           <TabPanel value={value} index={1}>

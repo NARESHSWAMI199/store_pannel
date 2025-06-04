@@ -109,7 +109,7 @@ import CopyButton from 'src/components/CopyButton';
               :
               <TableRow>
                 <TableCell colSpan={6} align="center">
-                  No Item Reviews Found
+                  No transactions found.
                 </TableCell>
               </TableRow>
               }
