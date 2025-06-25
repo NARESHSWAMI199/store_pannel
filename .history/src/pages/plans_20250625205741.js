@@ -177,7 +177,7 @@ const activateCurrentPlan = (planSlug) => {
   axios.defaults.headers = {
     Authorization: auth.token
   }
-  axios.get(`${host}/wholesale/plan/activate/${planSlug}`).then(res => {
+  axios.post(`${host}/wholesale/plan/activate/${planSlug}`).then(res => {
     setMessage(res.data.message);
     setFlag("success");
     setOpen(true);

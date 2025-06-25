@@ -156,9 +156,7 @@ const onActivate = (plan) =>{
   axios.defaults.headers = {
     Authorization: auth.token
   }
-  axios.post(host + "/future/plans/activate", {
-    slug: plan?.slug,
-  })
+  axios.post(`${host}/future/plans/activate/${plan?.slug}`)
     .then(res => {
       setMessage(res.data.message)
       setFlag("success")
@@ -177,7 +175,7 @@ const activateCurrentPlan = (planSlug) => {
   axios.defaults.headers = {
     Authorization: auth.token
   }
-  axios.get(`${host}/wholesale/plan/activate/${planSlug}`).then(res => {
+  axios.post(`${host}/wholesale/plan/activate/${planSlug}`).then(res => {
     setMessage(res.data.message);
     setFlag("success");
     setOpen(true);
