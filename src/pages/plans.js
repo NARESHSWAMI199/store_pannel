@@ -239,7 +239,7 @@ return (
             <Typography variant="h4" sx={{ fontWeight: 'bold', fontSize: 24, mb: 1 }}>
               {recentPlan.servicePlan?.price > 0 ? ruppeeIcon + recentPlan.servicePlan?.price : 'Free'}
               <Typography variant="caption" sx={{ color: '#6c757d', fontSize: 14 }}>
-                {" "+recentPlan.servicePlan?.months} month's plan
+                {" "+recentPlan.servicePlan?.months + " month's plan"} 
               </Typography>
             </Typography>
 

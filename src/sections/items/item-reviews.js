@@ -1,3 +1,4 @@
+import { Image } from '@mui/icons-material';
 import {
     Avatar,
     Box,
@@ -10,7 +11,7 @@ import {
     TableHead,
     TablePagination,
     TableRow,
-    Typography
+    Typography,
   } from '@mui/material';
   import { format } from 'date-fns';
   import PropTypes from 'prop-types';

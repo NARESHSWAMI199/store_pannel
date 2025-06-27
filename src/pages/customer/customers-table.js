@@ -39,7 +39,7 @@ import { useAuth } from 'src/hooks/use-auth';
 import { CopyOutlined } from '@ant-design/icons';
 
 
-export const CustomersTable = (props) => {
+const  CustomersTable = (props) => {
   const {
     count = 0,
     onDeselectAll,
@@ -416,3 +416,6 @@ CustomersTable.propTypes = {
   rowsPerPage: PropTypes.number,
   selected: PropTypes.array
 };
+
+
+export default CustomersTable;

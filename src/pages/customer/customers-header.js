@@ -8,7 +8,7 @@ const exp = require("constants")
 
 
 
-export function CustomerHeaders(props){
+export default function CustomerHeaders(props){
     return (
         <>
         
