@@ -6,9 +6,9 @@
   "homepage": "https://NARESHSWAMI199.github.io/store_pannel",
   "private": false,
   "scripts": {
-    "dev": "next",
+    "dev": "next -p 3001",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 3001",
     "export": "next export",
     "lint": "next lint",
     "lint-fix": "next lint --fix",
