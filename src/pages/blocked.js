@@ -137,7 +137,9 @@ const Page = () => {
             setData({
                 ...data,
                 ...searchData,
+                pageNumber : 0,
             })
+            setPage(0)
         }else{
             setData({
                 pageNumber: page,

@@ -5,6 +5,7 @@ import axios from 'axios';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { set } from 'nprogress';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAuth } from 'src/hooks/use-auth';
 import { useSelection } from 'src/hooks/use-selection';
@@ -222,7 +223,9 @@ const Page = () => {
             setData({
                 ...data,
                 ...searchData,
+                pageNumber : 0,
             })
+            setPage(0)
         }else{
             setData({
                 pageNumber: page,

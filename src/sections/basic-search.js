@@ -14,8 +14,8 @@ export const BasicSearch = (props) => {
 
 
   const [values,setValues] = useState({
-    inStock : 'Y',
-    status : 'A',
+    inStock : 'ALL',
+    status : 'ALL',
     type : 'A',
     fromDate : previousDate,
     toDate : currentDate
@@ -160,6 +160,7 @@ export const BasicSearch = (props) => {
                 value={values.status}
                 label="Status"
               >
+                <MenuItem value={"ALL"}>Select Status</MenuItem>
                 <MenuItem value={"A"}>Active</MenuItem>
                 <MenuItem value={"D"}>Deactive</MenuItem>
               </Select></Grid>}
@@ -179,6 +180,7 @@ export const BasicSearch = (props) => {
                 value={values.inStock}
                 label="Status"
               >
+                <MenuItem value={"ALL"}>Select Stock Status</MenuItem>
                 <MenuItem value={"Y"}>In stock</MenuItem>
                 <MenuItem value={"N"}>Out of stock</MenuItem>
               </Select></Grid>}
