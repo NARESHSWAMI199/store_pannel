@@ -210,7 +210,7 @@ const viewMore = () =>{
                   </SvgIcon>
                 </Badge>
               </IconButton>
-              <span style={{fontSize: '12px'}}>Notifications</span>
+              {/* <span style={{fontSize: '12px'}}>Notifications</span> */}
             </Tooltip>
             <Avatar
               onClick={accountPopover.handleOpen}
