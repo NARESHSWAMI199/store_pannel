@@ -19,6 +19,7 @@ import { BasicSearch } from 'src/sections/basic-search';
 import { ReloadOutlined } from '@ant-design/icons';
 import { ArrowButtons } from 'src/layouts/arrow-button';
 import { ItemHeaders } from 'src/sections/items-header';
+import{ useRouter as useNextRouter } from 'next/router';
 
 const UseitemSlugs = (items) => {
     return useMemo(
@@ -40,9 +41,10 @@ const Page = () => {
     const [message, setMessage] = useState("")
     const [flag, setFlag] = useState("warning")
 
+    const nextRouter = useNextRouter()
+    const {stock} = nextRouter.query
+
     const router = useRouter()
-    const searchParams = useSearchParams();
-    const stock = searchParams.get('stock');
     const auth = useAuth();
     const paginations = auth.paginations;
     const [page, setPage] = useState(0);

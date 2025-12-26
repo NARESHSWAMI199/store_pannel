@@ -13,6 +13,7 @@ import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { ItemReviews } from 'src/sections/items/item-reviews';
 import { host, itemImage, toTitleCase } from 'src/utils/util';
 import CommentIcon from '@mui/icons-material/Comment';
+import { useRouter } from 'next/router';
 
 const now = new Date();
 
@@ -23,8 +24,8 @@ const Page = () => {
   const [flag, setFlag] = useState("warning")
 
   const auth = useAuth()
-  const searchParams = useSearchParams();
-  const slug = searchParams.get('slug');
+  const router = useRouter();
+  const {slug} = router.query
   const [item,setItem] = useState({})
   const itemCreatedAt =   format(!!item.createdAt ? item.createdAt : 0, 'dd/MM/yyyy')
   const [page, setPage] = useState(0);

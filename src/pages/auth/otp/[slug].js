@@ -1,4 +1,5 @@
 import { Alert, Box, Button, Grid, Snackbar, Stack, TextField, Typography } from '@mui/material'
+import { useRouter as useNextRouter } from 'next/router'
 import { useRouter, useSearchParams } from 'next/navigation'
 import bg from 'public/assets/bg2.png'
 import React, { useCallback, useState } from 'react'
@@ -14,8 +15,9 @@ const [message,setMessage] = useState("")
 const [flag,setFlag] = useState("success")
 const auth = useAuth();
 const router = useRouter();
-const searchParams = useSearchParams();
-const slug = searchParams.get('slug');
+
+const nextRouter = useNextRouter();
+const {slug} = nextRouter.query;
 
 
 const handleClose = useCallback(() => {

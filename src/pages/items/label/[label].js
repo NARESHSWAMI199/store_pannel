@@ -5,6 +5,7 @@ import axios from 'axios';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter as useNextRouter } from 'next/router';
 import { set } from 'nprogress';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAuth } from 'src/hooks/use-auth';
@@ -31,9 +32,9 @@ const Page = () => {
 
     /** snackbar varibatles */
 
-    const router = useRouter()
-    const searchParams = useSearchParams();
-    const label = searchParams.get('label');
+    const router = useRouter
+    const nextRouter = useNextRouter()
+    const {label} = nextRouter.query
 
     const [open, setOpen] = useState()
     const [message, setMessage] = useState("")

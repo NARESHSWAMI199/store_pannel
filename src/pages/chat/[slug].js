@@ -4,7 +4,7 @@ import { Client } from '@stomp/stompjs';
 import axios from 'axios';
 import { format } from 'date-fns';
 import TimeAgo from 'javascript-time-ago';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useAuth } from 'src/hooks/use-auth';
 import { host, userImage } from 'src/utils/util';
@@ -30,8 +30,10 @@ function Page() {
     const [client, setClient] = useState(null);
     const auth = useAuth();
     const user = auth.user
-    const searchParams = useSearchParams();
-    const slug = searchParams.get('slug');
+
+    const router = useRouter();
+    const { slug } = router.query;
+
     const [reciver,setReciver] = useState()
     const [userStatus,setUserStatus] = useState()
     const [disabled,setDisabled] = useState(true)
