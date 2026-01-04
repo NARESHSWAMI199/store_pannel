@@ -86,6 +86,7 @@ const Page = (props) => {
       await auth.signIn(email, password, "OTP");
       router.push('/');
     } catch (err) {
+      console.log("Error found : ", err);
       setMessage(err.message);
       setFlag("error");
       setOpen(true);
@@ -314,6 +315,31 @@ const Page = (props) => {
                       onChange={handleChange}
                       type="number"
                     /> : ""}
+
+                {open &&
+                    <Typography
+                    color="text.secondary"
+                    variant="body2"
+                    sx={{ mt: 2 }}
+                  >
+                    {message}
+                    </Typography>
+                  }
+                   <Typography
+                    color="text.secondary"
+                    variant="body2"
+                    sx={{ mt: 2 }}
+                  >
+                    Didn't receive otp?&nbsp;
+                   <Button
+                      variant='text'
+                      onClick={sendOtp}
+                      color='primary'
+                      sx={{}}
+                    > 
+                      Resend otp
+                    </Button>
+                  </Typography> 
                 </Stack>
                 {showOtpInput ?
                   <Button
@@ -331,10 +357,10 @@ const Page = (props) => {
         </Grid>
       </Grid>
       <Snackbar
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         open={open}
         onClose={handleClose}
-        key={'top' + 'right'}
+        key={'bottom' + 'right'}
       >
         <Alert
           onClose={handleClose}
