@@ -96,7 +96,9 @@ const Page = () => {
     }
     // Call API to add money to wallet
     console.log(`Adding ${values.amount} to wallet`);
-    window.location.href = host + "/cashfree/pay/"+ encodeURIComponent(auth.token.replace("Bearer ", ""))+"?amount="+values.amount;
+    const token = auth.token.split(" ")[1];
+    const encodedToken = encodeURIComponent(token);
+    window.location.href = host + "/cashfree/pay/" + encodedToken +"?amount="+values.amount;
     
   };
 

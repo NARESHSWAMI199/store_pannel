@@ -1,12 +1,13 @@
-import { Box, Button, Card, CardActions, CardContent, CardHeader, Divider, TextField, Unstable_Grid2 as Grid, Snackbar, Alert, Container, Stack } from "@mui/material";
+import { Box, Button, Card, CardActions, CardContent, CardHeader, Divider, TextField, Unstable_Grid2 as Grid, Snackbar, Alert, Container, Stack, InputAdornment } from "@mui/material";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import {host, rowsPerPageOptions} from 'src/utils/util';
 import { useAuth } from 'src/hooks/use-auth';
 import { WalletTransactions } from "src/sections/wallet/wallet-transaction";
 import { useSelection } from "src/hooks/use-selection";
+import CongratulationDialog from "src/components/CongratulationCard";
 
 const Page = () => {
   const [open, setOpen] = useState(false);
@@ -20,18 +21,16 @@ const Page = () => {
 
   const paginations = auth.paginations
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(
-    1
-    //paginations?.WALLETTRANSACTIONS?.rowsNumber
-  );
-  const itemsSelection = useSelection();
+  const [rowsPerPage, setRowsPerPage] = useState(paginations?.WALLETTRANSACTIONS?.rowsNumber);
   const [totalElements, setTotalElements] = useState(0)
-
+  const [CongratulationOpen, setCongratulationOpen] = useState(false);
+  const searchParams = useSearchParams();
+  const congratulation = searchParams.get('congratulation');
+  const [activePlan , setActivePlan] = useState(null);
 
    const [data, setData] = useState({
           pageNumber: page,
-          size: !!rowsPerPage ? parseInt(rowsPerPage) : 1
-          //rowsPerPageOptions[0]
+          size: !!rowsPerPage ? parseInt(rowsPerPage) : rowsPerPageOptions[0]
       })
         
 
@@ -41,6 +40,28 @@ const Page = () => {
       [event.target.name]: event.target.value
     }));
   }, []);
+
+
+  useEffect(() => {
+  if (!!congratulation) {
+    axios.defaults.headers = {
+      Authorization: auth.token
+    };
+    axios.get(`${host}/wholesale/plan/detail/${congratulation}`)
+      .then(res => {
+        const plan = res.data;
+      if (plan) {
+        setCongratulationOpen(true);
+        setActivePlan(plan);
+      }}
+    ).catch(err => {
+        console.log(err);
+        setCongratulationOpen(false);
+      });
+  } else {
+    setCongratulationOpen(false);
+  }
+}, [congratulation]);
 
 
  
@@ -61,7 +82,7 @@ const Page = () => {
         setFlag("error");
         setOpen(true);
       });
-  },[]);
+  },[data,rowsPerPage, page]);
 
 
 
@@ -120,8 +141,14 @@ const Page = () => {
                           onChange={handleChange}
                           required
                           value={values.amount}
+                          
                           InputLabelProps={{ shrink: true }}
                           type="number"
+                          InputProps={{
+                            startAdornment: <InputAdornment position="start">₹</InputAdornment>,
+                            max : 4,
+                          }}
+                          sx={{ mb: 3 }}
                         />
                       </Grid>
                     </Grid>
@@ -148,7 +175,6 @@ const Page = () => {
                       onRowsPerPageChange={handleRowsPerPageChange}
                       page={page}
                       rowsPerPage={rowsPerPage}
-                      selected={itemsSelection.selected}
                   />
                 </Box>
               </CardContent>
@@ -163,12 +189,15 @@ const Page = () => {
           </Snackbar>
         </Stack>
       </Container>
+
+      <CongratulationDialog open={CongratulationOpen} onClose={()=>setCongratulationOpen(false)} activePlan={activePlan} />
+
     </Box>
   );
 };
 
 Page.getLayout = (page) => (
-  <DashboardLayout>
+  <DashboardLayout walletUpdate={true}>
     {page}
   </DashboardLayout>
 );
