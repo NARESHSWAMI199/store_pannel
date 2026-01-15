@@ -62,7 +62,9 @@ function Pricing() {
                 setOpen(true)
               });
       } else {
-        window.location.href = host + "/cashfree/pay/" + slug + "/" + encodeURIComponent(auth.token.replace("Bearer ", ""))
+            const token = auth.token.split(" ")[1];
+            const encodedToken = encodeURIComponent(token);
+            window.location.href = host + "/cashfree/pay/" + slug + "/" +encodedToken;
       }
       }
     if (!!auth.token) {
@@ -79,13 +81,13 @@ function Pricing() {
   return (
     <>
       <Grid container sx={{ padding: 5 }}>
-        <Typography variant="h2" sx={{ fontWeight: 'bold', mb: 2, textAlign: 'center' }}>
-          Our Plans
+        <Typography variant="h3" sx={{ fontWeight: 'bold', mb: 2, textAlign: 'center' }}>
+          Plans
         </Typography>
         <Grid container spacing={2}>
           {plans.map((plan, i) => (
-            <Grid item key={i} xs={12} sm={4}>
-              <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <Grid item key={i} xs={12} sm={3}>
+              <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column',justifyContent : 'center', alignItems : 'center' }}>
                 <CardContent>
                   <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
                    {plan.name}

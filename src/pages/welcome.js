@@ -48,7 +48,9 @@ function Page() {
               setOpen(true)
             });
         } else {
-          window.location.href = host + "/cashfree/pay/" + slug + "/" + encodeURIComponent(auth.token.replace("Bearer ", ""))
+            const token = auth.token.split(" ")[1];
+            const encodedToken = encodeURIComponent(token);
+            window.location.href = host + "/cashfree/pay/" + slug + "/" +encodedToken;
         }
       }
       if (!!auth.token) {
