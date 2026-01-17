@@ -160,7 +160,7 @@ const CreateItem = () => {
                 price: formData.get("price"),
                 discount: formData.get("discount"),
                 inStock: formData.get("inStock") ? 'Y' : 'N',
-                label: formData.get("itemLabel"),
+                label: formData.get("label"),
                 description: formData.get("description"),
                 categoryId: formData.get("category"),
                 subCategoryId: formData.get("subcategory"),
@@ -402,7 +402,7 @@ const CreateItem = () => {
                                             <Select
                                                 labelId="itemLabel"
                                                 id="demo-simple-select"
-                                                name='itemLabel'
+                                                name='label'
                                                 value={""+values.label}
                                                 label="Label"
                                                 onChange={handleChange}

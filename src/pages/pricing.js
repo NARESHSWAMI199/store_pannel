@@ -96,7 +96,7 @@ function Pricing() {
                     {plan.months} Months Plan
                   </Typography>
                   <Typography variant="h4" sx={{ fontWeight: 'bold', mt: 2 }}>
-                    ₹ {plan.price}
+                    ₹ {plan.price - plan.discount}
                   </Typography>
                   <Button
                     variant="contained"

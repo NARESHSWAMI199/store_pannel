@@ -72,12 +72,12 @@ export const  PaginationSettings = (props) => {
                         {sortingLables.map((label,key)=>{
                             let fieldFor = label.pagination?.fieldFor;
                             return (
-                                <Box key={key} sx={{display  : 'flex', alignItems : 'center',justifyContent : 'center'}}>
+                                <Box key={key}>
                                         <Typography sx={{minWidth : 150}} variant="h6">
                                             {label.pagination?.fieldFor}
                                         </Typography>
 
-                                        <FormControl fullWidth sx={{mx : 3}}> 
+                                        <FormControl fullWidth > 
                                             <Select
                                                 labelId="demo-simple-select-label"
                                                 id="demo-simple-select"
