@@ -15,11 +15,11 @@ export const  PaginationSettings = (props) => {
         // get all pagination setting labels
         axios.get(host + "/wholesale/pagination/all")
         .then(res => {
-            let sortingLables = Object.values(res.data);  // there we get a object with key ; value where in value we all detail about keys and rowNumbers
+            let result = res.data;
+            let sortingLables = Object.keys(result);  // there we get a object with key ; value where in value we all detail about keys and rowNumbers
             setSortingLabels(sortingLables)
             sortingLables.map(label => {
-                let fieldFor = label.pagination?.fieldFor;
-                rowsPerPageObj[fieldFor] = label.rowsNumber
+                rowsPerPageObj[label] = result[label].rowsNumber
                 setRowPerPageObj({...rowsPerPageObj})
             })
         })
@@ -70,14 +70,14 @@ export const  PaginationSettings = (props) => {
                     >
                         <Stack spacing={1}>
                         {sortingLables.map((label,key)=>{
-                            let fieldFor = label.pagination?.fieldFor;
+                            let fieldFor = label;
                             return (
-                                <Box key={key}>
-                                        <Typography sx={{minWidth : 150}} variant="h6">
-                                            {label.pagination?.fieldFor}
+                                <Box key={key} sx={{display  : 'flex', alignItems : 'center',justifyContent : 'center'}}>
+                                        <Typography sx={{minWidth : 150}} variant="p">
+                                            {fieldFor}
                                         </Typography>
 
-                                        <FormControl fullWidth > 
+                                        <FormControl fullWidth sx={{mx : 3}}> 
                                             <Select
                                                 labelId="demo-simple-select-label"
                                                 id="demo-simple-select"
