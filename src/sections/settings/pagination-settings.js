@@ -8,6 +8,7 @@ import { useAuth } from 'src/hooks/use-auth';
 
 export const  PaginationSettings = (props) => {
     const [sortingLables, setSortingLabels] = useState([])
+    const [pagination, setPegination] = useState([])
     const [rowsPerPageObj , setRowPerPageObj] = useState({})
     const auth = useAuth()
 
@@ -16,10 +17,11 @@ export const  PaginationSettings = (props) => {
         axios.get(host + "/wholesale/pagination/all")
         .then(res => {
             let result = res.data;
-            let sortingLables = Object.keys(result);  // there we get a object with key ; value where in value we all detail about keys and rowNumbers
+            setPegination(result)
+            let sortingLables = Object.keys(result);  // there we get a object with keys
             setSortingLabels(sortingLables)
             sortingLables.map(label => {
-                rowsPerPageObj[label] = result[label].rowsNumber
+                rowsPerPageObj[label] = result[label].rowsNumber // seting  the rows numbers
                 setRowPerPageObj({...rowsPerPageObj})
             })
         })
@@ -30,10 +32,10 @@ export const  PaginationSettings = (props) => {
     },[])
 
     // TODO ; make sure call from auth-context or redux side 
-    const handleChange = (event,pagination) => {
+    const handleChange = (event,fieldFor) => {
         let rowsNumber = event.target.value;
         axios.post(host + "/wholesale/pagination/update", {
-            paginationId : pagination.id,
+            paginationId : pagination[fieldFor]?.id,
             rowsNumber : rowsNumber
         })
         .then(res => {
@@ -42,10 +44,10 @@ export const  PaginationSettings = (props) => {
         .catch(err => {
             props.showError(err);
         })
-        rowsPerPageObj[pagination?.fieldFor] = rowsNumber
+        rowsPerPageObj[fieldFor] = rowsNumber
         setRowPerPageObj({...rowsPerPageObj})
         // updated with redux also 
-        auth.updatePaginations(rowsNumber,pagination)
+        auth.updatePaginations(rowsNumber,pagination[fieldFor])
     };
 
   return (<>
@@ -81,8 +83,9 @@ export const  PaginationSettings = (props) => {
                                             <Select
                                                 labelId="demo-simple-select-label"
                                                 id="demo-simple-select"
+                                                name='pagination'
                                                 value={rowsPerPageObj[fieldFor]}
-                                                onChange={(e) => handleChange(e,label.pagination)}
+                                                onChange={(e) => handleChange(e,fieldFor)}
                                             >
                                               {rowsPerPageOptions.map((value , index)=>{
                                                     return <MenuItem key={index} value={value}>{value}</MenuItem>
