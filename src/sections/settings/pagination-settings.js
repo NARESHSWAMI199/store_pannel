@@ -35,7 +35,7 @@ export const  PaginationSettings = (props) => {
     const handleChange = (event,fieldFor) => {
         let rowsNumber = event.target.value;
         axios.post(host + "/wholesale/pagination/update", {
-            paginationId : pagination[fieldFor]?.id,
+            paginationId : pagination[fieldFor]?.paginationId,
             rowsNumber : rowsNumber
         })
         .then(res => {
