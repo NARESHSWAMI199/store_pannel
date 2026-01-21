@@ -1101,7 +1101,7 @@ function Page() {
                             <Typography 
                                 // Placeholder text
                                 variant='h5' 
-                                color={"#6c757d"} 
+                                color={"#7c8288"} 
                                 fontFamily={"sans-serif"}
                             >
                                 {"Let's live chat with your contacts"}

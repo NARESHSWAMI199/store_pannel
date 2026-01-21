@@ -6,8 +6,7 @@ import { AccountProfileDetails } from 'src/sections/account/account-profile-deta
 import axios from 'axios';
 import { useAuth } from 'src/hooks/use-auth';
 import { host } from 'src/utils/util';
-import { useEffect, useState } from 'react';
-import { ArrowButtons } from 'src/layouts/arrow-button';
+import { useRouter } from 'next/navigation';
 
 const Page = () => { 
 
@@ -23,6 +22,7 @@ const Page = () => {
       pageNumber : 0,
       size : 1000000
     })
+    const router = useRouter();
 
     const updateProfile = async (updatedUser) =>{
         axios.defaults.headers = {
