@@ -28,7 +28,7 @@ export const OverviewLatestItems = (props) => {
       <List>
         {products.map((product, index) => {
           const hasDivider = index < products.length - 1;
-          const ago = formatDistanceToNow(product.updatedAt);
+          const ago = product?.updatedAt ? formatDistanceToNow(product.updatedAt) : 'a while';
 
           return (
             <ListItem

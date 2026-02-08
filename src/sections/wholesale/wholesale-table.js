@@ -326,7 +326,6 @@ export const ItemsTable = (props) => {
                         titleAccess='delete' 
                         onClick={(e)=>{
                           setSlug(item.slug)
-                          setRowIndex(index)
                           setMessage("We are going to delete this item if you agree press agree otherwise press disagree.")
                           setAction("delete")
                           confirmBox()

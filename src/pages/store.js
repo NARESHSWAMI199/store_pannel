@@ -45,7 +45,9 @@ import ImageInput from "src/sections/image-input";
     const router = useRouter()
     const [categories,setItemCategories] = useState([])
     const [subcategories,setItemSubCategories] = useState([])
-    const [values,setValues] = useState({...store, ...user,
+    const [values,setValues] = useState({
+      ...store, 
+      ...user,
       street : store?.address?.street,
       zipCode : store?.address?.zipCode,
       storeEmail : store?.email,
@@ -66,8 +68,16 @@ import ImageInput from "src/sections/image-input";
         axios.get(host+"/wholesale/address/state")
         .then(res=>{
           setStateList(res.data)
-          let selectedState  = res.data.find(state=>state.id == store.address.state);
-          setValues((prevState)=>({...prevState, state : {label : selectedState?.stateName  || '', id : selectedState.id} }))
+          let selectedState  = res.data.find(state=>state.id == store.address?.state?.id);
+          setValues((prevState)=>(
+            {
+              ...prevState, 
+              state : {
+                label : selectedState?.stateName  || '', 
+                id : selectedState?.id
+              } 
+            })
+          )
         }
         )
         .catch(err=>{
@@ -90,8 +100,16 @@ import ImageInput from "src/sections/image-input";
       axios.get(host+`/wholesale/address/city/${values.state?.id}`)
       .then(res=>{
           setCityList(res.data);
-          let selectedCity = res.data.find(city=>city.id == store.address.city)
-          setValues((prevState)=>({...prevState, city : {label : selectedCity?.cityName || '', id : selectedCity?.id}}))
+          let selectedCity = res.data.find(city=>city.id == store.address?.city?.id)
+          setValues((prevState)=>(
+            {
+              ...prevState,
+              city : {
+                label : selectedCity?.cityName || '',
+                id : selectedCity?.id
+              }
+            }
+          ))
       })
       .catch(err=>{
         console.log(err)
@@ -354,10 +372,20 @@ import ImageInput from "src/sections/image-input";
                     <FormControl fullWidth>
                         <Autocomplete
                             disablePortal
-                            options={[...cityList.map((city)=>({label : city.cityName, id : city.id}))]}
+                            options={[...cityList.map((city)=>(
+                              {
+                                label : city.cityName,
+                                id : city.id
+                              })
+                            )]}
                             fullWidth
                             value={values.city?.label || ''}
-                            onChange={(e,value)=>setValues((prevState)=>({  ...prevState, city : value}))}
+                            onChange={(e,cityId)=>setValues((prevState)=>(
+                              {  
+                                ...prevState,
+                                city : cityId
+                              }
+                            ))}
                             renderInput={(params) => <TextField name="city" required {...params} label="City" />} >
                         </Autocomplete> 
                         </FormControl>
