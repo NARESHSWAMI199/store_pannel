@@ -9,7 +9,7 @@ const State = () => {
     })
 
     useEffect (()=>{
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
         console.log(token)
         setInitialState(token);
     },[])

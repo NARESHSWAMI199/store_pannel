@@ -42,7 +42,7 @@ export function authLogin(email, password) {
         password : password
     })
     .then (res => {
-        const token = res.data.res.token
+        const token = "Bearer " + res.data.res.token
         localStorage.setItem("token", token)
         localStorage.setItem("email",email)
         dispatch(authSuccess(token));
