@@ -168,7 +168,8 @@ import ImageInput from "src/sections/image-input";
               .then(res => {
                   const data = res.data;
                   setItemSubCategories(data)
-                  setValues((prevState)=>({...prevState, subcategory : {label : store?.storeSubCategory?.subcategory || '', id : store?.storeSubCategory?.id}}))
+                  let selectedSubcategory = data.filter(subcategory => subcategory.id == store?.storeSubCategory?.id)
+                  setValues((prevState)=>({...prevState, subcategory : {label : selectedSubcategory.subcategory || '', id : selectedSubcategory.id}}))
               })
               .catch(err => {
                   setMessage(!!err.response ? err.response.data.message : err.message)
@@ -400,7 +401,7 @@ import ImageInput from "src/sections/image-input";
                         <FormControl fullWidth>
                             <Autocomplete
                                 disablePortal
-                                options={[...categories.filter(category=> category.id !== 0).map((category)=>({label : category.category, id : category.id})),{label : 'Other', id : 0}]} 
+                                options={[...categories.filter(category=> category.id !== 0).map((category)=>({label : category.category, id : category.id}))]} 
                                 fullWidth
                                 name={"category"}
                                 value={values.category?.label || ''}
@@ -420,7 +421,7 @@ import ImageInput from "src/sections/image-input";
                             <Autocomplete
                                 disablePortal
                                 required
-                                options={[...subcategories.filter(subcategory => subcategory.id !== 0).map((subcategory)=>({label : subcategory?.subcategory, id : subcategory?.id})),{label : 'Other', id : 0}]}
+                                options={[...subcategories.filter(subcategory => subcategory.id !== 0).map((subcategory)=>({label : subcategory?.subcategory, id : subcategory?.id}))]}
                                 fullWidth
                                 name="subcategory"
                                 value={values.subcategory?.label || ''}
