@@ -40,6 +40,13 @@ const MultipleImageInput = (props) => {
     }
   },[props.avtars,props.totalImage])
 
+  
+  useEffect(() => {
+    if(props.remove === true){
+        setFileList([])
+        props.imagesRemoved()
+    }
+  },[props.remove])
 
     const onRemove = (file) => {
         setFileList((previousImages) => previousImages.filter(image=>{

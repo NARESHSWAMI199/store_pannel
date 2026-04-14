@@ -24,11 +24,7 @@ import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { host } from "src/utils/util";
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
-import ImageInput from "src/sections/image-input";
-import { margin } from "@mui/system";
-import { useRouter } from "next/navigation";
 import MultipleImageInput from "src/sections/multipleImage-input";
-
 
 
 const CreateItem = () =>{    
@@ -42,6 +38,7 @@ const [subcategories,setItemSubCategories] = useState([])
 const [newImages,setNewImages] = useState([])
 /** This is a string becaouse don't get actual files again */
 const [previousImages,setPreviousImages] = useState('')
+const [removeImages, setRemoveImage] = useState(false)
 
 
 const handleChange = useCallback(
@@ -144,6 +141,7 @@ useEffect(() => {
       setFlag("success")
       form.reset();
       reset()
+      setRemoveImage(true)
       setOpen(true)
     }).catch(err=>{
         setMessage(!!err.response  ? err.response.data.message : err.message)
@@ -156,6 +154,10 @@ useEffect(() => {
   const handleClose = useCallback(()=>{
         setOpen(false)
   })
+
+  const imagesRemoved = () => {
+    setRemoveImage(false) // setting false after image removed
+  }
    
 
 const reset = () =>{
@@ -215,7 +217,7 @@ return ( <>
         <Box sx={{
             my: 2
         }}>
-             <MultipleImageInput totalImage={5} onChange={onSubmit} />
+             <MultipleImageInput remove={removeImages} totalImage={5} onChange={onSubmit} imagesRemoved={imagesRemoved}/>
         </Box>
 
 
@@ -254,6 +256,7 @@ return ( <>
                 onChange={handleChange}
                 required={true}
                 type="number"
+                inputProps={{min :10}}
                 value={values.itemPrice}
                 InputLabelProps={{shrink: true}}
               />
@@ -274,6 +277,7 @@ return ( <>
                 onChange={handleChange}
                 required={true}
                 type="number"
+                inputProps={{min :0}}
                 value={values.itemDiscount}
               />
 
@@ -303,7 +307,7 @@ return ( <>
                         return ( <MenuItem key={i} value={categroyObj.id}>{categroyObj.category}</MenuItem>
                         )})
                     }
-                     <MenuItem value={0}>{"Other"}</MenuItem>
+                     {/* <MenuItem value={0}>{"Other"}</MenuItem> */}
                     </Select>
                 </FormControl>
             </Grid>
@@ -328,7 +332,7 @@ return ( <>
                         return ( <MenuItem key={i} value={subcategroyObj.id}>{subcategroyObj.subcategory}</MenuItem>
                         )})
                     }
-                     <MenuItem value={0}>{"Other"}</MenuItem>
+                     {/* <MenuItem value={0}>{"Other"}</MenuItem> */}
                     </Select>
                 </FormControl>
             </Grid>
