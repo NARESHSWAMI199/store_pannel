@@ -292,6 +292,7 @@ const CreateItem = () => {
                                             required={true}
                                             type="number"
                                             value={values.price}
+                                            inputProps={{min : 10}}
                                             InputLabelProps={{shrink:true}}
                                         />
 
@@ -311,6 +312,7 @@ const CreateItem = () => {
                                             onChange={handleChange}
                                             required={true}
                                             type="number"
+                                            inputProps={{min : 0}}
                                             value={values.discount}
                                             InputLabelProps={{ shrink: true }}
                                         />
@@ -342,7 +344,7 @@ const CreateItem = () => {
                                                 return ( <MenuItem key={i} value={categroyObj.id}>{categroyObj.category}</MenuItem>
                                                 )})
                                             }
-                                             <MenuItem value={0}>{"Other"}</MenuItem>
+                                             {/* <MenuItem value={0}>{"Other"}</MenuItem> */}
                                             </Select>
                                         </FormControl>
                                     </Grid>
@@ -368,7 +370,7 @@ const CreateItem = () => {
                                                 return ( <MenuItem key={i} value={subcategroyObj.id}>{subcategroyObj.subcategory}</MenuItem>
                                                 )})
                                             }
-                                             <MenuItem value={0}>{"Other"}</MenuItem>
+                                             {/* <MenuItem value={0}>{"Other"}</MenuItem> */}
                                             </Select>
                                         </FormControl>
                                     </Grid>
