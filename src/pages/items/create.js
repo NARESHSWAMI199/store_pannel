@@ -15,7 +15,8 @@ import { Box,
     Checkbox,
     Alert,
     Container,
-    Stack
+    Stack,
+    Autocomplete
 } from "@mui/material";
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
@@ -76,6 +77,8 @@ const handleChange = useCallback(
             .then(res => {
                 const data = res.data;
                 setItemCategories(data)
+                let selectedCategory = data.find(category => category?.id == values?.category?.id)
+                setValues(prev => ({...prev , category : {label : selectedCategory?.category , id :  selectedCategory?.id}}))
             })
             .catch(err => {
                 setMessage(!!err.response ? err.response.data.message : err.message)
@@ -93,10 +96,12 @@ useEffect(() => {
       axios.defaults.headers = {
           Authorization: auth.token
       }
-      await axios.get(host + "/wholesale/item/subcategory/"+values.category)
+      await axios.get(host + "/wholesale/item/subcategory/"+values.category?.id)
           .then(res => {
               const data = res.data;
               setItemSubCategories(data)
+              let selectedSubcategory = data.find(subcategory => subcategory?.id == values?.subcategory?.id)
+              setValues(prev => ({...prev , subcategory : {label : selectedSubcategory?.subcategory , id :  selectedSubcategory?.id}}))
           })
           .catch(err => {
               setMessage(!!err.response ? err.response.data.message : err.message)
@@ -104,7 +109,7 @@ useEffect(() => {
               setOpen(true)
           })
   }
-  if(values.category !=undefined){
+  if(values.category?.id !=undefined){
       getSubcategory();
   }
 }, [values.category]) 
@@ -123,8 +128,8 @@ useEffect(() => {
         label: formData.get("itemLabel"),
         description: formData.get("description"),
         wholesaleSlug : auth.store.slug,
-        categoryId: formData.get("category"),
-        subCategoryId: formData.get("subcategory"),
+        categoryId: values?.category?.id,
+        subCategoryId: values?.subcategory?.id,
         capacity : !!values.unit && values.unit != 'null' ? formData.get('capacity') : 0 ,
         // itemImage : values.itemImage
         previousItemImages : previousImages,
@@ -285,58 +290,44 @@ return ( <>
 
 
 
-
-
-              {/* Category */}
-              <Grid
+            {/* Category */}
+            <Grid
                 xs={12}
                 md={6}
+                item
             >
                 <FormControl fullWidth>
-                    <InputLabel  style={{background : 'white'}} id="itemLabel">Category</InputLabel>
-                    <Select
-                        labelId="itemLabel"
-                        id="category"
-                        name='category'
-                        value={values.category !=undefined ? ""+values.category : ""}
-                        onChange={handleChange}
-                        required
-                    >
-                    {categories.map((categroyObj , i) => {
-                        if(categroyObj.id !=0)
-                        return ( <MenuItem key={i} value={categroyObj.id}>{categroyObj.category}</MenuItem>
-                        )})
-                    }
-                     {/* <MenuItem value={0}>{"Other"}</MenuItem> */}
-                    </Select>
+                    <Autocomplete
+                        disablePortal
+                        options={[...categories.filter(category=> category.id !== 0).map((category)=>({label : category.category, id : category.id}))]} 
+                        fullWidth
+                        name={"category"}
+                        value={values.category?.label || ''}
+                        onChange={(e,value)=>setValues((prevState)=>({...prevState, category : value    }))}
+                        renderInput={(params) => <TextField required {...params} label="Categeory" />} >
+                    </Autocomplete> 
                 </FormControl>
             </Grid>
 
-               {/* Subcategory */}
-              <Grid
+            {/* Subcategory */}
+            <Grid
                 xs={12}
                 md={6}
+                item
             >
                 <FormControl fullWidth>
-                    <InputLabel  style={{background : 'white'}} id="itemLabel">Subcategory</InputLabel>
-                    <Select
-                        labelId="itemLabel"
-                        id="subcategory"
-                        name='subcategory'
-                        value={values.subcategory !=undefined ? ""+values.subcategory : ""}
-                        onChange={handleChange}
+                    <Autocomplete
+                        disablePortal
                         required
-                    >
-                    {subcategories.map((subcategroyObj , i) => {
-                        if(subcategroyObj.id !=0)
-                        return ( <MenuItem key={i} value={subcategroyObj.id}>{subcategroyObj.subcategory}</MenuItem>
-                        )})
-                    }
-                     {/* <MenuItem value={0}>{"Other"}</MenuItem> */}
-                    </Select>
+                        options={[...subcategories.filter(subcategory => subcategory.id !== 0).map((subcategory)=>({label : subcategory?.subcategory, id : subcategory?.id}))]}
+                        fullWidth
+                        name="subcategory"
+                        value={values.subcategory?.label || ''}
+                        onChange={(e,value)=>setValues((prevState)=>({  ...prevState, subcategory : value}))}
+                        renderInput={(params) => <TextField  required {...params} label="Subcategory" />} >
+                    </Autocomplete> 
                 </FormControl>
             </Grid>
-
 
 
                                         

@@ -1,6 +1,7 @@
 import RefreshIcon from '@mui/icons-material/Refresh';
 import {
     Alert,
+    Autocomplete,
     Box,
     Button,
     Card,
@@ -53,8 +54,8 @@ const CreateItem = () => {
                     const data = res.data.res;
                     setValues({
                         ...data,
-                        category : data.itemCategory.id,
-                        subcategory : data.itemSubCategory.id,
+                        category : {label : data.itemCategory.category , id : data.itemCategory.id},
+                        subcategory : {label : data.itemSubCategory.subcategory, id : data.itemSubCategory.id},
                         unit :  data.itemSubCategory.unit
                     })
 
@@ -90,6 +91,8 @@ const CreateItem = () => {
                 .then(res => {
                     const data = res.data;
                     setItemCategories(data)
+                    let selectedCategory = data.find(category => category?.id == values?.category?.id)
+                    setValues(prev => ({...prev , category : {label : selectedCategory?.category , id :  selectedCategory?.id}}))
                 })
                 .catch(err => {
                     setMessage(!!err.response ? err.response.data.message : err.message)
@@ -97,6 +100,7 @@ const CreateItem = () => {
                     setOpen(true)
                 })
         }
+      console.log("======= CATEGORY ;  ", JSON.stringify(values.category ))
         getData();
 
     }, [])
@@ -107,10 +111,12 @@ const CreateItem = () => {
             axios.defaults.headers = {
                 Authorization: auth.token
             }
-            await axios.get(host + "/wholesale/item/subcategory/"+values.category)
+            await axios.get(host + "/wholesale/item/subcategory/"+values.category.id)
                 .then(res => {
                     const data = res.data;
+                    let selectedSubcategory = data.find(subcategory => subcategory?.id == values?.subcategory?.id)
                     setItemSubCategories(data)
+                    setValues(prev => ({...prev , subcategory : {label : selectedSubcategory?.subcategory , id :  selectedSubcategory?.id}}))
                 })
                 .catch(err => {
                     setMessage(!!err.response ? err.response.data.message : err.message)
@@ -118,7 +124,10 @@ const CreateItem = () => {
                     setOpen(true)
                 })
         }
-        if(values.category !=undefined){
+
+        console.log("======= SUBCATEGORY ;  ", JSON.stringify(values.category ))
+
+        if(values?.category?.id != undefined){
             getSubcategory();
         }
     }, [values.category])
@@ -126,24 +135,10 @@ const CreateItem = () => {
 
     const handleChange = useCallback(
         (event) => {
-            if ([event.target.name] == 'subcategory'){
-                for(let subcategory of subcategories){
-                    console.log(subcategory.id + " "+event.target.value )
-                    if(subcategory.id ==  event.target.value){
-                        setValues((prevState) => ({
-                            ...prevState,
-                            unit : subcategory.unit,
-                            [event.target.name]: event.target.value
-                        }));
-                        break
-                    }
-                }
-            }else{
-                setValues((prevState) => ({
-                    ...prevState,
-                    [event.target.name]: event.target.value
-                }));
-            }
+            setValues((prevState) => ({
+                ...prevState,
+                [event.target.name]: event.target.value
+            }));
         },
         [subcategories]
     );
@@ -162,8 +157,8 @@ const CreateItem = () => {
                 inStock: formData.get("inStock") ? 'Y' : 'N',
                 label: formData.get("label"),
                 description: formData.get("description"),
-                categoryId: formData.get("category"),
-                subCategoryId: formData.get("subcategory"),
+                categoryId: values?.category?.id,
+                subCategoryId: values?.subcategory?.id,
                 capacity : !!values.unit && values.unit != 'null' ? formData.get('capacity') : 0 ,
                 previousItemImages : previousImages,
                 newItemImages : newImages
@@ -321,57 +316,42 @@ const CreateItem = () => {
 
 
 
-                               
-
                                     {/* Category */}
                                     <Grid
                                         xs={12}
                                         md={6}
+                                        item
                                     >
                                         <FormControl fullWidth>
-                                            <InputLabel id="itemLabel">Category</InputLabel>
-                                            <Select
-                                                labelId="itemLabel"
-                                                id="category"
-                                                name='category'
-                                                value={""+values.category}
-                                                label="Category"
-                                                onChange={handleChange}
-                                                required
-                                            >
-                                            {categories.map((categroyObj , i) => {
-                                                if(categroyObj.id !=0)
-                                                return ( <MenuItem key={i} value={categroyObj.id}>{categroyObj.category}</MenuItem>
-                                                )})
-                                            }
-                                             {/* <MenuItem value={0}>{"Other"}</MenuItem> */}
-                                            </Select>
+                                            <Autocomplete
+                                                disablePortal
+                                                options={[...categories.filter(category=> category.id !== 0).map((category)=>({label : category.category, id : category.id}))]} 
+                                                fullWidth
+                                                name={"category"}
+                                                value={values.category?.label || ''}
+                                                onChange={(e,value)=>setValues((prevState)=>({...prevState, category : value    }))}
+                                                renderInput={(params) => <TextField required {...params} label="Categeory" />} >
+                                            </Autocomplete> 
                                         </FormControl>
                                     </Grid>
 
-                                         {/* Subcategory */}
-                                         <Grid
+                                    {/* Subcategory */}
+                                    <Grid
                                         xs={12}
                                         md={6}
+                                        item
                                     >
                                         <FormControl fullWidth>
-                                            <InputLabel id="itemLabel">Subcategory</InputLabel>
-                                            <Select
-                                                labelId="itemLabel"
-                                                id="subcategory"
-                                                name='subcategory'
-                                                value={""+values.subcategory}
-                                                label="Subcategory"
-                                                onChange={handleChange}
+                                            <Autocomplete
+                                                disablePortal
                                                 required
-                                            >
-                                            {subcategories.map((subcategroyObj , i) => {
-                                                if(subcategroyObj.id !=0)
-                                                return ( <MenuItem key={i} value={subcategroyObj.id}>{subcategroyObj.subcategory}</MenuItem>
-                                                )})
-                                            }
-                                             {/* <MenuItem value={0}>{"Other"}</MenuItem> */}
-                                            </Select>
+                                                options={[...subcategories.filter(subcategory => subcategory.id !== 0).map((subcategory)=>({label : subcategory?.subcategory, id : subcategory?.id}))]}
+                                                fullWidth
+                                                name="subcategory"
+                                                value={values.subcategory?.label || ''}
+                                                onChange={(e,value)=>setValues((prevState)=>({  ...prevState, subcategory : value}))}
+                                                renderInput={(params) => <TextField  required {...params} label="Subcategory" />} >
+                                            </Autocomplete> 
                                         </FormControl>
                                     </Grid>
 
