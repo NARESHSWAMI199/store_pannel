@@ -7,7 +7,7 @@ import axios from 'axios';
 import { useAuth } from 'src/hooks/use-auth';
 import { host } from 'src/utils/util';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 const Page = () => { 
 
@@ -39,7 +39,7 @@ const Page = () => {
           setFlag("success")
           setContent(data)
           try {
-            sessionStorage.setItem("user", JSON.stringify(data))
+            handleUpdateUserProfile(data);
           }catch{
             sessionStorage.setItem("isAuthenticated", "false")
           }
@@ -61,6 +61,14 @@ const Page = () => {
       const handleClose = () => {
         setOpen(false)
       };
+
+
+      const handleUpdateUserProfile = useCallback((data) => {
+        sessionStorage.setItem("user", JSON.stringify(data))
+        auth.dispatchSessionDetails();
+      },[auth])
+
+      
 
 
     return (<>

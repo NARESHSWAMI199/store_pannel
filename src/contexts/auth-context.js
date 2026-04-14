@@ -248,6 +248,18 @@ export const AuthProvider = (props) => {
   };
 
 
+    const dispatchSessionDetails = async () => {
+      let user = sessionStorage.getItem("user");
+      let store  = sessionStorage.getItem("store");
+      dispatch({
+        type: HANDLERS.UPDATE_USER,
+        payload : !!user ? JSON.parse(user) : user,
+        store :!!store ? JSON.parse(store) : store
+      });
+  };
+
+
+
 
 
   const signUp = async (name,email,contact,password) => {
@@ -358,7 +370,8 @@ const updatePaginations = (rowsNumber,pagination) =>{
         signOut,
         updateUserDetail,
         validateOtp,
-        updatePaginations
+        updatePaginations,
+        dispatchSessionDetails
       }}
     >
       {children}
