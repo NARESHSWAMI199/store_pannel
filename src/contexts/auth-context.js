@@ -314,7 +314,7 @@ export const AuthProvider = (props) => {
       slug : slug
     })
     .then(res => {
-      const token = res.data.token
+      const token = "Bearer "+res.data.token
       const user = res.data.user
       const store = res.data.store
       const paginations = res.data.paginations

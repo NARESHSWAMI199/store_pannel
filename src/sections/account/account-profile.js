@@ -20,7 +20,7 @@ import { Image } from 'antd';
 
 export const AccountProfile = (props) => {
   const user = props.user
-  const createdAt = (!!user && !!user.createdAt) ?  format(user.createdAt, 'dd/MM/yyyy') : "";
+  const updatedAt = (!!user && !!user.updatedAt) ?  format(user.updatedAt, 'dd/MM/yyyy') : "";
   const auth = useAuth();
   const [message , setMessage] = useState("")
   const [flag , setFlag] = useState("info")
@@ -119,7 +119,7 @@ export const AccountProfile = (props) => {
                   color="text.secondary"
                   variant="body2"
                 >
-                  Last updated at : {createdAt}
+                  Last updated at : {updatedAt}
                 </Typography>
               </Box>
             </CardContent>
