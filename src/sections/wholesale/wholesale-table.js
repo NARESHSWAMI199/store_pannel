@@ -99,7 +99,7 @@ export const ItemsTable = (props) => {
             <TableHead>
               <TableRow>
                 <TableCell padding="checkbox">
-                  <Checkbox
+                  {/* <Checkbox
                     checked={selectedAll}
                     indeterminate={selectedSome}
                     onChange={(event) => {
@@ -109,7 +109,7 @@ export const ItemsTable = (props) => {
                         onDeselectAll?.();
                       }
                     }}
-                  />
+                  /> */}
                 </TableCell>
                 <TableCell>
                   Name
@@ -163,7 +163,7 @@ export const ItemsTable = (props) => {
                     selected={isSelected}
                   >
                     <TableCell padding="checkbox">
-                      <Checkbox
+                      {/* <Checkbox
                         checked={isSelected}
                         onChange={(event) => {
                           if (event.target.checked) {
@@ -172,7 +172,7 @@ export const ItemsTable = (props) => {
                             onDeselectOne?.(item.slug);
                           }
                         }}
-                      />
+                      /> */}
                     </TableCell>
                     <TableCell>
                       <Stack
@@ -187,9 +187,13 @@ export const ItemsTable = (props) => {
                         style={{borderRadius : "50%" , width:"50px", height : "50px" }}
                       />  
                       : 
-                      <Avatar src={itemImage+item.slug+"/"+item.avtars?.split(',')[0]} >
+                      <Image  style={{
+                        borderRadius : '50%',
+                        width : 40,
+                        height : 40
+                      }} src={itemImage+item.slug+"/"+item.avtars?.split(',')[0]} >
                         {getInitials(item.name)}
-                      </Avatar>
+                      </Image>
                     }
                    
                       <Typography variant="subtitle2">

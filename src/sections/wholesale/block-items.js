@@ -85,7 +85,7 @@ export const BlockedItems = (props) => {
             <TableHead>
               <TableRow>
                 <TableCell padding="checkbox">
-                  <Checkbox
+                  {/* <Checkbox
                     checked={selectedAll}
                     indeterminate={selectedSome}
                     onChange={(event) => {
@@ -95,7 +95,7 @@ export const BlockedItems = (props) => {
                         onDeselectAll?.();
                       }
                     }}
-                  />
+                  /> */}
                 </TableCell>
                 <TableCell>
                   Name
@@ -149,7 +149,7 @@ export const BlockedItems = (props) => {
                     selected={isSelected}
                   >
                     <TableCell padding="checkbox">
-                      <Checkbox
+                      {/* <Checkbox
                         checked={isSelected}
                         onChange={(event) => {
                           if (event.target.checked) {
@@ -158,7 +158,7 @@ export const BlockedItems = (props) => {
                             onDeselectOne?.(item.slug);
                           }
                         }}
-                      />
+                      /> */}
                     </TableCell>
                     <TableCell>
                       <Stack
@@ -173,9 +173,13 @@ export const BlockedItems = (props) => {
                         style={{borderRadius : "50%" , width:"50px", height : "50px" }}
                       />  
                       : 
-                      <Avatar src={itemImage+item.slug+"/"+item.avtars?.split(',')[0]} >
+                      <Image  style={{
+                        borderRadius : '50%',
+                        width : 40,
+                        height : 40
+                      }} src={itemImage+item.slug+"/"+item.avtars?.split(',')[0]} >
                         {getInitials(item.name)}
-                      </Avatar>
+                      </Image>
                     }
                    
                       <Typography variant="subtitle2">
@@ -295,6 +299,27 @@ export const BlockedItems = (props) => {
 
                 );
               })}
+
+
+              {items.length === 0  && 
+                <TableRow>
+                  <TableCell
+                    colSpan={11}
+                    sx={{
+                      textAlign: 'center',
+                      py: 3
+                    }}
+                  >
+                    <Typography
+                      color="text.secondary"
+                      variant="body1"
+                    >
+                      No items found
+                    </Typography>
+                  </TableCell>
+                </TableRow>
+              }
+
             </TableBody>
           </Table>
         </Box>
