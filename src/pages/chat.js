@@ -858,12 +858,6 @@ function Page() {
                                     alignItems: 'center' 
                                 }}
                             >
-                                <EmojiPicker 
-                                    // Emoji picker for adding emojis to messages
-                                    open={openEmojis} 
-                                    width={'100%'} 
-                                    onEmojiClick={(emojiObj) => setChatMessage(prev => `${prev || ''} ${emojiObj.emoji}`)} 
-                                />
                                 <Box 
                                     // Container for message input and image previews
                                     sx={{ 
@@ -1043,6 +1037,25 @@ function Page() {
             />
         </Box>
     }
+    <Box 
+        // Emoji picker positioned above input to prevent overlap
+        sx={{ 
+            position: 'absolute', 
+            bottom: '100%',
+            left: 0,
+            right: 0,
+            display: openEmojis ? 'block' : 'none',
+            zIndex: 1000,
+            width: '100%'
+        }}
+    >
+        <EmojiPicker 
+            // Emoji picker for adding emojis to messages
+            open={openEmojis} 
+            width={'100%'} 
+            onEmojiClick={(emojiObj) => setChatMessage(prev => `${prev || ''} ${emojiObj.emoji}`)} 
+        />
+    </Box>
 </Box>
                         </Box>
                             </Box>
