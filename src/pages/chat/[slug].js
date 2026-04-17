@@ -7,7 +7,7 @@ import TimeAgo from 'javascript-time-ago';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useAuth } from 'src/hooks/use-auth';
-import { host, userImage } from 'src/utils/util';
+import { host, userImage, wbhost } from 'src/utils/util';
 
 import en from 'javascript-time-ago/locale/en';
 import ru from 'javascript-time-ago/locale/ru';
@@ -119,7 +119,7 @@ function Page() {
         if(slug == undefined) return;
         document.cookie = `X-Username=${user?.slug}_${slug}; path=/`
         const client = new Client({
-            brokerURL: 'ws://localhost:8080/chat', // Replace with your WebSocket server URL
+            brokerURL: `${wbhost}/ws/chat`, // Replace with your WebSocket server URL
             reconnectDelay: 5000, 
             debug: function (str) {
                 console.log(str);
@@ -128,7 +128,7 @@ function Page() {
         client.onConnect = (frame) => {
             console.log('Connected: ' + frame);
             client.publish({
-                destination: `/app/chat/connect/${user?.slug}`,
+                destination: `/app/ws/chat/connect/${user?.slug}`,
                 body: JSON.stringify({ slug: user?.slug }),
             });
 
@@ -178,7 +178,7 @@ function Page() {
     useEffect(()=>{
         if(slug == undefined && client && client.connected) return;
         if(client && client.connected){
-            client.publish({ destination: `/app/chat/${slug}/userStatus`});
+            client.publish({ destination: `/app/ws/chat/${slug}/userStatus`});
         }
     },[slug,client,userStatus])
 
@@ -186,7 +186,7 @@ function Page() {
         client.activate();
         if (client && client.connected) {
             console.log(client)
-        client.publish({ destination: `/app/chat/private/${slug}_${user?.slug}`, body:  JSON.stringify(message)});
+        client.publish({ destination: `/app/ws/chat/private/${slug}_${user?.slug}`, body:  JSON.stringify(message)});
 
         } else {
         console.warn('Client not connected, unable to send message.');

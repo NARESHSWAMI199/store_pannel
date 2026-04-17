@@ -167,7 +167,7 @@ function Page() {
     // Effect to subscribe to "seen" messages when receiver changes
     useEffect(() => {
         if (client && client.connected && receiver) {
-            client.publish({ destination: `/app/chats/was-seen/${receiver.slug}` });
+            client.publish({ destination: `/app/ws/chats/was-seen/${receiver.slug}` });
             subscribeToSeenMessages(client, user, setMessages);
         }
     }, [receiver, newMessage]);
@@ -1231,7 +1231,7 @@ export default Page;
 // Function to create WebSocket client
 const createWebSocketClient = (user, setNewMessage, setMessages,setPastMessages, setChatUsers, setIsPlaying, showNotification,auth) => {
     const wsClient = new Client({
-        brokerURL: `${wbhost}/chat?${user?.slug}`,
+        brokerURL: `${wbhost}/ws/chat?${user?.slug}`,
         debug: function (str) {
             console.log(str);
         },
@@ -1239,7 +1239,7 @@ const createWebSocketClient = (user, setNewMessage, setMessages,setPastMessages,
 
     wsClient.onConnect = (frame) => {
         console.log('Connected: ' + frame);
-        wsClient.publish({ destination: `/app/chat/connect/${user?.slug}` });
+        wsClient.publish({ destination: `/app/ws/chat/connect/${user?.slug}` });
         wsClient.subscribe(`/user/${user?.slug}/queue/private`, async (data) => {
 
             // Setting the message to the server
@@ -1456,7 +1456,7 @@ const sendMessage = (client,token,messageBody,receiver,setSnackbarMessage,setSna
                     setSnackbarOpen(true);
                 });
             } else {
-                client.publish({ destination: `/app/chat/private/${messageBody.receiver}`, body: JSON.stringify(messageBody) });
+                client.publish({ destination: `/app/ws/chat/private/${messageBody.receiver}`, body: JSON.stringify(messageBody) });
             }
         } else {
             console.warn('Client not connected, unable to send message.');
