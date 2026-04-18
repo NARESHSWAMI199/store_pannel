@@ -8,6 +8,7 @@ import { useAuth } from 'src/hooks/use-auth';
 import { WalletTransactions } from "src/sections/wallet/wallet-transaction";
 import { useSelection } from "src/hooks/use-selection";
 import CongratulationDialog from "src/components/CongratulationCard";
+import { apiRequest } from 'src/utils/api-request';
 
 const Page = () => {
   const [open, setOpen] = useState(false);
@@ -44,10 +45,7 @@ const Page = () => {
 
   useEffect(() => {
   if (!!congratulation) {
-    axios.defaults.headers = {
-      Authorization: auth.token
-    };
-    axios.get(`${host}/wholesale/plan/detail/${congratulation}`)
+    apiRequest.get(`/wholesale/plan/detail/${congratulation}`)
       .then(res => {
         const plan = res.data;
       if (plan) {
@@ -67,10 +65,7 @@ const Page = () => {
  
 
   useEffect(() => {
-    axios.defaults.headers = {
-      Authorization: auth.token
-    } 
-    axios.post(host + "/wholesale/wallet/transactions/all",data)
+    apiRequest.post("/wholesale/wallet/transactions/all",data)
       .then(res => {
         const data = res.data.content;
         setTransactions(data);

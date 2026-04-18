@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from 'src/hooks/use-auth';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { host, ruppeeIcon } from 'src/utils/util';
+import { apiRequest } from 'src/utils/api-request';
 import {ActivatedPlans} from 'src/sections/plans/activated-plans';
 import {FuturePlans} from 'src/sections/plans/future-plans';
 import EventIcon from '@mui/icons-material/Event';
@@ -54,11 +55,8 @@ const [value, setValue] = useState(0);
 const [reload, setReload] = useState(false);
 
 useEffect(() => {
-  axios.defaults.headers = {
-    Authorization: auth.token,
-  };
-  axios
-    .post(`${host}/wholesale/plan/my-plans`, {})
+  apiRequest
+    .post(`/wholesale/plan/my-plans`, {})
     .then((res) => {
       const data = res.data.content;
       setUserPlans(data);
@@ -79,11 +77,8 @@ useEffect(() => {
 
 
 useEffect(() => {
-  axios.defaults.headers = {
-    Authorization: auth.token,
-  };
-  axios
-    .post(`${host}/future/plans/`, {})
+  apiRequest
+    .post(`/future/plans/`, {})
     .then((res) => {
       const data = res.data.content;
       setFuturePlans(data);
@@ -114,12 +109,9 @@ const handleClose = () => {
 
 //** for payment redirection */
 const redirectForPayment = (slug, pg) => {
-  axios.defaults.headers = {
-    Authorization: auth.token
-  }
   const redirect = async () => {
     if (pg === "phonepe") {
-      await axios.get(host + "/pg/pay/" + slug)
+      await apiRequest.get("/pg/pay/" + slug)
         .then(res => {
           window.open(res.data.url);
         })
@@ -153,10 +145,7 @@ const handleChange = (event,newValue) => {
 const onActivate = (plan) =>{
   if (!plan) return
   
-  axios.defaults.headers = {
-    Authorization: auth.token
-  }
-  axios.post(host + "/future/plans/activate", {
+  apiRequest.post("/future/plans/activate", {
     slug: plan?.slug,
   })
     .then(res => {
@@ -174,10 +163,7 @@ const onActivate = (plan) =>{
 }
 
 const activateCurrentPlan = (planSlug) => {
-  axios.defaults.headers = {
-    Authorization: auth.token
-  }
-  axios.get(`${host}/wholesale/plan/activate/${planSlug}`).then(res => {
+  apiRequest.get(`/wholesale/plan/activate/${planSlug}`).then(res => {
     setMessage(res.data.message);
     setFlag("success");
     setOpen(true);

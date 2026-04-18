@@ -13,6 +13,7 @@ import DialogFormForExcelImport from 'src/layouts/excel/import-excel';
 import { BasicSearch } from 'src/sections/basic-search';
 import { BlockedItems } from 'src/sections/wholesale/block-items';
 import { host, toTitleCase } from 'src/utils/util';
+import { apiRequest } from 'src/utils/api-request';
 
 const now = new Date();
 
@@ -59,10 +60,7 @@ const Page = () => {
 
     useEffect(() => {
         const getData = async () => {
-            axios.defaults.headers = {
-                Authorization: auth.token
-            }
-            await axios.post(host + "/wholesale/item/all", data)
+            await apiRequest.post("/wholesale/item/all", data)
                 .then(res => {
                     const data = res.data.content;
                     setTotalElements(res.data.totalElements)
@@ -72,11 +70,6 @@ const Page = () => {
                     setMessage(!!err.response ? err.response.data.message : err.message)
                     setFlag("error")
                     setOpen(true)
-                    let status = (!!err.response ? err.response.status : 0);
-                    if (status == 401) {
-                      auth.signOut();
-                      router.push("/auth/login")
-                    }
                 })
         }
         getData();
@@ -89,10 +82,7 @@ const Page = () => {
         let success = false
         let form = e.target;
         var formData = new FormData(form);
-        axios.defaults.headers = {
-            Authorization: auth.token
-        }
-        await axios.post(host + '/admin/item/importExcel/' + wholesale?.slug, formData, {
+        await apiRequest.post('/admin/item/importExcel/' + wholesale?.slug, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }

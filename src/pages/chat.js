@@ -1330,15 +1330,13 @@ const subscribeToSeenMessages = (client, user, setMessages) => {
 
 // Function to fetch past messages
 const fetchPastMessages = (receiver, setPastMessages,token,setMessages,router,setSnackbarMessage,setSnackbarOpen) => {
-    axios.defaults.headers = { Authorization: token };
-    axios.post(`${host}/chats/all`, { receiver: receiver.slug })
+    apiRequest.post(`/chats/all`, { receiver: receiver.slug })
         .then(res => {
             setPastMessages(res.data);
             setMessages([])
         })
         .catch(err => {
-            handleUnauthorizedResponse(err, router);
-            let error = !!err.response ? err.response.data?.message : err.message; 
+            let error = !!err.response ? err.response.data?.message : err.message;
             setSnackbarMessage(error);
             setSnackbarOpen(true);
         });
@@ -1346,16 +1344,14 @@ const fetchPastMessages = (receiver, setPastMessages,token,setMessages,router,se
 
 // Function to update chat users' online status
 const updateChatUsersStatus = (chatUsers, setChatUsers, token,router,setSnackbarMessage,setSnackbarOpen) => {
-    axios.defaults.headers = { Authorization: token };
     setChatUsers(prevUsers => prevUsers.map(chatUser => {
-        axios.get(`${host}/chat/status/${chatUser.slug}`)
+        apiRequest.get(`/chat/status/${chatUser.slug}`)
             .then(res => {
                 let user = res.data;
                 chatUser.isOnline = user.slug === chatUser.slug ? user.isOnline : false;
             })
             .catch(err => {
-                handleUnauthorizedResponse(err, router);
-                let error = !!err.response ? err.response.data?.message : err.message; 
+                let error = !!err.response ? err.response.data?.message : err.message;
                 setSnackbarMessage(error);
                 setSnackbarOpen(true);
             });

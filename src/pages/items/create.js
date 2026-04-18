@@ -23,6 +23,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "src/hooks/use-auth";
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { host } from "src/utils/util";
+import { apiRequest } from 'src/utils/api-request';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import MultipleImageInput from "src/sections/multipleImage-input";
@@ -70,10 +71,7 @@ const handleChange = useCallback(
 
   useEffect(() => {
     const getData = async () => {
-        axios.defaults.headers = {
-            Authorization: auth.token
-        }
-        await axios.get(host + "/wholesale/item/category")
+        await apiRequest.get("/wholesale/item/category")
             .then(res => {
                 const data = res.data;
                 setItemCategories(data)
@@ -93,10 +91,7 @@ const handleChange = useCallback(
 
 useEffect(() => {
   const getSubcategory = async () => {
-      axios.defaults.headers = {
-          Authorization: auth.token
-      }
-      await axios.get(host + "/wholesale/item/subcategory/"+values.category?.id)
+      await apiRequest.get("/wholesale/item/subcategory/"+values.category?.id)
           .then(res => {
               const data = res.data;
               setItemSubCategories(data)
@@ -136,11 +131,11 @@ useEffect(() => {
         newItemImages : newImages
       }
 
-    axios.defaults.headers = {
-        Authorization : auth.token,
-        "Content-Type" : "multipart/form-data"
-    }
-    axios.post(host+"/wholesale/item/add",item)
+    apiRequest.post("/wholesale/item/add",item, {
+        headers: {
+            "Content-Type" : "multipart/form-data"
+        }
+    })
     .then(res => {
       setMessage(res.data.message)
       setFlag("success")

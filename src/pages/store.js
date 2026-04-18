@@ -26,6 +26,7 @@
     import { BasicHeaders } from "src/sections/basic-header";
 import ImageInput from "src/sections/image-input";
     import { host, storeImage, suId } from "src/utils/util";
+    import { apiRequest } from 'src/utils/api-request';
 
 
 
@@ -62,10 +63,7 @@ import ImageInput from "src/sections/image-input";
     }  ,[store])
 
     useEffect(()=>{
-        axios.defaults.headers={
-            Authorization : auth.token
-        }
-        axios.get(host+"/wholesale/address/state")
+        apiRequest.get("/wholesale/address/state")
         .then(res=>{
           setStateList(res.data)
           let selectedState  = res.data.find(state=>state.id == store.address?.state?.id);
@@ -97,7 +95,7 @@ import ImageInput from "src/sections/image-input";
 
     useEffect(()=>{
       const getCity = async () => { 
-      axios.get(host+`/wholesale/address/city/${values.state?.id}`)
+      apiRequest.get(`/wholesale/address/city/${values.state?.id}`)
       .then(res=>{
           setCityList(res.data);
           let selectedCity = res.data.find(city=>city.id == store.address?.city?.id)
@@ -140,10 +138,7 @@ import ImageInput from "src/sections/image-input";
 
     useEffect(() => {
         const getData = async () => {
-            axios.defaults.headers = {
-                Authorization: auth.token
-            }
-            await axios.get(host + "/wholesale/store/category")
+            await apiRequest.get("/wholesale/store/category")
                 .then(res => {
                     const data = res.data;
                     setItemCategories(data)
@@ -161,10 +156,7 @@ import ImageInput from "src/sections/image-input";
     
     useEffect(() => {
       const getSubcategory = async () => {
-          axios.defaults.headers = {
-              Authorization: auth.token
-          }
-          await axios.get(host + "/wholesale/store/subcategory/"+values.category?.id)
+          await apiRequest.get("/wholesale/store/subcategory/"+values.category?.id)
               .then(res => {
                   const data = res.data;
                   setItemSubCategories(data)
@@ -216,11 +208,11 @@ import ImageInput from "src/sections/image-input";
             storePic : store.storePic
           }
 
-        axios.defaults.headers = {
-            Authorization : auth.token,
-            "Content-Type" : "multipart/form-data"
-        }
-        axios.post(host+"/wholesale/store/update",data)
+        apiRequest.post("/wholesale/store/update",data, {
+            headers: {
+                "Content-Type" : "multipart/form-data"
+            }
+        })
         .then(res => {
           setMessage(res.data.message)
           setFlag("success")

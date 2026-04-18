@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { useAuth } from 'src/hooks/use-auth'
 import HomeNavbar from 'src/sections/top-nav'
 import { host } from 'src/utils/util'
+import { apiRequest } from 'src/utils/api-request'
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 
 function Pricing() {
@@ -20,7 +21,7 @@ function Pricing() {
   const [selectedPlan, setSelectedPlan] = useState(null);
 
   useEffect(() => {
-    axios(host + "/wholesale/plan/all")
+    apiRequest.get("/wholesale/plan/all")
       .then(res => {
         setPlans(res.data)
       })
@@ -34,13 +35,9 @@ function Pricing() {
   }, [])
 
   const redirectForPayment = (slug, pg) => {
-    axios.defaults.headers = {
-      Authorization: auth.token
-    }
-
     const redirect = async () => {
       if (pg === "wallet") {
-        axios.get(host + "/wholesale/wallet/pay/" + slug)
+        apiRequest.get("/wholesale/wallet/pay/" + slug)
         .then(res => {
             setMessage(res.data.message)
             setFlag("success")
@@ -52,7 +49,7 @@ function Pricing() {
           setOpen(true)
         });
       } else if (pg === "phonepe") {
-            await axios.get(host + "/pg/pay/" + slug)
+            await apiRequest.get("/pg/pay/" + slug)
               .then(res => {
                 window.open(res.data.url);
               })

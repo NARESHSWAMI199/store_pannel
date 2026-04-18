@@ -8,6 +8,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useAuth } from 'src/hooks/use-auth';
 import { host, userImage, wbhost } from 'src/utils/util';
+import { apiRequest } from 'src/utils/api-request';
 
 import en from 'javascript-time-ago/locale/en';
 import ru from 'javascript-time-ago/locale/ru';
@@ -84,11 +85,8 @@ function Page() {
 
     useEffect(() => {
         if (slug == undefined || slug == null) return;
-        axios.defaults.headers = {
-            Authorization: auth.token,
-        };
-        axios
-            .get(host + `/wholesale/auth/detail/${slug}`)
+        apiRequest
+            .get(`/wholesale/auth/detail/${slug}`)
             .then((res) => {
                 let user = res.data?.user;
                 setReciver(user);
@@ -108,7 +106,7 @@ function Page() {
     }, [slug, auth.token]);
 
     const updateUserLastSeen = () => {
-        return axios.get(host+`/wholesale/auth/last-seen`)
+        return apiRequest.get(`/wholesale/auth/last-seen`)
         .then(res => res.data )
         .catch(err => {
             console.log(err.message)

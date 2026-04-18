@@ -7,6 +7,7 @@ import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { PaginationSettings } from 'src/sections/settings/pagination-settings';
 import { SettingsPassword } from 'src/sections/settings/settings-password';
 import { host } from 'src/utils/util';
+import { apiRequest } from 'src/utils/api-request';
 
 const Page = () => {
 
@@ -28,10 +29,7 @@ const Page = () => {
         password: password
       }
 
-      axios.defaults.headers = {
-        Authorization: auth.token
-      }
-      await axios.post(host + "/wholesale/auth/password", user)
+      await apiRequest.post("/wholesale/auth/password", user)
         .then(res => {
           setMessage(res.data.message)
           setFlag("success")
@@ -39,11 +37,6 @@ const Page = () => {
         }).catch(err => {
           setMessage(!!err.response ? err.response.data.message : err.message)
           setFlag("error")
-          let status = (!!err.response ? err.response.status : 0);
-          if (status == 401) {
-            auth.signOut();
-            router.push("/auth/login")
-          }
         })
       setOpen(true)
       return result

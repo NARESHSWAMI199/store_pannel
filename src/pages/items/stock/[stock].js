@@ -20,6 +20,7 @@ import { ReloadOutlined } from '@ant-design/icons';
 import { ArrowButtons } from 'src/layouts/arrow-button';
 import { ItemHeaders } from 'src/sections/items-header';
 import{ useRouter as useNextRouter } from 'next/router';
+import { apiRequest } from 'src/utils/api-request';
 
 const UseitemSlugs = (items) => {
     return useMemo(
@@ -85,10 +86,7 @@ const Page = () => {
 
     useEffect(() => {
         const getData = async () => {
-            axios.defaults.headers = {
-                Authorization: auth.token
-            }
-            await axios.post(host + "/wholesale/item/all", data)
+            await apiRequest.post("/wholesale/item/all", data)
                 .then(res => {
                     const data = res.data.content;
                     setTotalElements(res.data.totalElements)
@@ -98,11 +96,6 @@ const Page = () => {
                     setMessage(!!err.response ? err.response.data.message : err.message)
                     setFlag("error")
                     setOpen(true)
-                    let status = (!!err.response ? err.response.status : 0);
-                    if (status == 401) {
-                      auth.signOut();
-                      router.push("/auth/login")
-                    }
                 })
         }
         getData();
@@ -115,10 +108,7 @@ const Page = () => {
         let success = false
         let form = e.target;
         var formData = new FormData(form);
-        axios.defaults.headers = {
-            Authorization: auth.token
-        }
-        await axios.post(host + '/wholesale/item/importExcel/' + wholesale?.slug, formData, {
+        await apiRequest.post('/wholesale/item/importExcel/' + wholesale?.slug, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
@@ -144,10 +134,7 @@ const Page = () => {
  
 
     const onChangeInStock = (slug, inStock) => {
-        axios.defaults.headers = {
-            Authorization: auth.token
-        }
-        axios.post(host + `/wholesale/item/stock`, {
+        apiRequest.post(`/wholesale/item/stock`, {
             slug: slug,
             stock: inStock
         })
@@ -176,10 +163,7 @@ const Page = () => {
 
 
     const onDelete = (slug) => {
-        axios.defaults.headers = {
-            Authorization: auth.token
-        }
-        axios.post(host + `/wholesale/item/delete`,
+        apiRequest.post(`/wholesale/item/delete`,
             {
                 slug: slug
             }
