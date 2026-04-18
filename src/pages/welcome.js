@@ -7,6 +7,7 @@ import bg from 'public/assets/bg2.png';
 import HomeNavbar from 'src/sections/top-nav';
 import Typewriter from 'src/components/Typewriter';
 import { host } from 'src/utils/util';
+import { apiRequest } from 'src/utils/api-request';
 import { useAuth } from 'src/hooks/use-auth';
 import { useRouter } from 'next/navigation';
 
@@ -20,8 +21,8 @@ function Page() {
 
   // Fetch plans from the backend
   useEffect(() => {
-    axios
-      .get(`${host}/wholesale/plan/all`)
+    apiRequest
+      .get(`/wholesale/plan/all`)
       .then((res) => {
         setPlans(res.data); // Assuming the API returns an array of plans
       })
@@ -32,13 +33,9 @@ function Page() {
 
 
     const redirectForPayment = (slug, pg) => {
-      axios.defaults.headers = {
-        Authorization: auth.token
-      }
-  
       const redirect = async () => {
         if (pg === "phonepe") {
-          await axios.get(host + "/pg/pay/" + slug)
+          await apiRequest.get("/pg/pay/" + slug)
             .then(res => {
               window.open(res.data.url);
             })

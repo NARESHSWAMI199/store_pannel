@@ -5,6 +5,7 @@ import { useCallback, useState } from 'react';
 import { useAuth } from 'src/hooks/use-auth';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { host } from 'src/utils/util';
+import { apiRequest } from 'src/utils/api-request';
 import ImageInput from "src/sections/image-input";
 import Spinner from '../sections/spinner';
 import { Typography } from 'antd';
@@ -30,16 +31,16 @@ const Page = () => {
             let data = {
                 image : values.image
             }
-            axios.defaults.headers = {
-                Authorization: auth.token,
-                "Content-Type" : "multipart/form-data"
-            }
            setShowSpinner("block")
            setShowPerview(false)
-           await axios.post(host + "/removebg/", data)
+           await apiRequest.post("/removebg/", data, {
+               headers: {
+                   "Content-Type" : "multipart/form-data"
+               }
+           })
             .then(res => {
                 let requestImageUrl = res.data.downloadPath
-                axios.get(host+requestImageUrl, { responseType: 'blob' })
+                apiRequest.get(requestImageUrl, { responseType: 'blob' })
                 .then(response => {
                     setImageUrl(URL.createObjectURL(response.data))
                     setShowPerview(true)

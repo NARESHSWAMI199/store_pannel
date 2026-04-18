@@ -12,6 +12,7 @@ import { useAuth } from 'src/hooks/use-auth';
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { ItemReviews } from 'src/sections/items/item-reviews';
 import { host, itemImage, toTitleCase } from 'src/utils/util';
+import { apiRequest } from 'src/utils/api-request';
 import CommentIcon from '@mui/icons-material/Comment';
 import { useRouter } from 'next/router';
 
@@ -41,10 +42,7 @@ const Page = () => {
 
   useEffect(() => {
     const getData = async () => {
-        axios.defaults.headers = {
-            Authorization: auth.token
-        }
-        await axios.get(host + "/wholesale/item/detail/"+slug,)
+        await apiRequest.get("/wholesale/item/detail/"+slug,)
             .then(res => {
                 const result = res.data.res;
                 setItem(result)
@@ -64,10 +62,7 @@ const Page = () => {
 // Getting item reviews */
 useEffect( ()=>{
   const getData = async () => {
-     axios.defaults.headers = {
-       Authorization : auth.token
-     }
-     await axios.post(host+"/wholesale/item/review/all",{...data,itemId : item.id})
+     await apiRequest.post("/wholesale/item/review/all",{...data,itemId : item.id})
      .then(res => {
         const response = res.data;
          setItemReviews(response.content);

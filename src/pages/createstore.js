@@ -19,6 +19,7 @@ import { useAuth } from "src/hooks/use-auth";
 import ImageInput from "src/sections/image-input";
 import HomeNavbar from 'src/sections/top-nav';
 import { host } from "src/utils/util";
+import { apiRequest } from 'src/utils/api-request';
 
 const CreateStore = () => {
     const [open, setOpen] = useState(false)
@@ -45,10 +46,7 @@ const CreateStore = () => {
     },[])
 
     useEffect(()=>{
-        axios.defaults.headers={
-            Authorization : auth.token
-        }
-        axios.get(host+"/wholesale/address/state")
+        apiRequest.get("/wholesale/address/state")
         .then(res=>setStateList(res.data))
         .catch(err=>{
           console.log(err)
@@ -62,7 +60,7 @@ const CreateStore = () => {
 
     useEffect(() => {
         const getCity = async () => {
-            await axios.get(host + `/wholesale/address/city/${values.state?.id}`)
+            await apiRequest.get(`/wholesale/address/city/${values.state?.id}`)
                 .then(res => {
                     setCityList(res.data)
                     setValues((prevState) => ({ ...prevState, city: { label: '' } }))
@@ -83,10 +81,7 @@ const CreateStore = () => {
 
     useEffect(() => {
         const getData = async () => {
-            axios.defaults.headers = {
-                Authorization: auth.token
-            }
-            await axios.get(host + "/wholesale/store/category")
+            await apiRequest.get("/wholesale/store/category")
                 .then(res => {
                     const data = res.data;
                     setItemCategories(data)
@@ -104,10 +99,7 @@ const CreateStore = () => {
     
     useEffect(() => {
         const getSubcategory = async () => {
-            axios.defaults.headers = {
-                Authorization: auth.token
-            }
-            await axios.get(host + "/wholesale/store/subcategory/" + values.category?.id)
+            await apiRequest.get("/wholesale/store/subcategory/" + values.category?.id)
                 .then(res => {
                     const data = res.data;
                     setItemSubCategories(data)
@@ -158,11 +150,11 @@ const CreateStore = () => {
                 storePic: store.storePic
             };
 
-            axios.defaults.headers = {
-                Authorization: auth.token,
-                "Content-Type": "multipart/form-data"
-            };
-            axios.post(host + "/wholesale/store/add", data)
+            apiRequest.post("/wholesale/store/add", data, {
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                }
+            })
                 .then(res => {
                     setMessage(res.data.message);
                     setFlag("success");
