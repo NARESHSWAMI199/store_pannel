@@ -27,6 +27,7 @@ import { useAuth } from "src/hooks/use-auth";
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import MultipleImageInput from "src/sections/multipleImage-input";
 import { host, itemImage } from "src/utils/util";
+import { apiRequest } from "src/utils/api-request";
 
 
 const CreateItem = () => {
@@ -46,10 +47,7 @@ const CreateItem = () => {
 
     useEffect(() => {
         const getData = async () => {
-            axios.defaults.headers = {
-                Authorization: auth.token
-            }
-            await axios.get(host + "/wholesale/item/detail/"+slug,)
+            await apiRequest.get("/wholesale/item/detail/"+slug,)
                 .then(res => {
                     const data = res.data.res;
                     setValues({
@@ -84,10 +82,7 @@ const CreateItem = () => {
 
     useEffect(() => {
         const getData = async () => {
-            axios.defaults.headers = {
-                Authorization: auth.token
-            }
-            await axios.get(host + "/wholesale/item/category")
+            await apiRequest.get("/wholesale/item/category")
                 .then(res => {
                     const data = res.data;
                     setItemCategories(data)
@@ -108,10 +103,7 @@ const CreateItem = () => {
 
     useEffect(() => {
         const getSubcategory = async () => {
-            axios.defaults.headers = {
-                Authorization: auth.token
-            }
-            await axios.get(host + "/wholesale/item/subcategory/"+values.category.id)
+            await apiRequest.get("/wholesale/item/subcategory/"+values.category.id)
                 .then(res => {
                     const data = res.data;
                     let selectedSubcategory = data.find(subcategory => subcategory?.id == values?.subcategory?.id)
@@ -164,11 +156,11 @@ const CreateItem = () => {
                 newItemImages : newImages
             }
 
-            axios.defaults.headers = {
-                Authorization: auth.token,
-                "Content-Type" : "multipart/form-data"
-            }
-            axios.post(host + "/wholesale/item/update", item)
+            apiRequest.post("/wholesale/item/update", item, {
+                headers: {
+                    "Content-Type" : "multipart/form-data"
+                }
+            })
                 .then(res => {
                     setMessage(res.data.message)
                     setFlag("success")
