@@ -26,6 +26,7 @@ import DrawerRight from 'src/sections/drawer';
 import { AccountBalanceOutlined, AccountBalanceWalletSharp, WalletOutlined, WalletSharp, WalletTwoTone } from '@mui/icons-material';
 import Link from 'next/link';
 import { fontSize } from '@mui/system';
+import { apiRequest } from 'src/utils/api-request';
 
 const SIDE_NAV_WIDTH = 280;
 const TOP_NAV_HEIGHT = 64;
@@ -48,10 +49,7 @@ export const TopNav = (props) => {
 
   useEffect(() => {
     const getData = async () => {
-        axios.defaults.headers = {
-            Authorization: auth.token
-        }
-        await axios.post(host + "/wholesale/store/notifications", data)
+        await apiRequest.post("/wholesale/store/notifications", data)
             .then(res => {
                 const data = res.data.content;
 
@@ -78,10 +76,7 @@ export const TopNav = (props) => {
 
 useEffect(() => {
   const getData = async () => {
-    axios.defaults.headers = {
-        Authorization: auth.token
-    }
-    await axios.get(host + "/wholesale/wallet/", )
+    await apiRequest.get("/wholesale/wallet/")
     .then(res => {
         const data = res.data;
         setWallet(data);
@@ -98,10 +93,7 @@ const onClose = ()=>{
 const showLoading = () => {
     setOpen(open ? false : true)
       let data = {seenIds : seenIds }
-      axios.defaults.headers = {
-          Authorization: auth.token
-      }
-       axios.post(host + "/wholesale/store/update/notifications", data)
+       apiRequest.post("/wholesale/store/update/notifications", data)
           .then(res => {
               const data = res.data;
               setTotalElements((0))

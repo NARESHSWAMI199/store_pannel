@@ -9,6 +9,7 @@ import { useState } from "react"
 import { useAuth } from "src/hooks/use-auth"
 import DialogFormForExcelImport from "src/layouts/excel/import-excel"
 import { host, projectName } from "src/utils/util"
+import { apiRequest } from "src/utils/api-request"
 
 const exp = require("constants")
 
@@ -27,10 +28,7 @@ export function ItemHeaders(props){
     // Import excel sheet
     const importItemExcelSheet = async (formData) => {
         let success = false;
-        axios.defaults.headers = {
-          Authorization: auth.token
-        };
-        await axios.post(host + '/wholesale/item/importExcel', formData,{
+        await apiRequest.post('/wholesale/item/importExcel', formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
@@ -76,12 +74,8 @@ export function ItemHeaders(props){
         if (!confirmDownload) {
             return;
         }
-
-        axios.defaults.headers = {
-            Authorization: auth.token
-        }
         
-        await axios.post(host + '/wholesale/item/exportExcel', !!props.searchFilters ? {...props.searchFilters} : undefined, { responseType: 'blob' })
+        await apiRequest.post('/wholesale/item/exportExcel', !!props.searchFilters ? {...props.searchFilters} : undefined, { responseType: 'blob' })
             .then(response => {
                 const url = window.URL.createObjectURL(new Blob([response.data], 
                     { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));

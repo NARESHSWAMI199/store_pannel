@@ -4,6 +4,7 @@ import axios from 'axios';
 import { host } from 'src/utils/util';
 import { Box } from '@mui/material';
 import ReactTimeAgo from 'react-time-ago';
+import { apiRequest } from 'src/utils/api-request';
 
 function UserStatus({receiver,client}) {
 
@@ -13,10 +14,7 @@ function UserStatus({receiver,client}) {
 
     // Only called when receiver changed.
     useEffect(() => {
-        axios.defaults.headers = {
-            Authorization : auth.token
-        }
-        axios.get(`${host}/chat/status/${receiver.slug}`)
+        apiRequest.get(`/chat/status/${receiver.slug}`)
         .then(res => {
             let user = res.data;
             setOnline(user.slug == receiver.slug ? user.isOnline : false)

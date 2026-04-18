@@ -5,15 +5,13 @@ import { Box, Button, Stack, Avatar } from '@mui/material';
 import { host, toTitleCase } from 'src/utils/util';
 import axios from 'axios';
 import { useAuth } from 'src/hooks/use-auth';
+import { apiRequest } from 'src/utils/api-request';
 
 const Accept = (props) => {
     const auth = useAuth();
 
     const handleAppceptOrDecline = (status) => {
-        axios.defaults.headers = {
-            Authorization: auth.token
-        };
-        axios.post(host + "/chat-users/accept", {
+        apiRequest.post("/chat-users/accept", {
             receiverSlug: receiver.slug,
             status: status
         })

@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useReducer, useRef } from 'react'
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import { host } from 'src/utils/util';
+import { apiRequest } from 'src/utils/api-request';
 
 const HANDLERS = {
   INITIALIZE: 'INITIALIZE',
@@ -218,10 +219,7 @@ export const AuthProvider = (props) => {
   };
 
     const updateUserDetail = async () => {
-      axios.defaults.headers = {
-        Authorization : authToken()
-      }
-      await axios.get(host+"/wholesale/auth/detail")
+      await apiRequest.get("/wholesale/auth/detail")
       .then (res => {
         const user = res.data.user
         const store = res.data.store

@@ -11,6 +11,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useAuth } from 'src/hooks/use-auth';
 import { host } from 'src/utils/util';
+import { apiRequest } from 'src/utils/api-request';
 
 const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth, user, darkMode ,setContactUsers,setChatUsers,setSnackbarMessage,setSnackbarOpen,onReceiverDeleted}) => {
     const [openDialog, setOpenDialog] = useState(false);
@@ -28,8 +29,7 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
     }, [contacts]);
 
     const searchUsers = () =>{
-        axios.defaults.headers = { Authorization: auth?.token };  
-        axios.post(`${host}/wholesale/auth/chat/users`,{
+        apiRequest.post(`/wholesale/auth/chat/users`,{
             searchKey : searchQuery
         })
         .then(response => {
@@ -50,7 +50,7 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
     };
 
     const handleAddContact = (contact) => {
-        axios.post(`${host}/contacts/add`, { contactSlug: contact.slug })
+        apiRequest.post(`/contacts/add`, { contactSlug: contact.slug })
             .then(async (response) => {
                 console.log('Contact added successfully:', response.data);
                 let newContact = response.data?.contact;
@@ -74,7 +74,7 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
 
 
     const confirmRemoveChatUser = () => {
-        axios.post(`${host}/chat-users/remove`, { 
+        apiRequest.post(`/chat-users/remove`, { 
             contactSlug: selectedContact.slug, 
             deleteChats: deleteChats 
         })
@@ -94,7 +94,7 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
     };
 
     const confirmRemoveContact = () => {
-        axios.post(`${host}/contacts/remove`, { 
+        apiRequest.post(`/contacts/remove`, { 
             contactSlug: selectedContact.slug, 
             deleteChats: deleteChats 
         })
@@ -384,8 +384,7 @@ const Contacts = ({ contacts, activeTab, setActiveTab, setReceiver, menuDivWidth
 };
 
 const isSenderAccepted = async (receiver,token) => {
-    axios.defaults.headers = { Authorization: token };  
-    return await axios.get(`${host}/chat-users/is-accepted/${receiver.slug}`)
+    return await apiRequest.get(`/chat-users/is-accepted/${receiver.slug}`)
     .then(res => {
         receiver.accepted = res.data;
         return receiver
@@ -399,8 +398,7 @@ const isSenderAccepted = async (receiver,token) => {
 
 
 const isReceiverBlocked = async (receiver,token) => {
-    axios.defaults.headers = { Authorization: token };  
-    return await axios.get(`${host}/is-blocked/${receiver.slug}`)
+    return await apiRequest.get(`/is-blocked/${receiver.slug}`)
     .then(res => {
         receiver.blocked = res.data;
         return receiver

@@ -7,6 +7,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import Accept from 'src/components/Accept'
 import axios from 'axios';
 import { useAuth } from 'src/hooks/use-auth';
+import { apiRequest } from 'src/utils/api-request';
 import { tr } from 'date-fns/locale';
 
 const Chats = (props) => {
@@ -24,10 +25,7 @@ const Chats = (props) => {
     
     useEffect(() => {
 
-        axios.defaults.headers = {
-            Authorization: auth.token
-        };
-        axios.get(`${host}/chat-users/is-accepted/${props.receiver?.slug}`)
+        apiRequest.get(`/chat-users/is-accepted/${props.receiver?.slug}`)
         .then(res => {
             let response = res.data;
             setAccepted(response);
@@ -62,7 +60,7 @@ const Chats = (props) => {
     const handleBlockUser = async (receiver) => {
         if(!receiver) return; // Check if receiver is defined
         try {
-            axios.get(host+`/block/${receiver?.slug}`)
+            apiRequest.get(`/block/${receiver?.slug}`)
             .then(res => {
                 let response = res.data;
                 console.log(`User ${receiver?.username} has been blocked.`, response);
@@ -79,7 +77,7 @@ const Chats = (props) => {
     // Function to unblock the user
     const handleUnblockUser = async () => { 
         try {
-            axios.get(host+`/unblock/${receiver?.slug}`)
+            apiRequest.get(`/unblock/${receiver?.slug}`)
             .then(res => {
                 let response = res.data;
                 console.log(`User ${receiver?.username} has been unblocked.`, response);
