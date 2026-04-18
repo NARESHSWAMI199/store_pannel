@@ -19,6 +19,7 @@ import { format } from 'date-fns';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth } from 'src/hooks/use-auth';
 import { defaultChatImage, host, userImage, wbhost } from 'src/utils/util';
+import { apiRequest } from 'src/utils/api-request';
 
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import SearchIcon from '@mui/icons-material/Search';
@@ -55,13 +56,11 @@ TimeAgo.addLocale(ru);
 // Helper function to fetch username by slug
 const fetchUserBySlug = async (slug, token) => {
     try {
-        const response = await axios.get(`${host}/wholesale/auth/detail/${slug}`, {
-            headers: { Authorization: token }
-        });
+        const response = await apiRequest.get(`/wholesale/auth/detail/${slug}`);
         return response.data.user
     } catch (error) {
         console.error('Error fetching username:', error);
-        let err = !!err.response ? err.response.data?.message : err.message; 
+        let err = !!error.response ? error.response.data?.message : error.message;
         setSnackbarMessage(error);
         setSnackbarOpen(true);
         return null;
@@ -424,9 +423,7 @@ function Page() {
             delete deleteParams.images;
         }
 
-        await axios.post(`${host}/chat/delete`, deleteParams, {
-            headers: { Authorization: auth.token }
-        }).then(res => {
+        await apiRequest.post(`/chat/delete`, deleteParams).then(res => {
             if (selectedMessage?.isSenderDeleted === 'H' || selectedMessage?.isReceiverDeleted === 'H') {
                 setMessages(prevMessages => prevMessages.filter(message => message.id !== selectedMessage.id));
                 setPastMessages(prevPastMessages => {
@@ -1368,15 +1365,13 @@ const updateChatUsersStatus = (chatUsers, setChatUsers, token,router,setSnackbar
 
 // Function to fetch contact users
 const fetchContactUsers = (setContactUsers, token,router,setSnackbarMessage,setSnackbarOpen) => {
-    axios.defaults.headers = { Authorization: token };
-    axios.get(`${host}/contacts/all`)
+    apiRequest.get(`/contacts/all`)
         .then(res => {
             setContactUsers(res.data);
         })
         .catch(err => {
             console.log(err)
-            handleUnauthorizedResponse(err, router);
-            let error = !!err.response ? err.response.data?.message : err.message; 
+            let error = !!err.response ? err.response.data?.message : err.message;
             setSnackbarMessage(error);
             setSnackbarOpen(true);
         });
@@ -1384,15 +1379,13 @@ const fetchContactUsers = (setContactUsers, token,router,setSnackbarMessage,setS
 
 // Function to fetch chat users
 const fetchChatUsers = (setChatUsers, token,router,setSnackbarMessage,setSnackbarOpen) => {
-    axios.defaults.headers = { Authorization: token };
-    axios.get(`${host}/chat-users/all`)
+    apiRequest.get(`/chat-users/all`)
         .then(res => {
             let response = res.data;
             setChatUsers(response)
         })
         .catch(err => {
-            handleUnauthorizedResponse(err, router);
-            let error = !!err.response ? err.response.data?.message : err.message;  
+            let error = !!err.response ? err.response.data?.message : err.message;
             setSnackbarMessage(error);
             setSnackbarOpen(true);
         });
@@ -1400,8 +1393,7 @@ const fetchChatUsers = (setChatUsers, token,router,setSnackbarMessage,setSnackba
 
 // Function to update seen messages
 const updateSeenMessages = (receiver, setChatUsers, setContactUsers,token, router,setSnackbarMessage,setSnackbarOpen) => {
-    axios.defaults.headers = { Authorization: token };
-    axios.post(`${host}/chat/seen`, { sender: receiver?.slug })
+    apiRequest.post(`/chat/seen`, { sender: receiver?.slug })
         .then(res => {
             // Update chat users' seen status
             setChatUsers(prevChatUsers => prevChatUsers.map(chatUser => {
@@ -1420,8 +1412,7 @@ const updateSeenMessages = (receiver, setChatUsers, setContactUsers,token, route
             }));
         })
         .catch(err => {
-            handleUnauthorizedResponse(err, router);
-            let error = !!err.response ? err.response.data?.message : err.message; 
+            let error = !!err.response ? err.response.data?.message : err.message;
             setSnackbarMessage(error);
             setSnackbarOpen(true);
         });
@@ -1456,15 +1447,13 @@ const sendMessage = (client,token,messageBody,receiver,setSnackbarMessage,setSna
         if (client.connected) {
             if (messageBody?.images?.length > 0) {
                 console.log(token ," :  token ")
-                axios.defaults.headers = {
-                    Authorization : token,
-                    "Content-Type" : "multipart/form-data"
-                }
-                axios.post(`${host}/chat/upload`,messageBody).then(response => {
+                apiRequest.post(`/chat/upload`, messageBody, {
+                    headers: { "Content-Type": "multipart/form-data" }
+                }).then(response => {
                     console.log('Images sent successfully');
                 }).catch(err => {
                     console.error('Error sending images:', err);
-                    let error = !!err.response ? err.response.data?.message : err.message; 
+                    let error = !!err.response ? err.response.data?.message : err.message;
                     setSnackbarMessage(error);
                     setSnackbarOpen(true);
                 });
@@ -1479,10 +1468,10 @@ const sendMessage = (client,token,messageBody,receiver,setSnackbarMessage,setSna
 
 // Function to update user's last seen
 const updateUserLastSeen = async () => {
-    return axios.get(`${host}/wholesale/auth/last-seen`)
+    return apiRequest.get(`/wholesale/auth/last-seen`)
         .then(res => res.data)
         .catch(err => {
-            let error = !!err.response ? err.response.data?.message : err.message; 
+            let error = !!err.response ? err.response.data?.message : err.message;
             setSnackbarMessage(error);
             setSnackbarOpen(true);
         });
@@ -1503,14 +1492,13 @@ const showNotification = async (message,token) => {
 
 
 const getParentMessage = async (message,token) => {
-    axios.defaults.headers = { Authorization: token };  
-    let parentId =  await axios.post(`${host}/chats/parentId`,message)
+    let parentId =  await apiRequest.post(`/chats/parentId`, message)
     .then(res => {
         return res.data;
     })
     .catch(err => {
         console.log(err.message)
         return null;
-    })  
+    })
     return parentId;
 }

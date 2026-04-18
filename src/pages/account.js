@@ -3,11 +3,11 @@ import { Box, Container, Stack, Typography, Unstable_Grid2 as Grid, Snackbar, Al
 import { Layout as DashboardLayout } from 'src/layouts/dashboard/layout';
 import { AccountProfile } from 'src/sections/account/account-profile';
 import { AccountProfileDetails } from 'src/sections/account/account-profile-details';
-import axios from 'axios';
 import { useAuth } from 'src/hooks/use-auth';
 import { host } from 'src/utils/util';
 import { useRouter } from 'next/navigation';
 import { useCallback, useState } from 'react';
+import { apiRequest } from 'src/utils/api-request';
 
 const Page = () => { 
 
@@ -26,14 +26,11 @@ const Page = () => {
     const router = useRouter();
 
     const updateProfile = async (updatedUser) =>{
-        axios.defaults.headers = {
-          Authorization : auth.token
-        }
         const data = {
           ...user,
           ...updatedUser
         }
-        await axios.post(host+"/wholesale/auth/update",data)
+        await apiRequest.post("/wholesale/auth/update", data)
         .then(res => {
           setMessage(res.data.message)
           setFlag("success")
@@ -48,11 +45,6 @@ const Page = () => {
           setFlag('error')
           setMessage(!!err.response ? err.response.data.message : err.message)
           console.log(err.message)
-          let status = (!!err.response ? err.response.status : 0);
-          if (status == 401) {
-            auth.signOut();
-            router.push("/auth/login")
-          }
         })
         setOpen(true)
     }

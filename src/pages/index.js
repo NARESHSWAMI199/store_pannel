@@ -7,13 +7,13 @@ import { OverviewLatestItems } from 'src/sections/overview/overview-latest-items
 import { OverviewItems } from 'src/sections/overview/overview-sales';
 import { OverviewTraffic } from 'src/sections/overview/overview-traffic';
 import { use, useCallback, useEffect, useState } from 'react';
-import axios from 'axios';
 import { useAuth } from 'src/hooks/use-auth';
 import { host, suId } from 'src/utils/util';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { StockTraffic } from 'src/sections/overview/stock-traffic';
 import Link from 'next/link';
 import CongratulationDialog from 'src/components/CongratulationCard';
+import { apiRequest } from 'src/utils/api-request';
 
 
 const Page = (props) =>  {
@@ -41,10 +41,7 @@ const [activePlan , setActivePlan] = useState(null);
 
 useEffect(() => {
   if (!!congratulation) {
-    axios.defaults.headers = {
-      Authorization: auth.token
-    };
-    axios.get(`${host}/wholesale/plan/detail/${congratulation}`)
+    apiRequest.get(`/wholesale/plan/detail/${congratulation}`)
       .then(res => {
         const plan = res.data;
       if (plan) {
@@ -62,10 +59,7 @@ useEffect(() => {
 
 
 useEffect(() => {
-  axios.defaults.headers = {
-    Authorization: auth.token
-  };
-  axios.get(host + "/wholesale/plan/is-active")
+  apiRequest.get("/wholesale/plan/is-active")
     .then(res => {
       let planIsActive = res.data.planIsActive;
       if (planIsActive) {
@@ -81,10 +75,7 @@ useEffect(() => {
 // Getting All Stores 
 useEffect(() => {
   const getData = async () => {
-    axios.defaults.headers = {
-      Authorization: auth.token
-    };
-    await axios.post(host + "/wholesale/item/all", { storeId: auth.store?.id })
+    await apiRequest.post("/wholesale/item/all", { storeId: auth.store?.id })
       .then(res => {
         const data = res.data.content;
         setItems(data);
@@ -100,10 +91,7 @@ useEffect(() => {
 
   // Get current year store count
   useEffect(() => {
-      axios.defaults.headers = {
-        Authorization: auth.token
-      }
-        axios.post(host + "/wholesale/dashboard/graph/months/", {
+      apiRequest.post("/wholesale/dashboard/graph/months/", {
           "year": currentYear
         })
         .then(res => {
@@ -117,20 +105,12 @@ useEffect(() => {
         })
         .catch(err => {
           console.log(err)
-          let status = (!!err.response ? err.response.status : 0);
-          if (status == 401) {
-            auth.signOut();
-            router.push("/auth/login")
-          }
         })
     }, [])
 
   // Get store count of last year
   useEffect(() => {
-    axios.defaults.headers = {
-      Authorization: auth.token
-    }
-    axios.post(host + "/wholesale/dashboard/graph/months/", {
+    apiRequest.post("/wholesale/dashboard/graph/months/", {
       "year": currentYear-1
     })
       .then(res => {
@@ -150,10 +130,7 @@ useEffect(() => {
 // Get all basics counts 
   useEffect(() => {
     const getData = async () => {
-      axios.defaults.headers = {
-        Authorization: auth.token
-      };
-      await axios.get(host + "/wholesale/dashboard/counts")
+      await apiRequest.get("/wholesale/dashboard/counts")
         .then(res => {
           const data = res.data;
           setDashboardData(data);

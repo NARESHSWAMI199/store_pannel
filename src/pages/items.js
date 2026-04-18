@@ -1,7 +1,6 @@
 import ArrowDownOnSquareIcon from '@heroicons/react/24/solid/ArrowDownOnSquareIcon';
 import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
 import { Alert, Box, Button, Container, Snackbar, Stack, SvgIcon } from '@mui/material';
-import axios from 'axios';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -14,6 +13,7 @@ import { BasicSearch } from 'src/sections/basic-search';
 import { ItemsTable } from 'src/sections/wholesale/wholesale-table';
 import { host, rowsPerPageOptions, toTitleCase } from 'src/utils/util';
 import { ItemHeaders } from 'src/sections/items-header';
+import { apiRequest } from 'src/utils/api-request';
 
 const UseitemSlugs = (items) => {
     return useMemo(
@@ -60,10 +60,7 @@ const Page = () => {
 
     useEffect(() => {
         const getData = async () => {
-            axios.defaults.headers = {
-                Authorization: auth.token
-            }
-            await axios.post(host + "/wholesale/item/all", data)
+            await apiRequest.post("/wholesale/item/all", data)
                 .then(res => {
                     const data = res.data.content;
                     setTotalElements(res.data.totalElements)
@@ -73,11 +70,6 @@ const Page = () => {
                     setMessage(!!err.response ? err.response.data.message : err.message)
                     setFlag("error")
                     setOpen(true)
-                    let status = (!!err.response ? err.response.status : 0);
-                    if (status == 401) {
-                      auth.signOut();
-                      router.push("/auth/login")
-                    }
                 })
         }
         getData();
@@ -90,10 +82,7 @@ const Page = () => {
         let success = false
         let form = e.target;
         var formData = new FormData(form);
-        axios.defaults.headers = {
-            Authorization: auth.token
-        }
-        await axios.post(host + '/wholesale/item/importExcel/' + wholesale?.slug, formData, {
+        await apiRequest.post('/wholesale/item/importExcel/' + wholesale?.slug, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
@@ -117,10 +106,7 @@ const Page = () => {
 
 
     const onChangeInStock = (slug, inStock) => {
-        axios.defaults.headers = {
-            Authorization: auth.token
-        }
-        axios.post(host + `/wholesale/item/stock`, {
+        apiRequest.post(`/wholesale/item/stock`, {
             slug: slug,
             stock: inStock
         })
@@ -149,10 +135,7 @@ const Page = () => {
 
 
     const onDelete = (slug) => {
-        axios.defaults.headers = {
-            Authorization: auth.token
-        }  
-        axios.post(host + `/wholesale/item/delete`,
+        apiRequest.post(`/wholesale/item/delete`,
             {
                 slug: slug
             }
